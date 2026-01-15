@@ -283,7 +283,7 @@ export default function ProfilePage() {
     });
   };
 
-  const handleSidebarClick = (id: SidebarKey) => {
+  const handleSidebarClick = (id: string) => {
     if (id === "logout") {
       logoutMutation();
       return;
@@ -297,7 +297,7 @@ export default function ProfilePage() {
     if (id === "viewed") {
       refetchViewed();
     }
-    setActiveTab(id);
+    setActiveTab(id as SidebarKey);
   };
 
   const renderSummary = () => (

@@ -8,15 +8,16 @@ import {
 } from "../../../graphql/products/server";
 
 type PageProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function ProductDetailPage({ params }: PageProps) {
+  const { id } = await params;
   if (isBuildMode()) {
-    return <ProductDetailPageClient initialProductId={params.id} />;
+    return <ProductDetailPageClient initialProductId={id} />;
   }
 
-  const productId = params.id;
+  const productId = id;
 
   const [detailResult, similaritiesResult, averageResult, reviewsResult] =
     await Promise.all([

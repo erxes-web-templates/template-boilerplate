@@ -30,6 +30,14 @@ import { ArrowLeft, ExternalLink, RefreshCw } from "lucide-react";
 const formatCurrency = (value: number) =>
   `₮${Math.round(value).toLocaleString()}`;
 
+interface PaymentOption {
+  _id: string;
+  name: string;
+  status: string;
+  kind: string;
+  config?: any;
+}
+
 const PaymentPage = () => {
   const router = useRouter();
   const { toast } = useToast();
@@ -283,7 +291,7 @@ const PaymentPage = () => {
                 onValueChange={(value) => setSelectedPaymentId(value)}
                 className="space-y-3"
               >
-                {paymentOptions.map((option) => {
+                {paymentOptions.map((option: PaymentOption) => {
                   const checked = option._id === selectedPaymentId;
                   const config =
                     (option.config as {

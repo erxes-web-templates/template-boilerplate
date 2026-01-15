@@ -114,7 +114,7 @@ const ProductsSection = ({ section }: { section: Section }) => {
 
         <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
           {(loading ? Array.from({ length: limit || 3 }) : products).map(
-            (product: ProductSummary, index) => {
+            (product: ProductSummary, index: number) => {
               if (loading) {
                 return (
                   <Card key={`placeholder-${index}`} className="animate-pulse">

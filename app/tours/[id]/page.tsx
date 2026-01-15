@@ -15,15 +15,16 @@ import {
 } from "../../../components/ui/accordion";
 
 type PageProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function TourDetailPage({ params }: PageProps) {
+  const { id } = await params;
   if (isBuildMode()) {
-    return <TourDetailPageClient initialTourId={params.id} />;
+    return <TourDetailPageClient initialTourId={id} />;
   }
 
-  const tour = await fetchBmTourDetail(params.id);
+  const tour = await fetchBmTourDetail(id);
   const groupTours = await fetchBmToursGroup(1, 100);
 
   if (!tour) {

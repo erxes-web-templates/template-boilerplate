@@ -388,7 +388,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
               orderItemId: item._id ?? undefined,
             };
           })
-          .filter((entry): entry is CartItem => Boolean(entry))
+          .filter((entry: CartItem | null): entry is CartItem => Boolean(entry))
       );
 
       if (localCartRaw.length > 0) {

@@ -5,15 +5,16 @@ import { fetchCmsPost } from "../../../lib/fetchCms";
 import { getFileUrl } from "../../../lib/utils";
 
 type PageProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function PostDetailPage({ params }: PageProps) {
+  const { id } = await params;
   if (isBuildMode()) {
-    return <BlogPostPageClient initialPostId={params.id} />;
+    return <BlogPostPageClient initialPostId={id} />;
   }
 
-  const post = await fetchCmsPost({ id: params.id });
+  const post = await fetchCmsPost({ id });
 
   if (!post) {
     return <div className="container mx-auto p-4">Post not found.</div>;

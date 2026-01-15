@@ -26,7 +26,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCart } from "../../lib/CartContext";
 import { useProductsQuery } from "../../graphql/products";
@@ -346,16 +353,18 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
               className="flex w-full max-w-sm flex-col gap-4 p-6 sm:max-w-md"
             >
               <div className="flex items-start justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold">Your cart</h2>
-                  <p className="text-sm text-muted-foreground">
+                <SheetHeader className="space-y-1 text-left">
+                  <SheetTitle className="text-lg font-semibold">
+                    Your cart
+                  </SheetTitle>
+                  <SheetDescription className="text-sm text-muted-foreground">
                     {hasItems
                       ? `${totalItems} item${
                           totalItems === 1 ? "" : "s"
                         } ready to checkout.`
                       : "You have no items in your cart yet."}
-                  </p>
-                </div>
+                  </SheetDescription>
+                </SheetHeader>
                 {hasItems && (
                   <Badge variant="outline">{totalItems} items</Badge>
                 )}

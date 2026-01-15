@@ -96,13 +96,14 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
         schema = z.string().min(5, "Invalid phone number");
       } else if (field.validation === "date") {
         schema = z.date({
-          required_error: `${field.text} is required`,
-          invalid_type_error: "Please select a valid date",
+          error: `${field.text} is required`,
+
+          // invalid_type_error: "Please select a valid date",
         });
       } else if (field.validation === "datetime") {
         schema = z.date({
-          required_error: `${field.text} is required`,
-          invalid_type_error: "Please select a valid date and time",
+          error: `${field.text} is required`,
+          // invalid_type_error: "Please select a valid date and time",
         });
       } else {
         // Default string validation
@@ -564,6 +565,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                           </FormLabel>
                           {description && (
                             <FormDescription>
+                              {" "}
                               <span
                                 dangerouslySetInnerHTML={{
                                   __html: description,
