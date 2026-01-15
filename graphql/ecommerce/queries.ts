@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 const productreviews = gql`
   query productreviews(
@@ -24,8 +24,8 @@ const productreviews = gql`
 `;
 
 const wishlist = gql`
-  query Wishlist($customerId: String, $page: Int, $perPage: Int) {
-    wishlist(customerId: $customerId, page: $page, perPage: $perPage) {
+  query Wishlist($customerId: String) {
+    wishlist(customerId: $customerId) {
       _id
       customerId
       product {
@@ -33,7 +33,7 @@ const wishlist = gql`
         name
         description
         unitPrice
-        remainder
+
         attachment {
           url
         }

@@ -16,7 +16,7 @@ import {
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Button } from "../../../components/ui/button";
-import { useToast } from "../../../hooks/use-toast";
+import { toast } from "sonner";
 import { templateUrl } from "../../../lib/utils";
 
 const resolveClientPortalId = (
@@ -38,10 +38,9 @@ export default function RegisterPage() {
   const router = useRouter();
   const params = useParams<{ id?: string }>();
   const searchParams = useSearchParams();
-  const { toast } = useToast();
 
   const clientPortalId = resolveClientPortalId(
-    params?.id,
+    process.env.ERXES_CP_ID || params?.id,
     searchParams?.get("clientPortalId")
   );
 
@@ -56,18 +55,15 @@ export default function RegisterPage() {
 
   const [registerMutation, { loading }] = useMutation(mutations.createUser, {
     onError(error) {
-      toast({
-        title: "Registration failed",
+      toast("Registration failed", {
         description: error.message,
-        variant: "destructive",
       });
     },
     onCompleted() {
-      toast({
-        title: "Account created",
+      toast("Account created", {
         description: "You can now log in with your new credentials.",
       });
-      router.push(templateUrl("/login"));
+      router.push(templateUrl("/auth/login"));
     },
   });
 
@@ -75,11 +71,9 @@ export default function RegisterPage() {
     event.preventDefault();
 
     if (!clientPortalId) {
-      toast({
-        title: "Client portal not configured",
+      toast("Client portal not configured", {
         description:
           "Missing client portal identifier. Please contact support.",
-        variant: "destructive",
       });
       return;
     }
@@ -193,7 +187,7 @@ export default function RegisterPage() {
         <CardFooter className="justify-center text-sm text-muted-foreground">
           <span>Already have an account?</span>
           <Link
-            href={templateUrl("/login")}
+            href={templateUrl("/auth/login")}
             className="ml-1 font-medium text-primary hover:underline"
           >
             Sign in

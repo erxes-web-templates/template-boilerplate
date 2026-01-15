@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+
 type SidebarItem = {
   id: string;
   label: string;

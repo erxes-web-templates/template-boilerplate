@@ -16,7 +16,7 @@ import {
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Button } from "../../../components/ui/button";
-import { useToast } from "../../../hooks/use-toast";
+import { toast } from "sonner";
 import { templateUrl } from "../../../lib/utils";
 
 type LoginResponse =
@@ -66,10 +66,9 @@ export default function LoginPage() {
   const router = useRouter();
   const params = useParams<{ id?: string }>();
   const searchParams = useSearchParams();
-  const { toast } = useToast();
 
   const clientPortalId = resolveClientPortalId(
-    params?.id,
+    process.env.ERXES_CP_ID || params?.id,
     searchParams?.get("clientPortalId")
   );
 
@@ -80,31 +79,26 @@ export default function LoginPage() {
 
   const [loginMutation, { loading }] = useMutation(mutations.login, {
     onError(error) {
-      toast({
-        title: "Login failed",
+      toast("Login failed", {
         description: error.message,
-        variant: "destructive",
       });
     },
     onCompleted(data) {
       storeTokens(data?.clientPortalLogin);
-      toast({
-        title: "Signed in",
-        description: "You are now logged in.",
+      toast("Login successful", {
+        description: "You have been logged in successfully.",
       });
       router.push(templateUrl("/"));
     },
   });
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    console.log("xd");
     event.preventDefault();
 
     if (!clientPortalId) {
-      toast({
-        title: "Client portal not configured",
-        description:
-          "Missing client portal identifier. Please contact support.",
-        variant: "destructive",
+      toast("Client portal not configured", {
+        description: "Please contact the administrator.",
       });
       return;
     }
@@ -169,7 +163,7 @@ export default function LoginPage() {
         <CardFooter className="justify-center text-sm text-muted-foreground">
           <span>Don&apos;t have an account?</span>
           <Link
-            href={templateUrl("/register")}
+            href={templateUrl("/auth/register")}
             className="ml-1 font-medium text-primary hover:underline"
           >
             Create one

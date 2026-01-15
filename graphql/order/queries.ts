@@ -187,7 +187,7 @@ const getLastProductView = gql`
     lastViewedItems(customerId: $customerId, limit: $limit) {
       _id
       productId
-      updatedAt
+
       product {
         _id
         createdAt

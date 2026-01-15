@@ -5,6 +5,7 @@ import ClientShell from "./_components/ClientShell";
 import { fetchCpConfig } from "../lib/fetchCpConfig";
 import { isBuildMode } from "../lib/buildMode";
 import type { CPDetail } from "../types/cms";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: data.meta.title,
@@ -55,6 +56,7 @@ export default async function RootLayout({
     <html lang="en">
       <body>
         <ClientShell cpDetail={cpDetail}>{children}</ClientShell>
+        <Toaster />
       </body>
     </html>
   );

@@ -3,60 +3,62 @@
   "description": "home",
   "pageItems": [
     {
-      "type": "hero",
-      "content": "Welcome to Adventure Awaits!",
+      "type": "carousel",
+      "content": "",
       "order": 0,
-      "contentType": "imageText",
-      "contentTypeId": "",
+      "contentType": "carousel",
+      "contentTypeId": "FTapqtMXg7LxXBjkCoe7A",
       "config": {
-        "image": {
-          "file": {
-            "path": "./MeetMongolia Tripadvisor (1).jpg",
-            "relativePath": "./MeetMongolia Tripadvisor (1).jpg"
+        "title": "Featured carousel",
+        "description": "",
+        "items": [
+          {
+            "id": "14sGOzxGp63nlicHpPupq",
+            "title": "Your freedom starts with us",
+            "description": "",
+            "image": "erxes-saas/Wd8oMW5VMI8c0prVNqVAYpexels-vlada-karpovich-4050336.jpg",
+            "link": {
+              "type": "productCategory",
+              "value": "L2ETU8EWFdhcjkl4TzHgm"
+            }
           },
-          "url": "erxes-saas/ZkzEYXlRPY5hiAgmRWHSoMeetMongolia Tripadvisor (1).jpg"
-        },
-        "title": " ",
-        "description": "<p>.</p>",
-        "primaryCta": "",
-        "primaryCtaUrl": ""
+          {
+            "id": "y5xBxVBBA2Ui0ZiLIITn-",
+            "title": "Work where you are",
+            "description": "",
+            "image": "erxes-saas/6bBasRIda7tz1SoolWbkTpexels-anna-nekrashevich-8532928.jpg",
+            "link": { "type": "product", "value": "whI2KFfebaxIyJR_ck6CA" }
+          }
+        ]
       }
     },
     {
-      "type": "tours",
-      "content": "tours",
+      "type": "productCategories",
+      "content": "productCategories",
       "order": 1,
-      "contentType": "bm:tours",
-      "contentTypeId": "bm:tours",
-      "config": { "limit": 6 }
-    },
-    {
-      "type": "youtube",
-      "content": "",
-      "order": 2,
-      "contentType": "youtube",
-      "contentTypeId": "",
-      "config": { "videoUrl": "https://www.youtube.com/watch?v=GNoN2S1HlFE" }
-    },
-    {
-      "type": "imageText",
-      "content": "About Us",
-      "order": 3,
-      "contentType": "imageText",
-      "contentTypeId": "",
+      "contentType": "posc:productCategories",
+      "contentTypeId": "posc:productCategories",
       "config": {
-        "image": {
-          "file": {
-            "path": "./Photo by Tungalagbaatar (7) (1).jpg",
-            "relativePath": "./Photo by Tungalagbaatar (7) (1).jpg"
-          },
-          "url": "erxes-saas/9qMkhPQMNfF2ndrlMWICaPhoto by Tungalagbaatar (7) (1).jpg"
-        },
-        "title": "Who We Are",
-        "description": "<ul><li><p><span style=\"color: rgb(55, 65, 81)\">Explore the heart of Mongolia with your travel friend and expert “Meet Mongolia Join Tour” LLC.&nbsp; We extend a heartfelt welcome to adventurers, explorers, and those seeking unique cultural experiences. Immerse yourself in the rich tapestry of Mongolian traditions, breathtaking landscapes, and the legendary hospitality of the nomadic people.</span></p></li><li><p><span style=\"color: rgb(55, 65, 81)\">At www.meetmongolia.com, we curate unforgettable journeys that allow you to delve into the soul of Mongolia. From the vast expanse of the Gobi Desert to the pristine beauty of Khuvsgul Lake, our tours are crafted to provide authentic encounters, captivating adventures, and a deep appreciation for Mongolia's natural wonders and cultural heritage.</span></p></li><li><p><span style=\"color: rgb(55, 65, 81)\">Embark on a voyage with us, where every moment is a story waiting to be told, and every destination is a chapter in your travel diary. Let the spirit of Mongolia enchant you, and let our expert guides lead you on a remarkable odyssey through this land of boundless horizons.</span></p></li><li><p><span style=\"color: rgb(55, 65, 81)\">Thank you for considering Meet Mongolia Join Tours LLC for your Mongolian adventure. We are thrilled to be a part of your journey.</span></p></li></ul>",
-        "primaryCta": "",
-        "primaryCtaUrl": "",
-        "imagePosition": "left"
+        "title": "Browse categories",
+        "description": "",
+        "categories": [
+          "OTr9U5UgFgOjx0lwbd0AU",
+          "z_iEx8ThDcY9yrIxf3osS",
+          "L2ETU8EWFdhcjkl4TzHgm"
+        ]
+      }
+    },
+    {
+      "type": "products",
+      "content": "products",
+      "order": 2,
+      "contentType": "posc:products",
+      "contentTypeId": "posc:products",
+      "config": {
+        "limit": 8,
+        "title": "Latest products",
+        "description": "",
+        "categoryId": "L2ETU8EWFdhcjkl4TzHgm"
       }
     }
   ]

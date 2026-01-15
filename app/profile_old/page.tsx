@@ -95,15 +95,6 @@ export default function ProfilePage() {
       customerId: user?.erxesCustomerId ?? undefined,
       sortField: "createdAt",
       sortDirection: -1,
-      statuses: [
-        "new",
-        "doing",
-        "done",
-        "complete",
-        "reDoing",
-        "pending",
-        "return",
-      ],
     },
     skip: !user?.erxesCustomerId,
     fetchPolicy: "cache-and-network",
@@ -418,7 +409,7 @@ export default function ProfilePage() {
   }
 
   if (error) {
-    redirect(templateUrl("/login"));
+    redirect(templateUrl("/auth/login"));
   }
 
   if (!user) {

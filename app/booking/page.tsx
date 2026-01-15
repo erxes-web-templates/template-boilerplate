@@ -3,8 +3,8 @@
 import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "@apollo/client";
-import pmsRoomQueries from "@/graphql/pms/graphql/rooms/queries";
-import pmsConfigQueries from "@/graphql/pms/graphql/config/queries";
+import pmsRoomQueries from "../../graphql/pms/rooms/queries";
+import pmsConfigQueries from "../../graphql/pms/config/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const parsePipelineConfig = (value: unknown) => {

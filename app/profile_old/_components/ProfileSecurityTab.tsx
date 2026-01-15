@@ -18,12 +18,7 @@ type ProfileSecurityTabProps = {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 };
 
-const ProfileSecurityTab = ({
-  form,
-  loading,
-  onChange,
-  onSubmit,
-}: ProfileSecurityTabProps) => (
+const ProfileSecurityTab = ({ form, loading, onChange, onSubmit }: ProfileSecurityTabProps) => (
   <form className="max-w-lg space-y-4" onSubmit={onSubmit}>
     <div className="space-y-2">
       <Label htmlFor="currentPassword">Одоогийн нууц үг</Label>
