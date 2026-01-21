@@ -60,15 +60,26 @@ const ProductCategoriesSection = ({ section }: { section: Section }) => {
       </section>
     );
   }
-  console.log(categories, "cattt");
 
   return (
-    <section className="py-16">
+    <section
+      className="py-16"
+      style={{
+        backgroundColor: "var(--background)",
+        color: "var(--primary)",
+        fontFamily: "var(--font-body)",
+      }}
+    >
       <div className="container mx-auto max-w-6xl px-4">
         <div className="mx-auto mb-10 max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight">{title}</h2>
+          <h2
+            className="text-3xl font-bold tracking-tight"
+            style={{ fontFamily: "var(--font-heading)" }}
+          >
+            {title}
+          </h2>
           {description && (
-            <p className="mt-3 text-base text-muted-foreground">
+            <p className="mt-3 text-base text-current opacity-70">
               {description}
             </p>
           )}
@@ -106,7 +117,11 @@ const ProductCategoriesSection = ({ section }: { section: Section }) => {
               }
 
               return (
-                <Card key={category._id} className="overflow-hidden">
+                <Card
+                  key={category._id}
+                  className="overflow-hidden rounded-2xl border shadow-sm"
+                  style={{ borderColor: "var(--accent)" }}
+                >
                   <CardHeader className="p-0">
                     {imageUrl ? (
                       <div className="relative h-48 w-full overflow-hidden bg-muted">
@@ -120,11 +135,11 @@ const ProductCategoriesSection = ({ section }: { section: Section }) => {
                     ) : null}
                   </CardHeader>
                   <CardContent className="space-y-3 p-5">
-                    <CardTitle className="text-lg font-semibold">
+                    <CardTitle className="sr-only">
                       {category.name}
                     </CardTitle>
                     {category.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-3">
+                      <p className="text-sm text-current opacity-70 line-clamp-3">
                         {category.description}
                       </p>
                     )}
@@ -141,7 +156,8 @@ const ProductCategoriesSection = ({ section }: { section: Section }) => {
                             ? `/products?categoryId=${category._id}`
                             : "/products"
                         }
-                        className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                        className="inline-flex items-center rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] transition hover:text-[color:var(--accent)]"
+                        style={{ borderColor: "var(--accent)" }}
                       >
                         View products
                       </Link>

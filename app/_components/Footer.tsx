@@ -23,23 +23,39 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
   const menus = data?.cmsMenuList || [];
 
   return (
-    <footer className="bg-gray-800 text-white">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-wrap justify-between">
-          <div className="w-full md:w-1/3 mb-6 md:mb-0">
-            <h3 className="text-xl font-bold mb-2">
+    <footer
+      className="text-current"
+      style={{
+        backgroundColor: "var(--background)",
+        color: "var(--primary)",
+      }}
+    >
+      <div
+        className="container mx-auto px-4 py-12"
+        style={{ fontFamily: "var(--font-body)" }}
+      >
+        <div className="flex flex-wrap gap-10">
+          <div className="w-full md:w-1/3">
+            <h3
+              className="text-2xl font-semibold tracking-wide"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
               <Link href={templateUrl("/")}>{cpDetail?.name}</Link>
             </h3>
-            <p>{cpDetail?.description}</p>
+            <p className="mt-3 text-sm leading-relaxed text-current opacity-70">
+              {cpDetail?.description}
+            </p>
           </div>
-          <div className="w-full md:w-1/3 mb-6 md:mb-0">
-            <h4 className="text-lg font-semibold mb-2">Quick Links</h4>
-            <ul>
+          <div className="w-full md:w-1/3">
+            <h4 className="text-xs font-semibold uppercase tracking-[0.35em] text-current opacity-70">
+              Quick Links
+            </h4>
+            <ul className="mt-4 space-y-2 text-sm">
               {menus.map((menu: MenuItem) => (
                 <li key={menu._id}>
                   <Link
                     href={templateUrl(menu.url || "/")}
-                    className="hover:underline"
+                    className="transition hover:text-[color:var(--accent)]"
                   >
                     {menu.label}
                   </Link>
@@ -48,15 +64,20 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
             </ul>
           </div>
           <div className="w-full md:w-1/3">
-            <h4 className="text-lg font-semibold mb-2">Contact Us</h4>
-            <p>Email: {cpDetail?.externalLinks?.emails[0]}</p>
-            <p>Phone: {cpDetail?.externalLinks?.phones[0]}</p>
-            <p>Address: {cpDetail?.externalLinks?.address} </p>
-            <div className="flex space-x-4">
+            <h4 className="text-xs font-semibold uppercase tracking-[0.35em] text-current opacity-70">
+              Contact
+            </h4>
+            <div className="mt-4 space-y-2 text-sm text-current opacity-70">
+              <p>Email: {cpDetail?.externalLinks?.emails[0]}</p>
+              <p>Phone: {cpDetail?.externalLinks?.phones[0]}</p>
+              <p>Address: {cpDetail?.externalLinks?.address}</p>
+            </div>
+            <div className="mt-5 flex items-center gap-3">
               {cpDetail?.externalLinks?.facebook && (
                 <a
                   href={cpDetail?.externalLinks?.facebook}
-                  className="text-white hover:text-gray-300 transition-colors duration-200"
+                  className="rounded-full border p-2 transition hover:text-[color:var(--accent)]"
+                  style={{ borderColor: "var(--accent)" }}
                 >
                   {" "}
                   <Facebook />{" "}
@@ -65,7 +86,8 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
               {cpDetail?.externalLinks?.twitter && (
                 <a
                   href={cpDetail?.externalLinks?.twitter}
-                  className="text-white hover:text-gray-300 transition-colors duration-200"
+                  className="rounded-full border p-2 transition hover:text-[color:var(--accent)]"
+                  style={{ borderColor: "var(--accent)" }}
                 >
                   {" "}
                   <Twitter />{" "}
@@ -74,7 +96,8 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
               {cpDetail?.externalLinks?.linkedin && (
                 <a
                   href={cpDetail?.externalLinks?.linkedin}
-                  className="text-white hover:text-gray-300 transition-colors duration-200"
+                  className="rounded-full border p-2 transition hover:text-[color:var(--accent)]"
+                  style={{ borderColor: "var(--accent)" }}
                 >
                   {" "}
                   <Linkedin />{" "}
@@ -83,7 +106,8 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
               {cpDetail?.externalLinks?.youtube && (
                 <a
                   href={cpDetail?.externalLinks?.youtube}
-                  className="text-white hover:text-gray-300 transition-colors duration-200"
+                  className="rounded-full border p-2 transition hover:text-[color:var(--accent)]"
+                  style={{ borderColor: "var(--accent)" }}
                 >
                   {" "}
                   <Youtube />{" "}
@@ -92,7 +116,8 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
               {cpDetail?.externalLinks?.instagram && (
                 <a
                   href={cpDetail?.externalLinks?.instagram}
-                  className="text-white hover:text-gray-300 transition-colors duration-200"
+                  className="rounded-full border p-2 transition hover:text-[color:var(--accent)]"
+                  style={{ borderColor: "var(--accent)" }}
                 >
                   {" "}
                   <Instagram />{" "}
@@ -101,7 +126,8 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
               {cpDetail?.externalLinks?.whatsapp && (
                 <a
                   href={cpDetail?.externalLinks?.whatsapp}
-                  className="text-white hover:text-gray-300 transition-colors duration-200"
+                  className="rounded-full border p-2 transition hover:text-[color:var(--accent)]"
+                  style={{ borderColor: "var(--accent)" }}
                 >
                   {" "}
                   <MessageCircle />{" "}
@@ -110,7 +136,9 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
             </div>
           </div>
         </div>
-        <div className="mt-8 text-center">
+        <div className="mt-12 border-t pt-6 text-center text-xs uppercase tracking-[0.35em] text-current opacity-60"
+          style={{ borderColor: "var(--accent)" }}
+        >
           <p>{cpDetail?.copyright}</p>
         </div>
       </div>

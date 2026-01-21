@@ -11,6 +11,8 @@ import { Section } from "../../../types/sections";
 import { toHtml } from "../../../lib/html";
 import { templateUrl } from "@/lib/utils";
 import { isBuildMode } from "../../../lib/buildMode";
+import { useParams } from "next/navigation";
+import useClientPortal from "@/hooks/useClientPortal";
 import {
   Card,
   CardContent,
@@ -34,6 +36,8 @@ const toCurrency = (value?: number | null) => {
 type ButtonState = "idle" | "adding" | "added";
 
 const ProductsSection = ({ section }: { section: Section }) => {
+  const params = useParams<{ id: string }>();
+  const { cpDetail } = useClientPortal({ id: params.id });
   const limit = Number(section.config?.limit ?? 6);
   const categoryId = section.config?.categoryId || null;
   const tag = section.config?.tag || null;
@@ -81,6 +85,18 @@ const ProductsSection = ({ section }: { section: Section }) => {
   const title = section.config?.title || "Latest products";
   const description = section.config?.description || "";
 
+  const sectionStyles = useMemo(() => {
+    const styles = cpDetail?.styles || {};
+    const overrides = styles.productsSection || {};
+    return {
+      baseColor: overrides.baseColor || "var(--primary)",
+      backgroundColor: overrides.backgroundColor || "var(--background)",
+      activeTabColor: overrides.activeTabColor || "var(--accent)",
+      baseFont: overrides.baseFont || "var(--font-body)",
+      headingFont: overrides.headingFont || "var(--font-heading)",
+    };
+  }, [cpDetail?.styles]);
+
   if (!loading && !error && products.length === 0) {
     return (
       <section className="py-16">
@@ -95,12 +111,24 @@ const ProductsSection = ({ section }: { section: Section }) => {
   }
 
   return (
-    <section className="py-16 bg-muted/10">
+    <section
+      className="py-16"
+      style={{
+        backgroundColor: sectionStyles.backgroundColor,
+        color: sectionStyles.baseColor,
+        fontFamily: sectionStyles.baseFont,
+      }}
+    >
       <div className="container mx-auto max-w-6xl px-4">
         <div className="mx-auto mb-10 max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight">{title}</h2>
+          <h2
+            className="text-3xl font-bold tracking-tight"
+            style={{ fontFamily: sectionStyles.headingFont }}
+          >
+            {title}
+          </h2>
           {description && (
-            <p className="mt-3 text-base text-muted-foreground">
+            <p className="mt-3 text-base text-current opacity-70">
               {description}
             </p>
           )}
@@ -212,7 +240,11 @@ const ProductsSection = ({ section }: { section: Section }) => {
               return (
                 <Card
                   key={product?._id || index}
-                  className="flex h-full flex-col overflow-hidden"
+                  className="flex h-full flex-col overflow-hidden rounded-2xl border shadow-sm"
+                  style={{
+                    borderColor: sectionStyles.activeTabColor,
+                    backgroundColor: sectionStyles.backgroundColor,
+                  }}
                 >
                   <CardHeader className="p-0">
                     <div className="relative aspect-square w-full overflow-hidden bg-muted">
@@ -235,7 +267,7 @@ const ProductsSection = ({ section }: { section: Section }) => {
                       <CardTitle className="text-lg font-semibold">
                         {product?.name ?? "Untitled product"}
                       </CardTitle>
-                      <CardDescription className="mt-2 line-clamp-2 text-sm">
+                      <CardDescription className="mt-2 line-clamp-2 text-sm text-current opacity-70">
                         <span
                           dangerouslySetInnerHTML={toHtml(
                             product?.description ?? ""
@@ -245,22 +277,39 @@ const ProductsSection = ({ section }: { section: Section }) => {
                     </div>
                     <div className="mt-auto space-y-2 text-sm">
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-foreground">
+                        <span className="font-semibold">
                           {price}
                         </span>
-                        <Badge variant={inStock ? "default" : "secondary"}>
+                        <Badge
+                          variant={inStock ? "default" : "secondary"}
+                          style={{
+                            backgroundColor: sectionStyles.activeTabColor,
+                            color: sectionStyles.backgroundColor,
+                          }}
+                        >
                           {inStock ? "In stock" : "Out of stock"}
                         </Badge>
                       </div>
                       {product?.category?.name && (
-                        <p className="text-xs text-muted-foreground">
+                        <p className="sr-only">
                           Category: {product.category.name}
                         </p>
                       )}
                     </div>
                   </CardContent>
-                  <CardFooter className="block md:flex items-center justify-end gap-2 border-t bg-muted/40 p-4">
-                    <Button asChild variant="default" size="sm">
+                  <CardFooter
+                    className="block md:flex items-center justify-end gap-2 border-t p-4"
+                    style={{ borderColor: sectionStyles.activeTabColor }}
+                  >
+                    <Button
+                      asChild
+                      size="sm"
+                      className="rounded-full"
+                      style={{
+                        backgroundColor: sectionStyles.activeTabColor,
+                        color: sectionStyles.backgroundColor,
+                      }}
+                    >
                       <Link
                         href={
                           isBuilder
@@ -274,6 +323,11 @@ const ProductsSection = ({ section }: { section: Section }) => {
                     <Button
                       variant="outline"
                       size="sm"
+                      className="rounded-full"
+                      style={{
+                        borderColor: sectionStyles.activeTabColor,
+                        color: sectionStyles.baseColor,
+                      }}
                       disabled={!inStock || !cartProductId || isAdding}
                       onClick={handleAddToCart}
                     >
@@ -291,7 +345,15 @@ const ProductsSection = ({ section }: { section: Section }) => {
         </div>
 
         <div className="mt-10 text-center">
-          <Button asChild variant="outline">
+          <Button
+            asChild
+            variant="outline"
+            className="rounded-full"
+            style={{
+              borderColor: sectionStyles.activeTabColor,
+              color: sectionStyles.baseColor,
+            }}
+          >
             <Link href={isBuilder ? templateUrl("/products") : "/products"}>
               Browse all products
             </Link>

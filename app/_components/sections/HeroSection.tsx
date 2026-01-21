@@ -14,7 +14,10 @@ const HeroSection = ({ section }: { section: Section }) => {
       : section.config.primaryCtaUrl
     : "#";
   return (
-    <section className="relative h-[600px]">
+    <section
+      className="relative h-[600px]"
+      style={{ backgroundColor: "var(--background)" }}
+    >
       {section.config.image && (
         <Image
           src={
@@ -25,16 +28,31 @@ const HeroSection = ({ section }: { section: Section }) => {
           objectFit="cover"
         />
       )}
-      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div className="text-center text-white">
-          <h1 className="text-5xl font-bold mb-4">{section.config.title}</h1>
+      <div className="absolute inset-0 flex items-center justify-center bg-black/55">
+        <div
+          className="text-center"
+          style={{ color: "var(--primary)", fontFamily: "var(--font-body)" }}
+        >
+          <h1
+            className="mb-4 text-5xl font-bold"
+            style={{ fontFamily: "var(--font-heading)" }}
+          >
+            {section.config.title}
+          </h1>
           <p
-            className="text-xl mb-8"
+            className="mb-8 text-xl"
             dangerouslySetInnerHTML={toHtml(section.config.description)}
           ></p>
           {section.config.primaryCtaUrl && (
             <Link href={ctaHref}>
-              <Button size="lg" variant="secondary">
+              <Button
+                size="lg"
+                className="rounded-full px-8"
+                style={{
+                  backgroundColor: "var(--accent)",
+                  color: "var(--background)",
+                }}
+              >
                 {section.config.primaryCta}
               </Button>
             </Link>

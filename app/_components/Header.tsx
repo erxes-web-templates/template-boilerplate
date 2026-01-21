@@ -88,18 +88,26 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
   };
   const nestedMenus = organizeMenus(menus);
 
-  const renderMenu = (menu: MenuItem & { children: MenuItem[] }) => (
+  const renderMenu = (
+    menu: MenuItem & { children: MenuItem[] },
+    isChild = false
+  ) => (
     <div key={menu._id} className="relative group z-10">
       <Link
         href={templateUrl(menu.url || "")}
-        className="hover:underline text-primary text-sm font-medium transition-colors hover:text-primary "
+        className={
+          isChild
+            ? "block rounded-lg px-2 py-1 text-xs font-semibold uppercase tracking-[0.18em] transition-colors hover:bg-slate-100 hover:text-[color:var(--accent)]"
+            : "text-sm font-semibold uppercase tracking-[0.2em] transition-colors hover:text-[color:var(--accent)]"
+        }
+        style={{ color: "var(--primary)" }}
       >
         {menu.label}
       </Link>
       {menu.children.length > 0 && (
-        <div className="absolute hidden group-hover:block bg-white shadow-md ">
-          <div className="space-y-2 p-2">
-            {menu.children.map((child: any) => renderMenu(child))}
+        <div className="absolute hidden min-w-[180px] translate-y-2 rounded-xl border border-slate-200/70 bg-white shadow-xl group-hover:block">
+          <div className="space-y-2 p-3">
+            {menu.children.map((child: any) => renderMenu(child, true))}
           </div>
         </div>
       )}
@@ -217,10 +225,24 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
   console.log(searchResults, "sr");
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-6">
-          <Link href={templateUrl("/")} className="text-xl font-bold">
+    <header
+      className="sticky top-0 z-50 w-full border-b shadow-lg"
+      style={{
+        backgroundColor: "var(--background)",
+        color: "var(--primary)",
+        borderColor: "var(--accent)",
+      }}
+    >
+      <div
+        className="container mx-auto flex h-16 items-center justify-between px-4 py-3"
+        style={{ fontFamily: "var(--font-body)" }}
+      >
+        <div className="flex items-center gap-8">
+          <Link
+            href={templateUrl("/")}
+            className="text-xl font-semibold tracking-wide"
+            style={{ fontFamily: "var(--font-heading)" }}
+          >
             {cpDetail.logo ? (
               <Image
                 src={getFileUrl(cpDetail.logo)}
@@ -232,15 +254,15 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
               cpDetail.name
             )}
           </Link>
-          <nav className="hidden items-center gap-6 md:flex">
+          <nav className="hidden items-center gap-6 text-sm uppercase tracking-[0.2em] md:flex">
             {nestedMenus.map(renderMenu)}
           </nav>
         </div>
 
         <div className="hidden flex-1 items-center justify-center px-8 md:flex">
-          <form onSubmit={handleSearchSubmit} className="w-full max-w-md">
+          <form onSubmit={handleSearchSubmit} className="w-full max-w-lg">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-current opacity-60" />
               <Input
                 type="search"
                 value={searchTerm}
@@ -248,24 +270,25 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 placeholder="Search..."
-                className="w-full pl-10"
+                className="w-full rounded-full border bg-transparent pl-11 placeholder:text-current placeholder:opacity-50"
+                style={{ color: "var(--primary)", borderColor: "var(--accent)" }}
               />
               {showSearchResults && (
-                <div className="absolute left-0 right-0 top-full z-20 mt-2 rounded-lg border border-border bg-popover shadow-xl bg-white">
+                <div className="absolute left-0 right-0 top-full z-20 mt-3 rounded-2xl border bg-white shadow-2xl">
                   {shouldQueryProducts ? (
                     searchLoading ? (
-                      <div className="p-4 text-sm text-muted-foreground">
+                      <div className="p-4 text-sm text-slate-500">
                         Searching products...
                       </div>
                     ) : searchResults.length ? (
-                      <ul className="divide-y divide-border">
+                      <ul className="divide-y divide-slate-100">
                         {searchResults.map((item: any) => (
                           <li key={item._id}>
                             <button
                               type="button"
                               onMouseDown={(event) => event.preventDefault()}
                               onClick={() => handleProductSelect(item._id)}
-                              className="flex w-full items-center justify-between gap-3 p-3 text-left hover:bg-muted/60"
+                              className="flex w-full items-center justify-between gap-3 p-4 text-left transition hover:bg-slate-50"
                             >
                               <div className="flex justify-start">
                                 <Image
@@ -275,21 +298,21 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                                   alt={item.name || "Product image"}
                                   width={40}
                                   height={40}
-                                  className="rounded mr-3"
+                                  className="rounded-xl mr-3"
                                 />
                                 <div className="flex flex-col">
-                                  <span className="text-sm font-semibold text-foreground">
+                                  <span className="text-sm font-semibold text-slate-900">
                                     {item.name || "Untitled product"}
                                   </span>
                                   {item.category?.name && (
-                                    <span className="text-xs text-muted-foreground">
+                                    <span className="text-xs text-slate-500">
                                       {item.category.name}
                                     </span>
                                   )}
                                 </div>
                               </div>
                               {Number.isFinite(item.unitPrice) && (
-                                <span className="text-sm font-semibold text-primary">
+                                <span className="text-sm font-semibold text-slate-900">
                                   {formatCurrency(item.unitPrice || 0)}
                                 </span>
                               )}
@@ -301,19 +324,19 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                             type="button"
                             onMouseDown={(event) => event.preventDefault()}
                             onClick={() => handleSearchSubmit()}
-                            className="flex w-full items-center justify-between p-3 text-sm font-medium text-primary hover:bg-muted/60"
+                            className="flex w-full items-center justify-between p-4 text-sm font-semibold text-slate-900 hover:bg-slate-50"
                           >
                             View all results
                           </button>
                         </li>
                       </ul>
                     ) : (
-                      <div className="p-4 text-sm text-muted-foreground">
+                      <div className="p-4 text-sm text-slate-500">
                         No products found.
                       </div>
                     )
                   ) : (
-                    <div className="p-4 text-sm text-muted-foreground">
+                    <div className="p-4 text-sm text-slate-500">
                       Type at least 2 characters to search.
                     </div>
                   )}
@@ -325,17 +348,27 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
 
         <div className="flex items-center gap-4">
           <Link href={templateUrl("/profile")}>
-            <Button variant="ghost" size="icon" className="hidden md:flex">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden text-current hover:bg-black/10 md:flex"
+            >
               <User className="h-5 w-5" />
             </Button>
           </Link>
 
           <Sheet open={isCartSheetOpen} onOpenChange={setIsCartSheetOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative text-current hover:bg-black/10"
+              >
                 <ShoppingCart className="h-5 w-5" />
                 {hasItems && (
-                  <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs">
+                  <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-[10px] font-semibold text-white"
+                    style={{ backgroundColor: "var(--accent)" }}
+                  >
                     {totalItems}
                   </Badge>
                 )}
@@ -344,11 +377,17 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
             <SheetContent
               side="right"
               className="flex w-full max-w-sm flex-col gap-4 p-6 sm:max-w-md"
+              style={{
+                backgroundColor: "var(--background)",
+                color: "var(--primary)",
+              }}
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold">Your cart</h2>
-                  <p className="text-sm text-muted-foreground">
+                  <h2 className="text-lg font-semibold tracking-wide">
+                    Your cart
+                  </h2>
+                  <p className="text-sm text-current opacity-70">
                     {hasItems
                       ? `${totalItems} item${
                           totalItems === 1 ? "" : "s"
@@ -357,7 +396,9 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                   </p>
                 </div>
                 {hasItems && (
-                  <Badge variant="outline">{totalItems} items</Badge>
+                  <Badge className="border text-current/80">
+                    {totalItems} items
+                  </Badge>
                 )}
               </div>
               {hasItems ? (
@@ -368,7 +409,11 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                       return (
                         <div
                           key={item.id}
-                          className="flex gap-3 rounded-md border border-border bg-card/50 p-3"
+                          className="flex gap-3 rounded-xl border p-3"
+                          style={{
+                            borderColor: "var(--accent)",
+                            backgroundColor: "var(--background)",
+                          }}
                         >
                           <div className="relative h-16 w-16 overflow-hidden rounded-md bg-muted">
                             {item.imageUrl ? (
@@ -380,7 +425,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                                 className="object-cover"
                               />
                             ) : (
-                              <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
+                              <div className="flex h-full w-full items-center justify-center text-[10px] text-current opacity-60">
                                 No image
                               </div>
                             )}
@@ -394,12 +439,12 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                                 {formatCurrency(lineTotal)}
                               </span>
                             </div>
-                            <p className="mt-1 text-xs text-muted-foreground">
+                            <p className="mt-1 text-xs text-current opacity-60">
                               Qty: {item.quantity} ·{" "}
                               {formatCurrency(item.unitPrice)} each
                             </p>
                             {item.categoryName && (
-                              <p className="mt-1 text-xs text-muted-foreground">
+                              <p className="mt-1 text-xs text-current opacity-60">
                                 Category: {item.categoryName}
                               </p>
                             )}
@@ -453,7 +498,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 text-destructive"
+                                  className="h-8 w-8 text-rose-400"
                                   onClick={() => {
                                     void removeFromCart(item.id);
                                   }}
@@ -470,20 +515,21 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                   </div>
                 </ScrollArea>
               ) : (
-                <div className="flex flex-1 items-center justify-center rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+                <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed p-6 text-center text-sm text-current opacity-60">
                   Add products to your cart to see them here.
                 </div>
               )}
-              <div className="space-y-4 border-t border-border pt-4">
+              <div className="space-y-4 border-t pt-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="text-current opacity-60">Subtotal</span>
                   <span className="text-base font-semibold">
                     {formatCurrency(totalPrice)}
                   </span>
                 </div>
                 <div className="flex gap-2">
                   <Button
-                    className="flex-1"
+                    className="flex-1 text-white"
+                    style={{ backgroundColor: "var(--accent)" }}
                     disabled={!hasItems || isSyncing}
                     asChild
                   >
@@ -507,27 +553,42 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
 
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-current hover:bg-black/10 md:hidden"
+              >
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right">
-              <nav className="flex flex-col gap-4 mt-8">
+            <SheetContent
+              side="right"
+              className="text-current"
+              style={{
+                backgroundColor: "var(--background)",
+                color: "var(--primary)",
+              }}
+            >
+              <nav className="mt-8 flex flex-col gap-4">
                 {nestedMenus.map((menu) => (
                   <div key={menu._id} className="flex flex-col">
                     <Link
                       href={templateUrl(menu.url || "")}
-                      className="hover:underline text-primary text-sm font-medium transition-colors hover:text-primary "
+                      className="text-sm font-semibold uppercase tracking-[0.2em] transition-colors"
+                      style={{ color: "var(--primary)" }}
                     >
                       {menu.label}
                     </Link>
                     {menu.children.length > 0 && (
-                      <div className="mt-2 ml-4 flex flex-col gap-2">
+                      <div className="mt-3 ml-3 flex flex-col gap-2 border-l pl-3"
+                        style={{ borderColor: "var(--accent)" }}
+                      >
                         {menu.children.map((child) => (
                           <Link
                             key={child._id}
                             href={templateUrl(child.url || "")}
-                            className="hover:underline text-primary text-sm font-medium transition-colors hover:text-primary "
+                            className="text-xs font-semibold uppercase tracking-[0.2em] transition-colors"
+                            style={{ color: "var(--primary)" }}
                           >
                             {child.label}
                           </Link>
