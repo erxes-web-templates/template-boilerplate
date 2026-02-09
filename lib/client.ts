@@ -11,7 +11,9 @@ const createClient = () =>
         "Access-Control-Allow-Origin": process.env.ERXES_URL || "",
       },
       fetchOptions: {
-        cache: "no-store",
+        // Use Next.js caching with 1 hour revalidation instead of no-store
+        // This allows static rendering while keeping data reasonably fresh
+        next: { revalidate: 3600 },
       },
     }),
   });
