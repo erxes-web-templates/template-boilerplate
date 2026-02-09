@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 };
 
 const fallbackCpDetail = (): CPDetail => {
-  const socials = data.additional?.social || [];
+  const socials: Array<{ name: string; url: string | string[] }> =
+    data.additional?.social || [];
   const findSocial = (name: string): string | string[] | undefined => {
     const item = socials.find((item: any) => item.name === name);
     return item?.url;
