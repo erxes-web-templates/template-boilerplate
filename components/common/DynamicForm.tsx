@@ -96,14 +96,13 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
         schema = z.string().min(5, "Invalid phone number");
       } else if (field.validation === "date") {
         schema = z.date({
-          error: `${field.text} is required`,
-
-          // invalid_type_error: "Please select a valid date",
+          required_error: `${field.text} is required`,
+          invalid_type_error: "Please select a valid date",
         });
       } else if (field.validation === "datetime") {
         schema = z.date({
-          error: `${field.text} is required`,
-          // invalid_type_error: "Please select a valid date and time",
+          required_error: `${field.text} is required`,
+          invalid_type_error: "Please select a valid date and time",
         });
       } else {
         // Default string validation
@@ -247,7 +246,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                                     variant={"outline"}
                                     className={cn(
                                       "w-full justify-start text-left font-normal",
-                                      !field.value && "text-muted-foreground"
+                                      !field.value && "text-muted-foreground",
                                     )}
                                   >
                                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -271,10 +270,10 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                                         if (field.value instanceof Date) {
                                           const newDate = new Date(date);
                                           newDate.setHours(
-                                            field.value.getHours()
+                                            field.value.getHours(),
                                           );
                                           newDate.setMinutes(
-                                            field.value.getMinutes()
+                                            field.value.getMinutes(),
                                           );
                                           field.onChange(newDate);
                                         } else {
@@ -306,11 +305,11 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                                             const [hours, minutes] =
                                               e.target.value.split(":");
                                             const newDate = new Date(
-                                              field.value
+                                              field.value,
                                             );
                                             newDate.setHours(parseInt(hours));
                                             newDate.setMinutes(
-                                              parseInt(minutes)
+                                              parseInt(minutes),
                                             );
                                             field.onChange(newDate);
                                           }
@@ -328,7 +327,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                                     variant={"outline"}
                                     className={cn(
                                       "w-full justify-start text-left font-normal",
-                                      !field.value && "text-muted-foreground"
+                                      !field.value && "text-muted-foreground",
                                     )}
                                   >
                                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -565,7 +564,6 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                           </FormLabel>
                           {description && (
                             <FormDescription>
-                              {" "}
                               <span
                                 dangerouslySetInnerHTML={{
                                   __html: description,
@@ -625,10 +623,10 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                                         <FormControl>
                                           <Checkbox
                                             checked={field.value?.includes(
-                                              option
+                                              option,
                                             )}
                                             onCheckedChange={(
-                                              checked: boolean
+                                              checked: boolean,
                                             ) => {
                                               const currentValue =
                                                 field.value || [];
@@ -641,8 +639,8 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                                                 field.onChange(
                                                   currentValue.filter(
                                                     (value: string) =>
-                                                      value !== option
-                                                  )
+                                                      value !== option,
+                                                  ),
                                                 );
                                               }
                                             }}
