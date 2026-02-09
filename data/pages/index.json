@@ -3,58 +3,42 @@
   "description": "home",
   "pageItems": [
     {
-      "type": "carousel",
-      "content": "",
+      "type": "hero",
+      "content": "Welcome to Adventure Awaits!",
       "order": 0,
-      "contentType": "carousel",
-      "contentTypeId": "FTapqtMXg7LxXBjkCoe7A",
+      "contentType": "imageText",
       "config": {
-        "title": "Featured carousel",
-        "description": "",
-        "items": [
-          {
-            "id": "14sGOzxGp63nlicHpPupq",
-            "title": "Your freedom starts with us",
-            "description": "",
-            "image": "erxes-saas/Wd8oMW5VMI8c0prVNqVAYpexels-vlada-karpovich-4050336.jpg",
-            "link": {
-              "type": "productCategory",
-              "value": "L2ETU8EWFdhcjkl4TzHgm"
-            }
-          },
-          {
-            "id": "y5xBxVBBA2Ui0ZiLIITn-",
-            "title": "Work where you are",
-            "description": "",
-            "image": "erxes-saas/6bBasRIda7tz1SoolWbkTpexels-anna-nekrashevich-8532928.jpg",
-            "link": { "type": "product", "value": "whI2KFfebaxIyJR_ck6CA" }
-          }
-        ]
+        "image": {
+          "file": { "name": "hero.jpg", "size": 0, "type": "image/jpeg" },
+          "initUrl": "/images/hero.jpg"
+        },
+        "title": "Discover Your Next Great Adventure",
+        "description": "Explore breathtaking destinations and unforgettable experiences.",
+        "primaryCta": "Explore Tours 23",
+        "primaryCtaUrl": "/tours"
       }
     },
     {
-      "type": "productCategories",
-      "content": "productCategories",
+      "type": "imageText",
+      "content": "About Us",
       "order": 1,
-      "contentType": "posc:productCategories",
-      "contentTypeId": "posc:productCategories",
+      "contentType": "imageText",
       "config": {
-        "title": "Browse categories",
-        "description": "",
-        "categories": ["Gb7iD874VB64Q5zcX0xj8", "SDbxw4xF7czn4K_a_UGo7"]
+        "image": {
+          "file": { "name": "hero.jpg", "size": 0, "type": "image/jpeg" },
+          "initUrl": "/images/about.jpg"
+        },
+        "title": "Who We Are",
+        "description": "At Adventure Awaits, we are passionate about crafting unforgettable travel experiences. With years of expertise, we specialize in curating unique tours that connect you with culture, nature, and adventure.",
+        "primaryCta": "Learn More",
+        "primaryCtaUrl": "/about"
       }
     },
     {
-      "type": "products",
-      "content": "products",
-      "order": 1,
-      "contentType": "core:products",
-      "name": "Available rooms",
-      "contentTypeId": "rooms",
-      "config": {
-        "limit": 6,
-        "tag": "WiTSuvpuccfhfZjBU2jpg"
-      }
+      "type": "tours",
+      "content": "Featured Tours",
+      "order": 2,
+      "contentType": "bms:tours"
     }
   ]
 }

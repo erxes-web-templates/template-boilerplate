@@ -25,9 +25,20 @@ export const metadata = {
 };
 
 export default function HomePage() {
+  console.log("=== HomePage Debug ===");
+  console.log("isBuildMode():", isBuildMode());
+  console.log("BUILD_MODE:", process.env.BUILD_MODE);
+  console.log("NEXT_PUBLIC_BUILD_MODE:", process.env.NEXT_PUBLIC_BUILD_MODE);
+  console.log("pageData:", pageData);
+  console.log("pageData.pageItems:", pageData.pageItems);
+  console.log("pageItems length:", pageData.pageItems?.length);
+
   if (isBuildMode()) {
+    console.log("Using HomePageClient (build mode)");
     return <HomePageClient />;
   }
+
+  console.log("Using JSON data (production mode)");
 
   const sectionComponents = {
     hero: HeroSection,
@@ -52,6 +63,9 @@ export default function HomePage() {
     sections: pageData.pageItems as unknown as Section[],
     components: sectionComponents,
   });
+
+  console.log("renderedSections:", renderedSections);
+  console.log("=== End Debug ===");
 
   return (
     <div className="home relative overflow-hidden min-h-screen">

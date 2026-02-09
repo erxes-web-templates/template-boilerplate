@@ -33,6 +33,8 @@ export default {
     NEXT_PUBLIC_POS_TOKEN: "d6GydPAvJnfesUb84FwKSZ8y3lkoVFtT",
     NEXT_PUBLIC_PMS_TOKEN: "",
     TEMPLATE_TYPE: "hotel",
+    BUILD_MODE: "production",
+    NEXT_PUBLIC_BUILD_MODE: "production",
   },
   images: {
     unoptimized: true,

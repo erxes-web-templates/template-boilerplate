@@ -12,4 +12,4 @@ export const getBuildMode = (): BuildMode => {
   );
 };
 
-export const isBuildMode = () => getBuildMode() === "production";
+export const isBuildMode = () => getBuildMode() === "build";
