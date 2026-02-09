@@ -24,22 +24,22 @@
 // export default nextConfig;
 export default {
   env: {
-    ERXES_API_URL: "https://sales.app.erxes.io/gateway/graphql",
-    ERXES_URL: "https://sales.app.erxes.io/gateway",
-    ERXES_FILE_URL: "https://sales.app.erxes.io/gateway/read-file?key=",
-    ERXES_CP_ID: "nwYOCDEOph3oAqo73dHq0",
+    ERXES_API_URL: "https://tegrigobi.app.erxes.io/gateway/graphql",
+    ERXES_URL: "https://tegrigobi.app.erxes.io/gateway",
+    ERXES_FILE_URL: "https://tegrigobi.app.erxes.io/gateway/read-file?key=",
+    ERXES_CP_ID: "gzeOstbmmN9HyDlLMDXNj",
     ERXES_APP_TOKEN:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHAiOnsibmFtZSI6IkVjb20iLCJjcmVhdGVkQXQiOiIyMDI1LTExLTA1VDAzOjQ4OjM3Ljg1N1oiLCJ1c2VyR3JvdXBJZCI6IjRFSHlkVERBaXMyTGRRblpuIiwiZXhwaXJlRGF0ZSI6IjIwMjUtMTItMTBUMTI6Mzc6NDEuNDY4WiIsIm5vRXhwaXJlIjp0cnVlLCJhbGxvd0FsbFBlcm1pc3Npb24iOnRydWUsIl9pZCI6IkZIUmVaSnNzYnZoYlQwSzZGZENneiIsIl9fdiI6MH0sImlhdCI6MTc2Mjc3ODI3MX0.aMcXwEHazogNwgeCTdshdj6ymRxb9UWr5Y1xgdU_5TY",
-    NEXT_PUBLIC_POS_TOKEN: "L1OQRxY65cWnx51WCdxum3s44egupVxE",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHAiOnsibmFtZSI6IlRlZ3JpIiwiY3JlYXRlZEF0IjoiMjAyNS0wOC0wNlQxMzoyNToyNC41MDFaIiwidXNlckdyb3VwSWQiOiI0RUh5ZFREQWlzMkxkUW5abiIsImV4cGlyZURhdGUiOiIyMDI1LTA5LTA2VDAxOjQ5OjM4Ljk5NloiLCJub0V4cGlyZSI6dHJ1ZSwiYWxsb3dBbGxQZXJtaXNzaW9uIjp0cnVlLCJfaWQiOiJQZndzdnZKMVB4dEsyd0g2UlNGdVkiLCJfX3YiOjB9LCJpYXQiOjE3NTQ1MzEzODh9.I1_uKipwUsicxRbZ93xwRlDcPrbqUPZKX0AfILuPSnA",
+    NEXT_PUBLIC_POS_TOKEN: "d6GydPAvJnfesUb84FwKSZ8y3lkoVFtT",
     NEXT_PUBLIC_PMS_TOKEN: "",
-    TEMPLATE_TYPE: "ecommerce",
+    TEMPLATE_TYPE: "hotel",
   },
   images: {
     unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "sales.app.erxes.io",
+        hostname: "tegrigobi.app.erxes.io",
       },
     ],
   },

@@ -41,24 +41,19 @@
       "config": {
         "title": "Browse categories",
         "description": "",
-        "categories": [
-          "OTr9U5UgFgOjx0lwbd0AU",
-          "z_iEx8ThDcY9yrIxf3osS",
-          "L2ETU8EWFdhcjkl4TzHgm"
-        ]
+        "categories": ["Gb7iD874VB64Q5zcX0xj8", "SDbxw4xF7czn4K_a_UGo7"]
       }
     },
     {
       "type": "products",
       "content": "products",
-      "order": 2,
-      "contentType": "posc:products",
-      "contentTypeId": "posc:products",
+      "order": 1,
+      "contentType": "core:products",
+      "name": "Available rooms",
+      "contentTypeId": "rooms",
       "config": {
-        "limit": 8,
-        "title": "Latest products",
-        "description": "",
-        "categoryId": "L2ETU8EWFdhcjkl4TzHgm"
+        "limit": 6,
+        "tag": "WiTSuvpuccfhfZjBU2jpg"
       }
     }
   ]
