@@ -14,9 +14,10 @@ export const metadata: Metadata = {
 
 const fallbackCpDetail = (): CPDetail => {
   const socials = data.additional?.social || [];
-  const findSocial = (name: string) =>
-    socials.find((item: { name: string }) => item.name === name)?.url;
-
+  const findSocial = (name: string) => {
+    const item = socials.find((item: any) => item.name === name);
+    return item?.url;
+  };
   return {
     _id: data.cpId || "local",
     name: data.meta.title,
