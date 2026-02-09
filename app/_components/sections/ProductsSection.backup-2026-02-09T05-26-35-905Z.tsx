@@ -96,12 +96,12 @@ const ProductsSection = ({ section }: { section: Section }) => {
 
   return (
     <section className="relative py-20 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-background to-purple-100/10" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-500/10 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-muted/10" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
       
       <div className="container relative mx-auto max-w-6xl px-4">
         <div className="mx-auto mb-12 max-w-2xl text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <h2 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
             {title}
           </h2>
           {description && (
@@ -124,18 +124,18 @@ const ProductsSection = ({ section }: { section: Section }) => {
                 return (
                   <Card 
                     key={`placeholder-${index}`} 
-                    className="animate-pulse overflow-hidden border-purple-200/50 shadow-lg"
+                    className="animate-pulse overflow-hidden border-muted/50 shadow-lg"
                     style={{
                       animationDelay: `${index * 100}ms`,
                     }}
                   >
-                    <CardHeader className="h-52 bg-gradient-to-br from-purple-100/60 to-purple-50/40" />
+                    <CardHeader className="h-52 bg-gradient-to-br from-muted/60 to-muted/40" />
                     <CardContent className="space-y-4 p-5">
-                      <div className="h-4 w-2/3 rounded-full bg-gradient-to-r from-purple-200/80 to-purple-100/60" />
-                      <div className="h-3 w-1/2 rounded-full bg-gradient-to-r from-purple-200/70 to-purple-100/50" />
-                      <div className="h-3 w-full rounded-full bg-gradient-to-r from-purple-200/60 to-purple-100/40" />
+                      <div className="h-4 w-2/3 rounded-full bg-gradient-to-r from-muted/80 to-muted/60" />
+                      <div className="h-3 w-1/2 rounded-full bg-gradient-to-r from-muted/70 to-muted/50" />
+                      <div className="h-3 w-full rounded-full bg-gradient-to-r from-muted/60 to-muted/40" />
                     </CardContent>
-                    <CardFooter className="h-12 bg-gradient-to-br from-purple-100/40 to-purple-50/20" />
+                    <CardFooter className="h-12 bg-gradient-to-br from-muted/40 to-muted/20" />
                   </Card>
                 );
               }
@@ -222,13 +222,13 @@ const ProductsSection = ({ section }: { section: Section }) => {
               return (
                 <Card
                   key={product?._id || index}
-                  className="group flex h-full flex-col overflow-hidden border-purple-200/50 bg-gradient-to-br from-card to-purple-50/30 shadow-lg transition-all duration-500 hover:shadow-2xl hover:shadow-purple-200/50 hover:scale-[1.02] hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-4"
+                  className="group flex h-full flex-col overflow-hidden border-muted/50 bg-gradient-to-br from-card to-card/50 shadow-lg transition-all duration-500 hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-4"
                   style={{
                     animationDelay: `${index * 100}ms`,
                   }}
                 >
                   <CardHeader className="p-0">
-                    <div className="relative aspect-square w-full overflow-hidden bg-gradient-to-br from-purple-100/80 to-purple-50/40">
+                    <div className="relative aspect-square w-full overflow-hidden bg-gradient-to-br from-muted/80 to-muted/40">
                       {imageUrl ? (
                         <Image
                           src={imageUrl}
@@ -237,16 +237,16 @@ const ProductsSection = ({ section }: { section: Section }) => {
                           className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-1"
                         />
                       ) : (
-                        <div className="flex aspect-square w-full items-center justify-center text-purple-400 bg-gradient-to-br from-purple-100/60 to-purple-50/30">
+                        <div className="flex aspect-square w-full items-center justify-center text-muted-foreground bg-gradient-to-br from-muted/60 to-muted/30">
                           No image
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-purple-900/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     </div>
                   </CardHeader>
                   <CardContent className="flex flex-1 flex-col space-y-3 p-5">
                     <div>
-                      <CardTitle className="text-lg font-semibold transition-colors duration-300 group-hover:text-purple-600">
+                      <CardTitle className="text-lg font-semibold transition-colors duration-300 group-hover:text-primary">
                         {product?.name ?? "Untitled product"}
                       </CardTitle>
                       <CardDescription className="mt-2 line-clamp-2 text-sm">
@@ -259,12 +259,12 @@ const ProductsSection = ({ section }: { section: Section }) => {
                     </div>
                     <div className="mt-auto space-y-2 text-sm">
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-foreground bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent text-lg">
+                        <span className="font-semibold text-foreground bg-gradient-to-r from-primary/80 to-primary bg-clip-text text-transparent text-lg">
                           {price}
                         </span>
                         <Badge 
                           variant={inStock ? "default" : "secondary"}
-                          className="transition-all duration-300 group-hover:scale-105 bg-purple-600 hover:bg-purple-700"
+                          className="transition-all duration-300 group-hover:scale-105"
                         >
                           {inStock ? "In stock" : "Out of stock"}
                         </Badge>
@@ -276,12 +276,12 @@ const ProductsSection = ({ section }: { section: Section }) => {
                       )}
                     </div>
                   </CardContent>
-                  <CardFooter className="block md:flex items-center justify-end gap-2 border-t border-purple-200/50 bg-gradient-to-r from-purple-50/30 to-purple-100/10 p-4 backdrop-blur-sm">
+                  <CardFooter className="block md:flex items-center justify-end gap-2 border-t border-muted/50 bg-gradient-to-r from-muted/30 to-muted/10 p-4 backdrop-blur-sm">
                     <Button 
                       asChild 
                       variant="default" 
                       size="sm"
-                      className="transition-all duration-300 hover:scale-105 hover:shadow-lg bg-purple-600 hover:bg-purple-700"
+                      className="transition-all duration-300 hover:scale-105 hover:shadow-lg"
                     >
                       <Link
                         href={
@@ -298,7 +298,7 @@ const ProductsSection = ({ section }: { section: Section }) => {
                       size="sm"
                       disabled={!inStock || !cartProductId || isAdding}
                       onClick={handleAddToCart}
-                      className="transition-all duration-300 hover:scale-105 hover:shadow-md disabled:opacity-50 border-purple-300 text-purple-700 hover:bg-purple-50 hover:text-purple-800"
+                      className="transition-all duration-300 hover:scale-105 hover:shadow-md disabled:opacity-50"
                     >
                       {isAdding
                         ? "Adding..."
@@ -317,7 +317,7 @@ const ProductsSection = ({ section }: { section: Section }) => {
           <Button 
             asChild 
             variant="outline" 
-            className="transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-gradient-to-r hover:from-purple-500/10 hover:to-purple-600/5 border-purple-300 text-purple-700 hover:text-purple-800"
+            className="transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5"
           >
             <Link href={isBuilder ? templateUrl("/products") : "/products"}>
               Browse all products

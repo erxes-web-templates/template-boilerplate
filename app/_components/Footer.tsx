@@ -23,23 +23,25 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
   const menus = data?.cmsMenuList || [];
 
   return (
-    <footer className="bg-gray-800 text-white">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-wrap justify-between">
-          <div className="w-full md:w-1/3 mb-6 md:mb-0">
-            <h3 className="text-xl font-bold mb-2">
-              <Link href={templateUrl("/")}>{cpDetail?.name}</Link>
-            </h3>
-            <p>{cpDetail?.description}</p>
+    <footer className="border-t bg-background">
+      <div className="container mx-auto max-w-6xl px-4 py-12">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+          <div>
+            <Link href={templateUrl("/")} className="text-lg font-semibold">
+              {cpDetail?.name}
+            </Link>
+            <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+              {cpDetail?.description}
+            </p>
           </div>
-          <div className="w-full md:w-1/3 mb-6 md:mb-0">
-            <h4 className="text-lg font-semibold mb-2">Quick Links</h4>
-            <ul>
+          <div>
+            <h4 className="text-sm font-medium mb-4">Quick Links</h4>
+            <ul className="space-y-2">
               {menus.map((menu: MenuItem) => (
                 <li key={menu._id}>
                   <Link
                     href={templateUrl(menu.url || "/")}
-                    className="hover:underline"
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {menu.label}
                   </Link>
@@ -47,71 +49,73 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
               ))}
             </ul>
           </div>
-          <div className="w-full md:w-1/3">
-            <h4 className="text-lg font-semibold mb-2">Contact Us</h4>
-            <p>Email: {cpDetail?.externalLinks?.emails[0]}</p>
-            <p>Phone: {cpDetail?.externalLinks?.phones[0]}</p>
-            <p>Address: {cpDetail?.externalLinks?.address} </p>
-            <div className="flex space-x-4">
+          <div>
+            <h4 className="text-sm font-medium mb-4">Contact</h4>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              {cpDetail?.externalLinks?.emails[0] && (
+                <p>{cpDetail?.externalLinks?.emails[0]}</p>
+              )}
+              {cpDetail?.externalLinks?.phones[0] && (
+                <p>{cpDetail?.externalLinks?.phones[0]}</p>
+              )}
+              {cpDetail?.externalLinks?.address && (
+                <p>{cpDetail?.externalLinks?.address}</p>
+              )}
+            </div>
+            <div className="flex gap-4 mt-4">
               {cpDetail?.externalLinks?.facebook && (
                 <a
                   href={cpDetail?.externalLinks?.facebook}
-                  className="text-white hover:text-gray-300 transition-colors duration-200"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {" "}
-                  <Facebook />{" "}
+                  <Facebook className="h-4 w-4" />
                 </a>
               )}
               {cpDetail?.externalLinks?.twitter && (
                 <a
                   href={cpDetail?.externalLinks?.twitter}
-                  className="text-white hover:text-gray-300 transition-colors duration-200"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {" "}
-                  <Twitter />{" "}
+                  <Twitter className="h-4 w-4" />
                 </a>
               )}
               {cpDetail?.externalLinks?.linkedin && (
                 <a
                   href={cpDetail?.externalLinks?.linkedin}
-                  className="text-white hover:text-gray-300 transition-colors duration-200"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {" "}
-                  <Linkedin />{" "}
+                  <Linkedin className="h-4 w-4" />
                 </a>
               )}
               {cpDetail?.externalLinks?.youtube && (
                 <a
                   href={cpDetail?.externalLinks?.youtube}
-                  className="text-white hover:text-gray-300 transition-colors duration-200"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {" "}
-                  <Youtube />{" "}
+                  <Youtube className="h-4 w-4" />
                 </a>
               )}
               {cpDetail?.externalLinks?.instagram && (
                 <a
                   href={cpDetail?.externalLinks?.instagram}
-                  className="text-white hover:text-gray-300 transition-colors duration-200"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {" "}
-                  <Instagram />{" "}
+                  <Instagram className="h-4 w-4" />
                 </a>
               )}
               {cpDetail?.externalLinks?.whatsapp && (
                 <a
                   href={cpDetail?.externalLinks?.whatsapp}
-                  className="text-white hover:text-gray-300 transition-colors duration-200"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {" "}
-                  <MessageCircle />{" "}
+                  <MessageCircle className="h-4 w-4" />
                 </a>
               )}
             </div>
           </div>
         </div>
-        <div className="mt-8 text-center">
-          <p>{cpDetail?.copyright}</p>
+        <div className="mt-12 pt-8 border-t text-center">
+          <p className="text-sm text-muted-foreground">{cpDetail?.copyright}</p>
         </div>
       </div>
     </footer>

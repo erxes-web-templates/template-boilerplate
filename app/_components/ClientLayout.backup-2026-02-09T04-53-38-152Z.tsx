@@ -185,24 +185,20 @@ export default function ClientBoilerplateLayout() {
   };
 
   return (
-    <div className="bg-background relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.03),transparent_50%)] pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(120,119,198,0.03),transparent_50%)] pointer-events-none" />
-      
+    <div className="bg-background">
       {missingPosToken && (
-        <div className="bg-gradient-to-r from-amber-50 via-amber-50/80 to-amber-50 border-b border-amber-200/50 backdrop-blur-sm relative z-10 animate-in fade-in slide-in-from-top-4 duration-500">
+        <div className="bg-amber-50 border-b border-amber-200">
           <div className="mx-auto max-w-6xl px-4 py-4">
             <Alert
               variant="destructive"
-              className="bg-gradient-to-br from-amber-50/50 to-orange-50/30 border border-amber-200/50 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-300 p-4 text-amber-900 animate-in fade-in zoom-in-95 duration-700"
+              className="bg-transparent border-none p-0 text-amber-900"
             >
-              <AlertTitle className="font-semibold text-amber-950">POS token required</AlertTitle>
-              <AlertDescription className="mt-2 text-amber-800">
-                This ecommerce template needs an <code className="px-1.5 py-0.5 bg-amber-100 rounded text-xs font-mono">erxes-pos-token</code> to
+              <AlertTitle>POS token required</AlertTitle>
+              <AlertDescription>
+                This ecommerce template needs an <code>erxes-pos-token</code> to
                 load products. Create a POS in erxes, copy its public token,
                 then add it to the client portal&apos;s environment variables as{" "}
-                <code className="px-1.5 py-0.5 bg-amber-100 rounded text-xs font-mono">NEXT_PUBLIC_POS_TOKEN</code>.
+                <code>NEXT_PUBLIC_POS_TOKEN</code>.
               </AlertDescription>
             </Alert>
           </div>
@@ -233,15 +229,9 @@ export default function ClientBoilerplateLayout() {
         />
       )}
       <CartProvider>
-        <div className="relative z-10 animate-in fade-in slide-in-from-top-2 duration-700">
-          <Header cpDetail={cpDetail} />
-        </div>
-        <main className="relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
-          {renderPageContent()}
-        </main>
-        <div className="relative z-10 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-200">
-          <Footer cpDetail={cpDetail} />
-        </div>
+        <Header cpDetail={cpDetail} />
+        <main>{renderPageContent()}</main>
+        <Footer cpDetail={cpDetail} />
       </CartProvider>
     </div>
   );

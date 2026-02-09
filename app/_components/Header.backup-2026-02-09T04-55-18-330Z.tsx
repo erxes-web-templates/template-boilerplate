@@ -99,22 +99,14 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
     <div key={menu._id} className="relative group z-10">
       <Link
         href={templateUrl(menu.url || "")}
-        className="relative text-sm font-medium text-foreground/80 transition-all duration-300 hover:text-primary after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-gradient-to-r after:from-primary after:to-primary/60 after:transition-all after:duration-300 hover:after:w-full"
+        className="hover:underline text-primary text-sm font-medium transition-colors hover:text-primary "
       >
         {menu.label}
       </Link>
       {menu.children.length > 0 && (
-        <div className="absolute hidden group-hover:block bg-white/95 backdrop-blur-md shadow-lg rounded-lg border border-border/50 mt-2 animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="space-y-1 p-3 min-w-[180px]">
-            {menu.children.map((child: any) => (
-              <Link
-                key={child._id}
-                href={templateUrl(child.url || "")}
-                className="block px-3 py-2 text-sm font-medium text-foreground/70 rounded-md transition-all duration-200 hover:text-primary hover:bg-primary/5"
-              >
-                {child.label}
-              </Link>
-            ))}
+        <div className="absolute hidden group-hover:block bg-white shadow-md ">
+          <div className="space-y-2 p-2">
+            {menu.children.map((child: any) => renderMenu(child))}
           </div>
         </div>
       )}
@@ -232,90 +224,79 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
   console.log(searchResults, "sr");
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-gradient-to-r from-background via-background to-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80 shadow-sm">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-8">
-          <Link
-            href={templateUrl("/")}
-            className="text-xl font-bold transition-transform duration-300 hover:scale-105"
-          >
+        <div className="flex items-center gap-6">
+          <Link href={templateUrl("/")} className="text-xl font-bold">
             {cpDetail.logo ? (
-              <div className="relative">
-                <Image
-                  src={getFileUrl(cpDetail.logo)}
-                  alt={cpDetail.name}
-                  width={50}
-                  height={50}
-                  className="transition-all duration-300 hover:brightness-110"
-                />
-              </div>
+              <Image
+                src={getFileUrl(cpDetail.logo)}
+                alt={cpDetail.name}
+                width={50}
+                height={50}
+              />
             ) : (
-              <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                {cpDetail.name}
-              </span>
+              cpDetail.name
             )}
           </Link>
-          <nav className="hidden items-center gap-8 md:flex">
+          <nav className="hidden items-center gap-6 md:flex">
             {nestedMenus.map(renderMenu)}
           </nav>
         </div>
 
         <div className="hidden flex-1 items-center justify-center px-8 md:flex">
           <form onSubmit={handleSearchSubmit} className="w-full max-w-md">
-            <div className="relative group">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors duration-300 group-focus-within:text-primary" />
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 type="search"
                 value={searchTerm}
                 onChange={handleInputChange}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
-                placeholder="Search products..."
-                className="w-full pl-10 bg-muted/30 border-border/50 transition-all duration-300 focus:bg-background focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+                placeholder="Search..."
+                className="w-full pl-10"
               />
               {showSearchResults && (
-                <div className="absolute left-0 right-0 top-full z-20 mt-2 rounded-xl border border-border/50 bg-gradient-to-b from-white to-white/95 backdrop-blur-xl shadow-2xl animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="absolute left-0 right-0 top-full z-20 mt-2 rounded-lg border border-border bg-popover shadow-xl bg-white">
                   {shouldQueryProducts ? (
                     searchLoading ? (
-                      <div className="p-6 text-sm text-muted-foreground text-center">
-                        <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent mr-2"></div>
+                      <div className="p-4 text-sm text-muted-foreground">
                         Searching products...
                       </div>
                     ) : searchResults.length ? (
-                      <ul className="divide-y divide-border/30">
+                      <ul className="divide-y divide-border">
                         {searchResults.map((item: any) => (
-                          <li key={item._id} className="group/item">
+                          <li key={item._id}>
                             <button
                               type="button"
                               onMouseDown={(event) => event.preventDefault()}
                               onClick={() => handleProductSelect(item._id)}
-                              className="flex w-full items-center justify-between gap-3 p-4 text-left transition-all duration-200 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10"
+                              className="flex w-full items-center justify-between gap-3 p-3 text-left hover:bg-muted/60"
                             >
-                              <div className="flex justify-start items-center">
-                                <div className="relative overflow-hidden rounded-lg mr-3 transition-transform duration-300 group-hover/item:scale-105">
-                                  <Image
-                                    src={
-                                      item.attachment.url || "/placeholder.png"
-                                    }
-                                    alt={item.name || "Product image"}
-                                    width={50}
-                                    height={50}
-                                    className="rounded"
-                                  />
-                                </div>
+                              <div className="flex justify-start">
+                                <Image
+                                  src={
+                                    item.attachment.url || "/placeholder.png"
+                                  }
+                                  alt={item.name || "Product image"}
+                                  width={40}
+                                  height={40}
+                                  className="rounded mr-3"
+                                />
                                 <div className="flex flex-col">
-                                  <span className="text-sm font-semibold text-foreground transition-colors duration-200 group-hover/item:text-primary">
+                                  <span className="text-sm font-semibold text-foreground">
                                     {item.name || "Untitled product"}
                                   </span>
                                   {item.category?.name && (
-                                    <span className="text-xs text-muted-foreground mt-0.5">
+                                    <span className="text-xs text-muted-foreground">
                                       {item.category.name}
                                     </span>
                                   )}
                                 </div>
                               </div>
                               {Number.isFinite(item.unitPrice) && (
-                                <span className="text-sm font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                                <span className="text-sm font-semibold text-primary">
                                   {formatCurrency(item.unitPrice || 0)}
                                 </span>
                               )}
@@ -327,19 +308,19 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                             type="button"
                             onMouseDown={(event) => event.preventDefault()}
                             onClick={() => handleSearchSubmit()}
-                            className="flex w-full items-center justify-center p-4 text-sm font-medium text-primary hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 transition-all duration-200"
+                            className="flex w-full items-center justify-between p-3 text-sm font-medium text-primary hover:bg-muted/60"
                           >
-                            View all results →
+                            View all results
                           </button>
                         </li>
                       </ul>
                     ) : (
-                      <div className="p-6 text-sm text-muted-foreground text-center">
+                      <div className="p-4 text-sm text-muted-foreground">
                         No products found.
                       </div>
                     )
                   ) : (
-                    <div className="p-6 text-sm text-muted-foreground text-center">
+                    <div className="p-4 text-sm text-muted-foreground">
                       Type at least 2 characters to search.
                     </div>
                   )}
@@ -349,27 +330,19 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
           </form>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <Link href={templateUrl("/profile")}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hidden md:flex transition-all duration-300 hover:bg-primary/10 hover:scale-105"
-            >
+            <Button variant="ghost" size="icon" className="hidden md:flex">
               <User className="h-5 w-5" />
             </Button>
           </Link>
 
           <Sheet open={isCartSheetOpen} onOpenChange={setIsCartSheetOpen}>
             <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative transition-all duration-300 hover:bg-primary/10 hover:scale-105"
-              >
+              <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
                 {hasItems && (
-                  <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs bg-gradient-to-r from-primary to-primary/70 border-0 animate-in zoom-in duration-300">
+                  <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs">
                     {totalItems}
                   </Badge>
                 )}
@@ -377,11 +350,11 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="flex w-full max-w-sm flex-col gap-4 p-6 sm:max-w-md bg-gradient-to-b from-background to-background/95"
+              className="flex w-full max-w-sm flex-col gap-4 p-6 sm:max-w-md"
             >
               <div className="flex items-start justify-between">
                 <SheetHeader className="space-y-1 text-left">
-                  <SheetTitle className="text-lg font-semibold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+                  <SheetTitle className="text-lg font-semibold">
                     Your cart
                   </SheetTitle>
                   <SheetDescription className="text-sm text-muted-foreground">
@@ -393,12 +366,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                   </SheetDescription>
                 </SheetHeader>
                 {hasItems && (
-                  <Badge
-                    variant="outline"
-                    className="border-primary/30 bg-primary/5"
-                  >
-                    {totalItems} items
-                  </Badge>
+                  <Badge variant="outline">{totalItems} items</Badge>
                 )}
               </div>
               {hasItems ? (
@@ -409,9 +377,9 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                       return (
                         <div
                           key={item.id}
-                          className="flex gap-3 rounded-xl border border-border/50 bg-gradient-to-br from-card/50 to-card/30 p-3 transition-all duration-300 hover:shadow-md hover:border-primary/30"
+                          className="flex gap-3 rounded-md border border-border bg-card/50 p-3"
                         >
-                          <div className="relative h-16 w-16 overflow-hidden rounded-lg bg-muted transition-transform duration-300 hover:scale-105">
+                          <div className="relative h-16 w-16 overflow-hidden rounded-md bg-muted">
                             {item.imageUrl ? (
                               <Image
                                 src={item.imageUrl}
@@ -431,7 +399,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                               <p className="text-sm font-medium leading-tight">
                                 {item.name}
                               </p>
-                              <span className="text-sm font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                              <span className="text-sm font-semibold">
                                 {formatCurrency(lineTotal)}
                               </span>
                             </div>
@@ -449,7 +417,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                                 <Button
                                   variant="outline"
                                   size="icon"
-                                  className="h-8 w-8 transition-all duration-200 hover:bg-primary/10 hover:border-primary/50"
+                                  className="h-8 w-8"
                                   onClick={() => {
                                     void updateQuantity(
                                       item.id,
@@ -460,13 +428,13 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                                 >
                                   <Minus className="h-4 w-4" />
                                 </Button>
-                                <span className="text-sm font-medium min-w-[20px] text-center">
+                                <span className="text-sm font-medium">
                                   {item.quantity}
                                 </span>
                                 <Button
                                   variant="outline"
                                   size="icon"
-                                  className="h-8 w-8 transition-all duration-200 hover:bg-primary/10 hover:border-primary/50"
+                                  className="h-8 w-8"
                                   onClick={() => {
                                     void updateQuantity(
                                       item.id,
@@ -484,7 +452,6 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                                   size="sm"
                                   asChild
                                   disabled={isSyncing}
-                                  className="transition-all duration-200 hover:bg-primary/10"
                                 >
                                   <Link
                                     href={templateUrl(`/products/${item.id}`)}
@@ -495,7 +462,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 text-destructive transition-all duration-200 hover:bg-destructive/10"
+                                  className="h-8 w-8 text-destructive"
                                   onClick={() => {
                                     void removeFromCart(item.id);
                                   }}
@@ -512,20 +479,20 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                   </div>
                 </ScrollArea>
               ) : (
-                <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border/50 bg-gradient-to-br from-muted/30 to-muted/10 p-6 text-center text-sm text-muted-foreground">
+                <div className="flex flex-1 items-center justify-center rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
                   Add products to your cart to see them here.
                 </div>
               )}
-              <div className="space-y-4 border-t border-border/50 pt-4 bg-gradient-to-b from-transparent to-muted/20 -mx-6 px-6 pb-2">
+              <div className="space-y-4 border-t border-border pt-4">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span className="text-base font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                  <span className="text-base font-semibold">
                     {formatCurrency(totalPrice)}
                   </span>
                 </div>
                 <div className="flex gap-2">
                   <Button
-                    className="flex-1 bg-gradient-to-r from-primary to-primary/90 transition-all duration-300 hover:shadow-lg hover:scale-105"
+                    className="flex-1"
                     disabled={!hasItems || isSyncing}
                     asChild
                   >
@@ -533,7 +500,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                   </Button>
                   <Button
                     variant="outline"
-                    className="flex-1 transition-all duration-300 hover:bg-destructive/10 hover:border-destructive/50 hover:text-destructive"
+                    className="flex-1"
                     size="lg"
                     disabled={!hasItems || isSyncing}
                     onClick={() => {
@@ -549,34 +516,27 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
 
           <Sheet>
             <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden transition-all duration-300 hover:bg-primary/10 hover:scale-105"
-              >
+              <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent
-              side="right"
-              className="bg-gradient-to-b from-background to-background/95"
-            >
+            <SheetContent side="right">
               <nav className="flex flex-col gap-4 mt-8">
                 {nestedMenus.map((menu) => (
                   <div key={menu._id} className="flex flex-col">
                     <Link
                       href={templateUrl(menu.url || "")}
-                      className="text-sm font-medium text-foreground/80 transition-all duration-300 hover:text-primary px-3 py-2 rounded-lg hover:bg-primary/5"
+                      className="hover:underline text-primary text-sm font-medium transition-colors hover:text-primary "
                     >
                       {menu.label}
                     </Link>
                     {menu.children.length > 0 && (
-                      <div className="mt-2 ml-4 flex flex-col gap-1 pl-3 border-l-2 border-border/30">
+                      <div className="mt-2 ml-4 flex flex-col gap-2">
                         {menu.children.map((child) => (
                           <Link
                             key={child._id}
                             href={templateUrl(child.url || "")}
-                            className="text-sm font-medium text-foreground/70 transition-all duration-300 hover:text-primary px-3 py-2 rounded-lg hover:bg-primary/5"
+                            className="hover:underline text-primary text-sm font-medium transition-colors hover:text-primary "
                           >
                             {child.label}
                           </Link>

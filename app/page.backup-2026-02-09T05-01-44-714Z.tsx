@@ -54,15 +54,10 @@ export default function HomePage() {
   });
 
   return (
-    <div className="home relative overflow-hidden min-h-screen">
-      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-background via-background/95 to-muted/30 pointer-events-none" />
-      <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent pointer-events-none animate-pulse [animation-duration:8s]" />
-      <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-accent/5 via-transparent to-transparent pointer-events-none animate-pulse [animation-duration:12s] [animation-delay:2s]" />
-      <div className="fixed top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10 animate-pulse [animation-duration:10s]" />
-      <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl -z-10 animate-pulse [animation-duration:14s] [animation-delay:3s]" />
-      <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out">
-        {renderedSections}
-      </div>
+    <div className="home relative overflow-hidden">
+      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-background via-background to-muted/20 pointer-events-none" />
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
+      <div className="animate-in fade-in duration-700">{renderedSections}</div>
     </div>
   );
 }
