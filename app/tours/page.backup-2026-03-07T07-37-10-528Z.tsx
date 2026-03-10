@@ -24,39 +24,30 @@ export default async function ToursPage() {
   const tours = data?.list || [];
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
-          Our Tours
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Discover our collection of amazing tours and experiences
-        </p>
-      </div>
-      
-      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:gap-10">
+    <>
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
         {tours.map((tour: BmTour) => (
-          <Card key={tour._id} className="flex flex-col overflow-hidden transition-shadow hover:shadow-lg">
-            <CardHeader className="p-0">
+          <Card key={tour._id} className="mb-2">
+            <CardHeader>
               {tour.imageThumbnail && (
-                <div className="relative w-full h-[240px] overflow-hidden">
+                <div className="relative w-full h-[200px]">
                   <Image
                     src={getFileUrl(tour.imageThumbnail)}
                     alt={tour.name}
                     fill
-                    className="object-cover transition-transform hover:scale-105"
+                    className="rounded-md h-[200px]"
                   />
                 </div>
               )}
             </CardHeader>
-            <CardContent className="flex-1 p-6">
-              <CardTitle className="mb-3 text-xl line-clamp-2">{tour.name}</CardTitle>
-              <CardDescription className="line-clamp-3">
-                <div dangerouslySetInnerHTML={{ __html: tour.content }} />
+            <CardContent>
+              <CardTitle>{tour.name}</CardTitle>
+              <CardDescription>
+                <p dangerouslySetInnerHTML={{ __html: tour.content }} />
               </CardDescription>
             </CardContent>
-            <CardFooter className="flex justify-between items-center p-6 pt-0 mt-auto">
-              <span className="text-xl font-bold text-primary">{tour.cost}</span>
+            <CardFooter className="flex justify-between items-center">
+              <span className="text-lg font-bold">{tour.cost}</span>
               <Link href={`/tours/${tour._id}`}>
                 <Button>Read more</Button>
               </Link>
@@ -64,6 +55,6 @@ export default async function ToursPage() {
           </Card>
         ))}
       </div>
-    </div>
+    </>
   );
 }

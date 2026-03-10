@@ -19,7 +19,7 @@ export default function InquiryPage() {
     },
   });
 
-  const groupTourItems = groupToursData?.bmToursGroupDetail?.items || [];
+  const groupTourItems = groupToursData?.cpBmToursGroupDetail?.items || [];
 
   const { data: formData } = useQuery(INQUIRY_FORM, {
     variables: {

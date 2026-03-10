@@ -40,7 +40,7 @@ export default function TourDetailPage({ initialTourId }: TourDetailPageProps) {
   });
 
   const tour = data?.bmTourDetail || {};
-  const groupTours = groupToursData?.bmToursGroup?.list || [];
+  const groupTours = groupToursData?.cpBmToursGroup?.list || [];
 
   return (
     <div className="container mx-auto p-4">

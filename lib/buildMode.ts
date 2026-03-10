@@ -12,4 +12,12 @@ export const getBuildMode = (): BuildMode => {
   );
 };
 
-export const isBuildMode = () => getBuildMode() === "build";
+export const isBuildMode = () => {
+  if (typeof window !== "undefined") {
+    return (
+      window.location.pathname.includes("/dashboard/projects/") ||
+      getBuildMode() === "build"
+    );
+  }
+  return getBuildMode() === "build";
+};

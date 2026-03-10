@@ -1,7 +1,7 @@
 "use client";
 
 import { Section } from "../types/sections";
-import { GET_CMS_PAGE } from "../graphql/queries";
+import { GET_WEB_PAGE } from "../graphql/queries";
 import { useQuery } from "@apollo/client";
 import { useParams } from "next/navigation";
 import React, { Suspense } from "react";
@@ -24,10 +24,17 @@ import BannerSection from "../app/_components/sections/BannerSection";
 import BookingFormSection from "../app/_components/sections/BookingFormSection";
 const usePage = (slug: string | null) => {
   const params = useParams<{ id: string }>();
-  const { data: pageData, loading } = useQuery(GET_CMS_PAGE, {
+  const { data: pageData, loading } = useQuery(GET_WEB_PAGE, {
     variables: {
       slug: slug,
+      webId: params.id,
     },
+    // Always fetch from network in build mode so the web builder preview
+    // picks up changes immediately after a save mutation runs
+    fetchPolicy:
+      process.env.NEXT_PUBLIC_BUILD_MODE === "build"
+        ? "network-only"
+        : "cache-first",
     context: {
       headers: {
         "client-portal-id": params.id,
@@ -35,7 +42,7 @@ const usePage = (slug: string | null) => {
     },
   });
 
-  const sections = pageData?.cmsPage?.pageItems || [];
+  const sections = pageData?.cpWebPage?.pageItems || [];
 
   const renderSection = (section: Section) => {
     switch (section.type) {

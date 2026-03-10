@@ -15,12 +15,11 @@ import {
 export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
   const { data } = useQuery(GET_CMS_MENU_LIST, {
     variables: {
-      clientPortalId: cpDetail._id,
       kind: "footer",
     },
   });
 
-  const menus = data?.cmsMenuList || [];
+  const menus = data?.cpMenus || [];
 
   return (
     <footer className="border-t bg-background">

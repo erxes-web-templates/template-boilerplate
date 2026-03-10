@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 
 export const TOURS_QUERY = gql`
-  query BmTours($page: Int, $perPage: Int, $status: String) {
-    bmTours(page: $page, perPage: $perPage, status: $status) {
-      total
+  query CpBmsTours($limit: Int, $status: String) {
+    cpBmsTours(limit: $limit, status: $status) {
+      totalCount
       list {
         _id
         content
@@ -162,11 +162,22 @@ export const CP_GET_CONFIG = gql`
   }
 `;
 
-export const GET_CMS_PAGE = gql`
-  query CmsPage($id: String, $slug: String) {
-    cmsPage(_id: $id, slug: $slug) {
+export const GET_WEB_PAGE = gql`
+  query CpWebPage(
+    $id: String
+    $slug: String
+    $language: String
+    $webId: String
+  ) {
+    cpWebPage(_id: $id, slug: $slug, language: $language, webId: $webId) {
       _id
+      webId
+      clientPortalId
       name
+      slug
+      type
+      description
+      coverImage
       content
       createdAt
       updatedAt
@@ -178,6 +189,8 @@ export const GET_CMS_PAGE = gql`
         contentTypeId
         config
       }
+      customFieldsData
+      customFieldsMap
     }
   }
 `;
@@ -204,17 +217,19 @@ export const GET_CMS_MENU = gql`
 `;
 
 export const GET_CMS_MENU_LIST = gql`
-  query CmsMenuList($clientPortalId: String!, $kind: String) {
-    cmsMenuList(clientPortalId: $clientPortalId, kind: $kind) {
+  query CpMenus($kind: String, $language: String) {
+    cpMenus(kind: $kind, language: $language) {
       _id
-      url
       parentId
-      icon
-      kind
+      clientPortalId
       label
-      contentType
-      contentTypeID
+      objectType
+      objectId
+      kind
+      icon
+      url
       order
+      target
     }
   }
 `;
@@ -541,16 +556,14 @@ export const INQUIRY_FORM = gql`
 `;
 
 export const TOURS_GROUP_QUERY = gql`
-  query bmToursGroup(
-    $page: Int
-    $perPage: Int
+  query CpBmToursGroup(
+    $limit: Int
     $tags: [String]
     $status: String
     $branchId: String
   ) {
-    bmToursGroup(
-      page: $page
-      perPage: $perPage
+    cpBmToursGroup(
+      limit: $limit
       tags: $tags
       status: $status
       branchId: $branchId
@@ -593,8 +606,8 @@ export const TOURS_GROUP_QUERY = gql`
 `;
 
 export const TOUR_GROUP_DETAIL_QUERY = gql`
-  query BmToursGroupDetail($groupCode: String, $status: String) {
-    bmToursGroupDetail(groupCode: $groupCode, status: $status) {
+  query CpBmToursGroupDetail($groupCode: String, $status: String) {
+    cpBmToursGroupDetail(groupCode: $groupCode, status: $status) {
       _id
       items {
         _id

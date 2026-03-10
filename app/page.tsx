@@ -1,5 +1,5 @@
-import pageData from "../data/pages/index.json";
 import { renderSections } from "../lib/renderSections";
+import { fetchWebPage } from "../lib/fetchWebPage";
 import { Section } from "../types/sections";
 import { isBuildMode } from "../lib/buildMode";
 import HomePageClient from "./_client/HomePage";
@@ -19,53 +19,37 @@ import LastViewedProductsSection from "./_components/sections/LastViewedProducts
 import BannerSection from "./_components/sections/BannerSection";
 import BookingFormSection from "./_components/sections/BookingFormSection";
 
-export const metadata = {
-  title: pageData.title,
-  description: pageData.description,
+const sectionComponents = {
+  hero: HeroSection,
+  imageText: AboutSection,
+  form: FormSection,
+  tours: ToursSection,
+  youtube: YoutubeSection,
+  cmsPosts: CmsPostsSection,
+  gallery: GallerySection,
+  contact: ContactSection,
+  text: TextSection,
+  products: ProductsSection,
+  productCategories: ProductCategoriesSection,
+  carousel: CarouselSection,
+  lastViewedProducts: LastViewedProductsSection,
+  banner: BannerSection,
+  bookingForm: BookingFormSection,
+  content: TextSection,
 };
 
-export default function HomePage() {
-  console.log("=== HomePage Debug ===");
-  console.log("isBuildMode():", isBuildMode());
-  console.log("BUILD_MODE:", process.env.BUILD_MODE);
-  console.log("NEXT_PUBLIC_BUILD_MODE:", process.env.NEXT_PUBLIC_BUILD_MODE);
-  console.log("pageData:", pageData);
-  console.log("pageData.pageItems:", pageData.pageItems);
-  console.log("pageItems length:", pageData.pageItems?.length);
-
+// In build mode this is rendered inside the web builder (client-side, live Apollo).
+// In production this is a Server Component — Next.js ISR re-generates it
+// automatically based on the revalidate interval set in lib/client.ts.
+export default async function HomePage() {
   if (isBuildMode()) {
-    console.log("Using HomePageClient (build mode)");
     return <HomePageClient />;
   }
 
-  console.log("Using JSON data (production mode)");
-
-  const sectionComponents = {
-    hero: HeroSection,
-    imageText: AboutSection,
-    form: FormSection,
-    tours: ToursSection,
-    youtube: YoutubeSection,
-    cmsPosts: CmsPostsSection,
-    gallery: GallerySection,
-    contact: ContactSection,
-    text: TextSection,
-    products: ProductsSection,
-    productCategories: ProductCategoriesSection,
-    carousel: CarouselSection,
-    lastViewedProducts: LastViewedProductsSection,
-    banner: BannerSection,
-    bookingForm: BookingFormSection,
-    content: TextSection,
-  };
-
-  const renderedSections = renderSections({
-    sections: pageData.pageItems as unknown as Section[],
-    components: sectionComponents,
-  });
-
-  console.log("renderedSections:", renderedSections);
-  console.log("=== End Debug ===");
+  // Production: fetch page data server-side (SSR/ISR)
+  const webId = process.env.ERXES_WEB_ID || "";
+  const page = await fetchWebPage(webId, "home");
+  const pageItems: Section[] = page?.pageItems ?? [];
 
   return (
     <div className="home relative overflow-hidden min-h-screen">
@@ -75,7 +59,7 @@ export default function HomePage() {
       <div className="fixed top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10 animate-pulse [animation-duration:10s]" />
       <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl -z-10 animate-pulse [animation-duration:14s] [animation-delay:3s]" />
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out">
-        {renderedSections}
+        {renderSections({ sections: pageItems, components: sectionComponents })}
       </div>
     </div>
   );

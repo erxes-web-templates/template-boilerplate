@@ -6,19 +6,19 @@ import {
 import { getClient } from "./client";
 import type { CmsMenuList, CmsMenuListVariables } from "../types/cms";
 
-export async function fetchMenuList(cpId: string, kind: string) {
+export async function fetchMenuList(kind: string) {
   const client = getClient();
 
   try {
     const { data } = await client.query<
-      { cmsMenuList: CmsMenuList },
-      CmsMenuListVariables
+      { cpMenus: CmsMenuList[] },
+      { kind: string }
     >({
       query: GET_CMS_MENU_LIST,
-      variables: { clientPortalId: cpId, kind },
+      variables: { kind },
     });
 
-    return data.cmsMenuList;
+    return data.cpMenus;
   } catch (error) {
     console.error("Error fetching Menu List:", error);
     return [];

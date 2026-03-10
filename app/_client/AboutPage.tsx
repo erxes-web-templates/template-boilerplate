@@ -9,7 +9,7 @@ const AboutPage = () => {
 
   const pageName = searchParams.get("pageName"); //pageName = about, tours, contact etc
   const PageContent = usePage(pageName);
-  console.log("test", pageName);
+  console.log("test abaa", pageName);
   return (
     <div>
       <PageContent />

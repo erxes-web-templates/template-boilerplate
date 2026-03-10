@@ -25,7 +25,7 @@ export default async function TourDetailPage({ params }: PageProps) {
   }
 
   const tour = await fetchBmTourDetail(id);
-  const groupTours = await fetchBmToursGroup(1, 100);
+  const groupTours = await fetchBmToursGroup(100);
 
   if (!tour) {
     return <div className="container mx-auto p-4">Tour not found.</div>;

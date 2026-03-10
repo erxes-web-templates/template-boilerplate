@@ -67,12 +67,11 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
 
   const { data } = useQuery(GET_CMS_MENU_LIST, {
     variables: {
-      clientPortalId: params.id || process.env.ERXES_CP_ID,
       kind: "main",
     },
   });
 
-  const menus = data?.cmsMenuList || [];
+  const menus = data?.cpMenus || [];
 
   const organizeMenus = (menus: MenuItem[]) => {
     const menuMap: Record<string, MenuItem & { children: MenuItem[] }> = {};

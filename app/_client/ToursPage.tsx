@@ -19,10 +19,10 @@ const ToursPage = () => {
   const PageContent = usePage(pageName);
 
   const { data, loading } = useQuery(TOURS_QUERY, {
-    variables: { perPage: 100, page: 1, status: "website" },
+    variables: { limit: 100, status: "website" },
   });
 
-  const tours = data?.bmTours?.list || [];
+  const tours = data?.cpBmsTours?.list || [];
 
   if (loading) {
     return "Loading ...";

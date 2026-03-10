@@ -14,21 +14,20 @@ import {
 } from "../types/tours";
 
 export async function fetchBmTours(
-  page: number,
-  perPage: number,
+  limit: number,
   config?: any
 ) {
   const client = getClient();
 
   console.log(
-    `[BM Tours] Request params - page: ${page}, perPage: ${perPage}, config:`,
+    `[BM Tours] Request params - limit: ${limit}, config:`,
     JSON.stringify(config)
   );
 
   try {
     const { data } = await client.query<BmToursData>({
       query: TOURS_QUERY,
-      variables: { page, perPage, ...config },
+      variables: { limit, ...config },
       context: {
         headers: {
           "erxes-app-token": process.env.ERXES_APP_TOKEN,
@@ -36,7 +35,7 @@ export async function fetchBmTours(
       },
     });
 
-    return data.bmTours;
+    return data.cpBmsTours;
   } catch (error) {
     console.error("[BM Tours] Error fetching data:", error);
 
@@ -61,7 +60,7 @@ export async function fetchBmTours(
       }
     }
 
-    return { total: 0, list: [] };
+    return { totalCount: 0, list: [] };
   }
 }
 
@@ -89,16 +88,16 @@ export async function fetchBmTourDetail(id: string, branchId?: string) {
   }
 }
 
-export async function fetchBmToursGroup(page: number, perPage: number) {
+export async function fetchBmToursGroup(limit: number) {
   const client = getClient();
 
   try {
     const { data } = await client.query<
-      { bmToursGroup: { list: BmTourDetail[] } },
+      { cpBmToursGroup: { list: BmTourDetail[] } },
       BmToursGroupVariables
     >({
       query: TOURS_GROUP_QUERY,
-      variables: { status: "website", page, perPage },
+      variables: { status: "website", limit },
       context: {
         headers: {
           "erxes-app-token": process.env.ERXES_APP_TOKEN,
@@ -106,7 +105,7 @@ export async function fetchBmToursGroup(page: number, perPage: number) {
       },
     });
 
-    return data.bmToursGroup.list;
+    return data.cpBmToursGroup.list;
   } catch (error) {
     console.error("Error fetching BM Tour Detail:", error);
     return null;
@@ -118,7 +117,7 @@ export async function fetchBmToursGroupDetail(groupCode: string) {
 
   try {
     const { data } = await client.query<
-      { bmToursGroupDetail: BmTourDetail[] },
+      { cpBmToursGroupDetail: BmTourDetail[] },
       BmTourGroupDetailVariables
     >({
       query: TOUR_GROUP_DETAIL_QUERY,
@@ -130,7 +129,7 @@ export async function fetchBmToursGroupDetail(groupCode: string) {
       },
     });
 
-    return data.bmToursGroupDetail;
+    return data.cpBmToursGroupDetail;
   } catch (error) {
     console.error("Error fetching BM Tours Group Detail:", error);
     return null;

@@ -1,45 +1,37 @@
 import { gql } from '@apollo/client';
 
 const login = gql`
-  mutation ClientPortalLogin(
-    $clientPortalId: String!
-    $login: String!
-    $password: String!
+  mutation ClientPortalUserLoginWithCredentials(
+    $email: String
+    $phone: String
+    $password: String
   ) {
-    clientPortalLogin(
-      clientPortalId: $clientPortalId
-      login: $login
+    clientPortalUserLoginWithCredentials(
+      email: $email
+      phone: $phone
       password: $password
     )
   }
 `;
 
 const createUser = gql`
-  mutation ClientPortalRegister(
-    $clientPortalId: String
+  mutation ClientPortalUserRegister(
     $email: String
+    $phone: String
+    $username: String
+    $password: String
     $firstName: String
     $lastName: String
-    $password: String
-    $phone: String
-    $companyName: String
-    $companyRegistrationNumber: String
-    $type: String
-    $username: String
-    $avatar: String
+    $userType: CPUserType
   ) {
-    clientPortalRegister(
-      clientPortalId: $clientPortalId
+    clientPortalUserRegister(
       email: $email
+      phone: $phone
+      username: $username
+      password: $password
       firstName: $firstName
       lastName: $lastName
-      password: $password
-      phone: $phone
-      companyName: $companyName
-      companyRegistrationNumber: $companyRegistrationNumber
-      type: $type
-      username: $username
-      avatar: $avatar
+      userType: $userType
     )
   }
 `;
@@ -56,17 +48,24 @@ const getCode = gql`
   }
 `;
 const resetPassword = gql`
-  mutation clientPortalResetPassword($newPassword: String!, $token: String!) {
-    clientPortalResetPassword(newPassword: $newPassword, token: $token)
+  mutation ClientPortalUserResetPassword(
+    $newPassword: String!
+    $token: String
+    $identifier: String
+    $code: String
+  ) {
+    clientPortalUserResetPassword(
+      newPassword: $newPassword
+      token: $token
+      identifier: $identifier
+      code: $code
+    )
   }
 `;
 
 const forgotPassword = gql`
-  mutation ClientPortalForgotPassword(
-    $clientPortalId: String!
-    $email: String
-  ) {
-    clientPortalForgotPassword(clientPortalId: $clientPortalId, email: $email)
+  mutation ClientPortalUserForgotPassword($identifier: String!) {
+    clientPortalUserForgotPassword(identifier: $identifier)
   }
 `;
 

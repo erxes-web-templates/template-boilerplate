@@ -14,8 +14,8 @@ interface BmTour {
 }
 
 interface BmToursData {
-  bmTours: {
-    total: number;
+  cpBmsTours: {
+    totalCount: number;
     list: BmTour[];
   };
 }
@@ -40,8 +40,7 @@ interface BmTourDetail {
 interface BmToursGroupVariables {
   status: string;
   branchId?: string;
-  page?: number;
-  perPage?: number;
+  limit?: number;
   tags?: string[];
 }
 
