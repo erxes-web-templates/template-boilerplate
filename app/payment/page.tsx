@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "@apollo/client";
 import {
@@ -92,28 +92,56 @@ const PaymentPage = () => {
   const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(
     null
   );
+  const selectedPaymentIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    selectedPaymentIdRef.current = selectedPaymentId;
+  }, [selectedPaymentId]);
+
   const [invoice, setInvoice] = useState<any | null>(null);
+  const [transaction, setTransaction] = useState<any | null>(null);
   const [invoiceError, setInvoiceError] = useState<string | null>(null);
+
+  const mutationContext = appToken
+    ? { headers: { "erxes-app-token": appToken } }
+    : undefined;
+
+  const [addTransaction, { loading: isAddingTransaction }] = useMutation(
+    paymentMutations.addTransaction,
+    {
+      context: mutationContext,
+      onCompleted(data) {
+        const tx = data?.cpPaymentTransactionsAdd;
+        if (tx) {
+          setTransaction(tx);
+        }
+      },
+      onError(error) {
+        setInvoiceError(error.message);
+      },
+    }
+  );
 
   const [createInvoice, { loading: isCreatingInvoice }] = useMutation(
     paymentMutations.createInvoice,
     {
-      context: appToken
-        ? {
-            headers: {
-              "erxes-app-token": appToken,
-            },
-          }
-        : undefined,
+      context: mutationContext,
       onCompleted(data) {
         const payload = data?.cpInvoiceCreate;
         if (payload) {
           setInvoice(payload);
           setInvoiceError(null);
-          toast({
-            title: "Төлбөрийн холбоос бэлэн боллоо",
-            description: "Доорх холбоосоор төлбөрөө гүйцэтгэнэ үү.",
-          });
+          const paymentId = selectedPaymentIdRef.current;
+          if (paymentId) {
+            addTransaction({
+              variables: {
+                input: {
+                  invoiceId: payload._id,
+                  paymentId,
+                  amount: payload.amount,
+                },
+              },
+            });
+          }
         } else {
           setInvoice(null);
           setInvoiceError("Төлбөрийн холбоос үүсгэж чадсангүй.");
@@ -348,10 +376,10 @@ const PaymentPage = () => {
               </Button>
               <Button
                 onClick={handleCreateInvoice}
-                disabled={!selectedPaymentId || isCreatingInvoice}
+                disabled={!selectedPaymentId || isCreatingInvoice || isAddingTransaction}
               >
-                {isCreatingInvoice
-                  ? "Төлбөрийн холбоос үүсгэж байна..."
+                {isCreatingInvoice || isAddingTransaction
+                  ? "Төлбөрийн мэдээлэл бэлдэж байна..."
                   : "Төлбөр төлөх"}
               </Button>
             </div>
@@ -432,9 +460,9 @@ const PaymentPage = () => {
           {invoice && (
             <Card>
               <CardHeader>
-                <CardTitle>Төлбөрийн холбоос</CardTitle>
+                <CardTitle>Төлбөрийн мэдээлэл</CardTitle>
                 <CardDescription>
-                  Холбоосыг дарж тухайн төлбөрийн системд шилжинэ үү.
+                  QR кодыг уншуулж эсвэл холбоосоор төлбөрөө гүйцэтгэнэ үү.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
@@ -452,7 +480,60 @@ const PaymentPage = () => {
                     )}
                   </span>
                 </div>
-                {invoiceRedirectUrl ? (
+
+                {isAddingTransaction && (
+                  <div className="flex items-center justify-center gap-2 py-4 text-sm text-muted-foreground">
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    QR код бэлдэж байна...
+                  </div>
+                )}
+
+                {transaction?.response && (() => {
+                  const res = transaction.response;
+                  const qrImage = res.qr_image || res.qrImage || res.qr_code || res.qrCode || null;
+                  const qrText = res.qr_text || res.qrText || res.qr || null;
+                  const redirectUrl = res.redirectUrl || res.redirect_url || res.paymentUrl || res.payment_url || res.url || invoiceRedirectUrl || null;
+
+                  return (
+                    <div className="space-y-3">
+                      {qrImage && (
+                        <div className="flex flex-col items-center gap-2 rounded-md border border-border p-4">
+                          <p className="text-xs text-muted-foreground">QR кодыг уншуулж төлнэ үү</p>
+                          <img
+                            src={qrImage.startsWith("data:") ? qrImage : `data:image/png;base64,${qrImage}`}
+                            alt="Payment QR"
+                            className="h-48 w-48 rounded"
+                          />
+                        </div>
+                      )}
+                      {!qrImage && qrText && (
+                        <div className="flex flex-col items-center gap-2 rounded-md border border-border p-4">
+                          <p className="text-xs text-muted-foreground">QR кодыг уншуулж төлнэ үү</p>
+                          <img
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=192x192&data=${encodeURIComponent(qrText)}`}
+                            alt="Payment QR"
+                            className="h-48 w-48 rounded"
+                          />
+                        </div>
+                      )}
+                      {redirectUrl && (
+                        <Button asChild className="w-full">
+                          <Link
+                            href={redirectUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2"
+                          >
+                            Төлбөр төлөх линк рүү очих
+                            <ExternalLink className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {!isAddingTransaction && !transaction && invoiceRedirectUrl && (
                   <Button asChild className="w-full">
                     <Link
                       href={invoiceRedirectUrl}
@@ -464,10 +545,6 @@ const PaymentPage = () => {
                       <ExternalLink className="h-4 w-4" />
                     </Link>
                   </Button>
-                ) : (
-                  <p className="text-xs text-muted-foreground">
-                    Төлбөрийн системээс холбоос иртэл түр хүлээнэ үү.
-                  </p>
                 )}
               </CardContent>
             </Card>
