@@ -23,10 +23,10 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { getFileUrl } from "@/lib/utils";
-import paymentQueries from "@/graphql/payment/queries";
-import paymentMutations from "@/graphql/payment/mutations";
-import orderMutations from "@/graphql/order/mutations";
-import authQueries from "@/graphql/auth/queries";
+import paymentQueries from "../../../graphql/payment/queries";
+import paymentMutations from "../../../graphql/payment/mutations";
+import orderMutations from "../../../graphql/order/mutations";
+import authQueries from "../../../graphql/auth/queries";
 import {
   CheckCircle,
   Clock,
@@ -805,6 +805,8 @@ const ProfileOrdersTab = ({ orders, loading }: ProfileOrdersTabProps) => {
       </p>
     );
   }
+
+  console.log(orders, "ppppppp");
 
   return (
     <>

@@ -113,6 +113,8 @@ export default function ProfilePage() {
     fetchPolicy: "cache-and-network",
   });
 
+  console.log("ordersData,", ordersData);
+
   const {
     data: wishlistData,
     loading: wishlistLoading,
@@ -519,6 +521,7 @@ export default function ProfilePage() {
                   <ProfileWishlistTab
                     items={wishlistItems}
                     loading={wishlistLoading}
+                    onRemoved={refetchWishlist}
                   />
                 )}
                 {activeTab === "viewed" && (

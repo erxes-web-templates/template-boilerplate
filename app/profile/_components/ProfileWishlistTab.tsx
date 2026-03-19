@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { X } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -10,6 +13,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getFileUrl, templateUrl } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import productMutations from "../../../graphql/products/mutations";
 import Link from "next/link";
 
 type WishlistItem = {
@@ -29,9 +34,36 @@ type WishlistItem = {
 type ProfileWishlistTabProps = {
   items: WishlistItem[];
   loading?: boolean;
+  onRemoved?: () => void;
 };
 
-const ProfileWishlistTab = ({ items, loading }: ProfileWishlistTabProps) => {
+const ProfileWishlistTab = ({
+  items,
+  loading,
+  onRemoved,
+}: ProfileWishlistTabProps) => {
+  const { toast } = useToast();
+  const [removingId, setRemovingId] = useState<string | null>(null);
+
+  const [wishlistRemove] = useMutation(productMutations.wishlistRemove);
+
+  const handleRemove = async (wishId: string) => {
+    setRemovingId(wishId);
+    try {
+      await wishlistRemove({ variables: { id: wishId } });
+      toast({ title: "Хүслийн жагсаалтаас хасагдлаа" });
+      onRemoved?.();
+    } catch (err: any) {
+      toast({
+        title: "Алдаа гарлаа",
+        description: err?.message ?? "Дахин оролдоно уу.",
+        variant: "destructive",
+      });
+    } finally {
+      setRemovingId(null);
+    }
+  };
+
   if (loading) {
     return (
       <p className="text-sm text-muted-foreground">
@@ -55,6 +87,7 @@ const ProfileWishlistTab = ({ items, loading }: ProfileWishlistTabProps) => {
         const imageUrl = product?.attachment?.url
           ? getFileUrl(product.attachment.url)
           : undefined;
+        const isRemoving = removingId === entry._id;
 
         return (
           <Card
@@ -74,6 +107,14 @@ const ProfileWishlistTab = ({ items, loading }: ProfileWishlistTabProps) => {
                   No image
                 </div>
               )}
+              <button
+                onClick={() => handleRemove(entry._id)}
+                disabled={isRemoving}
+                aria-label="Хүслийн жагсаалтаас хасах"
+                className="absolute right-2 top-2 rounded-full bg-white/90 p-1 shadow transition hover:bg-white disabled:opacity-50"
+              >
+                <X className="h-4 w-4 text-foreground" />
+              </button>
             </div>
             <CardHeader className="py-3">
               <CardTitle className="text-base font-semibold">
