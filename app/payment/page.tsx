@@ -186,7 +186,7 @@ const PaymentPage = () => {
       return;
     }
 
-    const variables: Record<string, any> = {
+    const input: Record<string, any> = {
       amount: totalPrice,
       paymentIds: [selectedPaymentId],
       contentType: "pos:orders",
@@ -199,10 +199,10 @@ const PaymentPage = () => {
     };
 
     if (typeof window !== "undefined") {
-      variables.redirectUri = window.location.href;
+      input.redirectUri = window.location.href;
     }
 
-    await createInvoice({ variables });
+    await createInvoice({ variables: { input } });
   }, [
     createInvoice,
     erxesCustomerId,
