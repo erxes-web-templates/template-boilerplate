@@ -15,10 +15,7 @@ import {
 } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "../../components/ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
 import { useToast } from "../../hooks/use-toast";
 import { useCart } from "../../lib/CartContext";
 import paymentQueries from "../../graphql/payment/queries";
@@ -48,12 +45,7 @@ interface PaymentOption {
 const PaymentPage = () => {
   const router = useRouter();
   const { toast } = useToast();
-  const {
-    items: cartItems,
-    totalPrice,
-    totalItems,
-    orderId,
-  } = useCart();
+  const { items: cartItems, totalPrice, totalItems, orderId } = useCart();
 
   const { data: userData } = useQuery(authQueries.currentUser, {
     fetchPolicy: "cache-first",
@@ -67,21 +59,21 @@ const PaymentPage = () => {
   });
   const appToken = configData?.currentConfig?.erxesAppToken ?? null;
 
-  const {
-    data: orderData,
-    loading: orderLoading,
-  } = useQuery(orderQueries.currentOrder, {
-    variables: {
-      customerId: erxesCustomerId,
-      saleStatus: "cart",
-      perPage: 1,
-      sortField: "createdAt",
-      sortDirection: -1,
-      statuses: [],
+  const { data: orderData, loading: orderLoading } = useQuery(
+    orderQueries.currentOrder,
+    {
+      variables: {
+        customerId: erxesCustomerId,
+        saleStatus: "cart",
+        perPage: 1,
+        sortField: "createdAt",
+        sortDirection: -1,
+        statuses: [],
+      },
+      skip: !erxesCustomerId,
+      fetchPolicy: "cache-and-network",
     },
-    skip: !erxesCustomerId,
-    fetchPolicy: "cache-and-network",
-  });
+  );
 
   const {
     data: paymentsData,
@@ -93,11 +85,11 @@ const PaymentPage = () => {
 
   const paymentOptions = useMemo(
     () => paymentsData?.cpPayments ?? [],
-    [paymentsData]
+    [paymentsData],
   );
 
   const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(
-    null
+    null,
   );
   const selectedPaymentIdRef = useRef<string | null>(null);
   useEffect(() => {
@@ -126,7 +118,7 @@ const PaymentPage = () => {
       onError(error) {
         setInvoiceError(error.message);
       },
-    }
+    },
   );
 
   const [createInvoice, { loading: isCreatingInvoice }] = useMutation(
@@ -164,7 +156,7 @@ const PaymentPage = () => {
           variant: "destructive",
         });
       },
-    }
+    },
   );
 
   useEffect(() => {
@@ -358,7 +350,10 @@ const PaymentPage = () => {
                           {config?.description ?? option.kind}
                         </span>
                         {option.status !== "active" && (
-                          <Badge variant="outline" className="mt-2 w-fit text-xs">
+                          <Badge
+                            variant="outline"
+                            className="mt-2 w-fit text-xs"
+                          >
                             Түр идэвхгүй
                           </Badge>
                         )}
@@ -385,7 +380,9 @@ const PaymentPage = () => {
               </Button>
               <Button
                 onClick={handleCreateInvoice}
-                disabled={!selectedPaymentId || isCreatingInvoice || isAddingTransaction}
+                disabled={
+                  !selectedPaymentId || isCreatingInvoice || isAddingTransaction
+                }
               >
                 {isCreatingInvoice || isAddingTransaction
                   ? "Төлбөрийн мэдээлэл бэлдэж байна..."
@@ -461,7 +458,9 @@ const PaymentPage = () => {
                     ? `, ${parsedDeliveryInfo.district}`
                     : ""}
                 </p>
-                {parsedDeliveryInfo.street && <p>{parsedDeliveryInfo.street}</p>}
+                {parsedDeliveryInfo.street && (
+                  <p>{parsedDeliveryInfo.street}</p>
+                )}
               </CardContent>
             </Card>
           )}
@@ -476,14 +475,17 @@ const PaymentPage = () => {
         </div>
       </div>
 
-      <Dialog open={modalOpen} onOpenChange={(open) => {
-        setModalOpen(open);
-        if (!open) {
-          setInvoice(null);
-          setTransaction(null);
-          setInvoiceError(null);
-        }
-      }}>
+      <Dialog
+        open={modalOpen}
+        onOpenChange={(open) => {
+          setModalOpen(open);
+          if (!open) {
+            setInvoice(null);
+            setTransaction(null);
+            setInvoiceError(null);
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Төлбөрийн мэдээлэл</DialogTitle>
@@ -502,9 +504,9 @@ const PaymentPage = () => {
                 <span>Үлдэгдэл дүн</span>
                 <span className="font-semibold text-foreground">
                   {formatCurrency(
-                    typeof invoice.remainingAmount === "number"
-                      ? invoice.remainingAmount
-                      : totalPrice
+                    typeof invoice.amount === "number"
+                      ? invoice.amount
+                      : totalPrice,
                   )}
                 </span>
               </div>
@@ -516,50 +518,71 @@ const PaymentPage = () => {
                 </div>
               )}
 
-              {transaction?.response && (() => {
-                const res = transaction.response;
-                const qrImage = res.qr_image || res.qrImage || res.qr_code || res.qrCode || null;
-                const qrText = res.qr_text || res.qrText || res.qr || null;
-                const redirectUrl = res.redirectUrl || res.redirect_url || res.paymentUrl || res.payment_url || res.url || invoiceRedirectUrl || null;
+              {transaction?.response &&
+                (() => {
+                  const res = transaction.response;
+                  const qrImage =
+                    res.qr_image ||
+                    res.qrImage ||
+                    res.qr_code ||
+                    res.qrCode ||
+                    null;
+                  const qrText = res.qr_text || res.qrText || res.qr || null;
+                  const redirectUrl =
+                    res.redirectUrl ||
+                    res.redirect_url ||
+                    res.paymentUrl ||
+                    res.payment_url ||
+                    res.url ||
+                    invoiceRedirectUrl ||
+                    null;
 
-                return (
-                  <div className="space-y-3">
-                    {qrImage && (
-                      <div className="flex flex-col items-center gap-2 rounded-md border border-border p-4">
-                        <p className="text-xs text-muted-foreground">QR кодыг уншуулж төлнэ үү</p>
-                        <img
-                          src={qrImage.startsWith("data:") ? qrImage : `data:image/png;base64,${qrImage}`}
-                          alt="Payment QR"
-                          className="h-48 w-48 rounded"
-                        />
-                      </div>
-                    )}
-                    {!qrImage && qrText && (
-                      <div className="flex flex-col items-center gap-2 rounded-md border border-border p-4">
-                        <p className="text-xs text-muted-foreground">QR кодыг уншуулж төлнэ үү</p>
-                        <img
-                          src={`https://api.qrserver.com/v1/create-qr-code/?size=192x192&data=${encodeURIComponent(qrText)}`}
-                          alt="Payment QR"
-                          className="h-48 w-48 rounded"
-                        />
-                      </div>
-                    )}
-                    {redirectUrl && (
-                      <Button asChild className="w-full">
-                        <Link
-                          href={redirectUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2"
-                        >
-                          Төлбөр төлөх линк рүү очих
-                          <ExternalLink className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                    )}
-                  </div>
-                );
-              })()}
+                  return (
+                    <div className="space-y-3">
+                      {qrImage && (
+                        <div className="flex flex-col items-center gap-2 rounded-md border border-border p-4">
+                          <p className="text-xs text-muted-foreground">
+                            QR кодыг уншуулж төлнэ үү
+                          </p>
+                          <img
+                            src={
+                              qrImage.startsWith("data:")
+                                ? qrImage
+                                : `data:image/png;base64,${qrImage}`
+                            }
+                            alt="Payment QR"
+                            className="h-48 w-48 rounded"
+                          />
+                        </div>
+                      )}
+                      {!qrImage && qrText && (
+                        <div className="flex flex-col items-center gap-2 rounded-md border border-border p-4">
+                          <p className="text-xs text-muted-foreground">
+                            QR кодыг уншуулж төлнэ үү
+                          </p>
+                          <img
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=192x192&data=${encodeURIComponent(qrText)}`}
+                            alt="Payment QR"
+                            className="h-48 w-48 rounded"
+                          />
+                        </div>
+                      )}
+                      {redirectUrl && (
+                        <Button asChild className="w-full">
+                          <Link
+                            href={redirectUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2"
+                          >
+                            Төлбөр төлөх линк рүү очих
+                            <ExternalLink className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })()}
 
               {!isAddingTransaction && !transaction && invoiceRedirectUrl && (
                 <Button asChild className="w-full">
