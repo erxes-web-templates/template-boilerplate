@@ -67,7 +67,7 @@ const ProductsSection = ({ section }: { section: Section }) => {
   });
 
   const products = useMemo(() => {
-    const payload = data?.poscProducts as unknown;
+    const payload = data?.cpPoscProducts as unknown;
     if (!payload) {
       return [];
     }

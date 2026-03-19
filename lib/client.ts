@@ -5,7 +5,7 @@ const createClient = () =>
     ssrMode: typeof window === "undefined",
     cache: new InMemoryCache(),
     link: new HttpLink({
-      uri: process.env.ERXES_API_URL,
+      uri: process.env.ERXES_API_URL || "http://localhost:4000/graphql",
       credentials: "include",
       headers: {
         "Access-Control-Allow-Origin": process.env.ERXES_URL || "",

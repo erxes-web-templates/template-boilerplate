@@ -7,7 +7,7 @@ import { AuthProvider } from "./AuthContext";
 // Create the Apollo Client instance
 function makeClient() {
   const httpLink = new HttpLink({
-    uri: process.env.ERXES_API_URL, // Your GraphQL API endpoint
+    uri: process.env.ERXES_API_URL || "http://localhost:4000/graphql", // Your GraphQL API endpoint
     credentials: "include", // Include cookies
     headers: {
       "Access-Control-Allow-Origin": process.env.ERXES_URL || "", // CORS header

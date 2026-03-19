@@ -134,12 +134,12 @@ export default function ProductsPage({
   });
 
   const categories: ProductCategory[] = useMemo(
-    () => categoriesData?.poscProductCategories ?? initialCategories ?? [],
+    () => categoriesData?.cpPoscProductCategories ?? initialCategories ?? [],
     [categoriesData, initialCategories]
   );
 
   const products: DisplayProduct[] = useMemo(() => {
-    const list = productsData?.poscProducts ?? initialProducts ?? [];
+    const list = productsData?.cpPoscProducts ?? initialProducts ?? [];
     return list.map((product) => ({
       id: product._id,
       name: product.name ?? "Untitled product",

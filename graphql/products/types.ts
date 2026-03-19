@@ -25,7 +25,7 @@ export interface ProductCategoriesVariables {
 }
 
 export interface ProductCategoriesData {
-  poscProductCategories: ProductCategory[];
+  cpPoscProductCategories: ProductCategory[];
 }
 
 export interface ProductSummary {
@@ -59,11 +59,11 @@ export interface ProductsVariables {
 }
 
 export interface ProductsData {
-  poscProducts: ProductSummary[];
+  cpPoscProducts: ProductSummary[];
 }
 
 export interface ProductsByTagData {
-  poscProducts: Array<{
+  cpPoscProducts: Array<{
     _id: string;
   }>;
 }
@@ -115,7 +115,7 @@ export interface ProductSimilaritiesPayload {
 }
 
 export interface ProductSimilaritiesData {
-  poscProductSimilarities?: Maybe<ProductSimilaritiesPayload>;
+  cpPoscProductSimilarities?: Maybe<ProductSimilaritiesPayload>;
 }
 
 export interface ProductSimilaritiesVariables {
@@ -142,7 +142,7 @@ export interface ProductDetail {
 }
 
 export interface ProductDetailData {
-  poscProductDetail?: Maybe<ProductDetail>;
+  cpPoscProductDetail?: Maybe<ProductDetail>;
 }
 
 export interface ProductDetailVariables {
@@ -156,7 +156,7 @@ export interface ProductReviewSummary {
 }
 
 export interface ProductReviewData {
-  productreview?: Maybe<ProductReviewSummary>;
+  cpProductReview?: Maybe<ProductReviewSummary>;
 }
 
 export interface ProductReviewVariables {
@@ -185,7 +185,7 @@ export interface LastProductViewVariables {
 }
 
 export interface ProductAverageReviewData {
-  productreview?: Maybe<ProductReviewSummary>;
+  cpProductReview?: Maybe<ProductReviewSummary>;
 }
 
 export interface ProductAverageReviewVariables {
@@ -193,7 +193,7 @@ export interface ProductAverageReviewVariables {
 }
 
 export interface ProductReviewsData {
-  productreviews: Array<{
+  cpProductReviews: Array<{
     _id: string;
     customerId?: Maybe<string>;
     review?: Maybe<string>;

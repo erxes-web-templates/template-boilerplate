@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
 
 const productreviews = gql`
-  query productreviews(
+  query cpProductReviews(
     $productIds: [String]
     $customerId: String
     $page: Int
     $perPage: Int
   ) {
-    productreviews(
+    cpProductReviews(
       productIds: $productIds
       customerId: $customerId
       page: $page

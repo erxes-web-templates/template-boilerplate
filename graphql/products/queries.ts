@@ -9,8 +9,8 @@ const commonFields = `
 `;
 
 const productCategories = gql`
-  query poscProductCategories ($parentId: String, $searchValue: String, $excludeEmpty: Boolean, $meta: String, $page: Int, $perPage: Int, $sortField: String, $sortDirection: Int) {
-    poscProductCategories(parentId: $parentId, searchValue: $searchValue, excludeEmpty: $excludeEmpty, meta: $meta, page: $page, perPage: $perPage, sortField: $sortField, sortDirection: $sortDirection) {
+  query cpPoscProductCategories ($parentId: String, $searchValue: String, $excludeEmpty: Boolean, $meta: String, $page: Int, $perPage: Int, $sortField: String, $sortDirection: Int) {
+    cpPoscProductCategories(parentId: $parentId, searchValue: $searchValue, excludeEmpty: $excludeEmpty, meta: $meta, page: $page, perPage: $perPage, sortField: $sortField, sortDirection: $sortDirection) {
       ${commonFields}
       order
       parentId
@@ -22,19 +22,19 @@ const productCategories = gql`
 `;
 
 const products = gql`
-  query poscProducts(
+  query cpPoscProducts(
     $searchValue: String,
     $tag: String
-    $type: String, 
-    $categoryId: String, 
-    $page: Int, 
-    $perPage: Int, 
-    $isKiosk: Boolean, 
+    $type: String,
+    $categoryId: String,
+    $page: Int,
+    $perPage: Int,
+    $isKiosk: Boolean,
     $groupedSimilarity: String
     $sortField: String
     $sortDirection: Int
     ) {
-    poscProducts(
+    cpPoscProducts(
       searchValue: $searchValue, 
       tag: $tag
       categoryId: $categoryId, 
@@ -66,15 +66,15 @@ const products = gql`
 
 const productsByTag = gql`
   query productsByTag($tag: String) {
-    poscProducts(tag: $tag) {
+    cpPoscProducts(tag: $tag) {
       _id
     }
   }
 `;
 
 const productsMeta = gql`
-  query PoscProductsMeta($perPage: Int) {
-    poscProducts(perPage: $perPage, isKiosk: true) {
+  query CpPoscProductsMeta($perPage: Int) {
+    cpPoscProducts(perPage: $perPage, isKiosk: true) {
       _id
       modifiedAt
     }
@@ -82,8 +82,8 @@ const productsMeta = gql`
 `;
 
 const productSimilarities = gql`
-  query PoscProductSimilarities($id: String!, $groupedSimilarity: String) {
-    poscProductSimilarities(_id: $id, groupedSimilarity: $groupedSimilarity) {
+  query CpPoscProductSimilarities($id: String!, $groupedSimilarity: String) {
+    cpPoscProductSimilarities(_id: $id, groupedSimilarity: $groupedSimilarity) {
       products {
         _id
         description
@@ -110,7 +110,7 @@ const productsCount = gql`
     $groupedSimilarity: String
     $isKiosk: Boolean
   ) {
-    poscProductsTotalCount(
+    cpPoscProductsTotalCount(
       categoryId: $categoryId
       type: $type
       searchValue: $searchValue
@@ -128,7 +128,7 @@ const getPriceInfo = gql`
 
 const getInitialCategory = gql`
   query InitialCategory($_id: String) {
-    poscProductCategoryDetail(_id: $_id) {
+    cpPoscProductCategoryDetail(_id: $_id) {
       _id
       name
       attachment {
@@ -141,8 +141,8 @@ const getInitialCategory = gql`
 const getKioskCategory = getInitialCategory;
 
 const productDetail = gql`
-  query ProductDetail($_id: String) {
-    poscProductDetail(_id: $_id) {
+  query CpPoscProductDetail($_id: String) {
+    cpPoscProductDetail(_id: $_id) {
       _id
       name
       description
@@ -167,8 +167,8 @@ const productDetail = gql`
 `;
 
 const productReview = gql`
-  query Productreview($productId: String!) {
-    productreview(productId: $productId) {
+  query CpProductreview($productId: String!) {
+    cpProductReview(productId: $productId) {
       average
       length
       productId
@@ -179,8 +179,8 @@ const productReview = gql`
 const getLastProductView = orderQueries.getLastProductView;
 
 const getProductReviews = gql`
-  query Productreviews($productIds: [String], $customerId: String) {
-    productreviews(productIds: $productIds, customerId: $customerId) {
+  query CpProductreviews($productIds: [String], $customerId: String) {
+    cpProductReviews(productIds: $productIds, customerId: $customerId) {
       _id
       customerId
       review

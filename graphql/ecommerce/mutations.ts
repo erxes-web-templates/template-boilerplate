@@ -1,14 +1,14 @@
 import { gql } from '@apollo/client';
 
 const productReviewAdd = gql`
-  mutation productreviewAdd(
+  mutation cpProductReviewAdd(
     $productId: String
     $customerId: String
     $review: Float
     $description: String
     $info: JSON
   ) {
-    productreviewAdd(
+    cpProductReviewAdd(
       productId: $productId
       customerId: $customerId
       review: $review
@@ -26,7 +26,7 @@ const productReviewAdd = gql`
 `;
 
 const productReviewUpdate = gql`
-  mutation productreviewUpdate(
+  mutation cpProductReviewUpdate(
     $_id: String!
     $productId: String
     $customerId: String
@@ -34,7 +34,7 @@ const productReviewUpdate = gql`
     $description: String
     $info: JSON
   ) {
-    productreviewUpdate(
+    cpProductReviewUpdate(
       _id: $_id
       productId: $productId
       customerId: $customerId
@@ -53,8 +53,8 @@ const productReviewUpdate = gql`
 `;
 
 const productReviewRemove = gql`
-  mutation productReviewRemove($_id: String!) {
-    productReviewRemove(_id: $_id)
+  mutation cpProductReviewRemove($_id: String!) {
+    cpProductReviewRemove(_id: $_id)
   }
 `;
 

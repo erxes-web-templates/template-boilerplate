@@ -74,7 +74,7 @@ type ProductDetailPageProps = {
   initialProduct?: ProductDetail | null;
   initialSimilarProducts?: ProductSummary[];
   initialAverageReview?: ProductReviewSummary | null;
-  initialProductReviews?: ProductReviewsData["productreviews"];
+  initialProductReviews?: ProductReviewsData["cpProductReviews"];
 };
 
 export default function ProductDetailPage({
@@ -116,7 +116,7 @@ export default function ProductDetailPage({
     skip: !productId,
   });
 
-  const product = productData?.poscProductDetail ?? initialProduct ?? null;
+  const product = productData?.cpPoscProductDetail ?? initialProduct ?? null;
   const gallery = useMemo(() => {
     if (!product) {
       return [] as string[];
@@ -147,7 +147,7 @@ export default function ProductDetailPage({
 
   const similarProducts = useMemo(() => {
     const items =
-      similarityData?.poscProductSimilarities?.products?.filter(
+      similarityData?.cpPoscProductSimilarities?.products?.filter(
         (entry) => entry._id !== product?._id
       ) ??
       initialSimilarProducts?.filter((entry) => entry._id !== product?._id) ??
@@ -156,7 +156,7 @@ export default function ProductDetailPage({
   }, [similarityData, product?._id, initialSimilarProducts]);
 
   const reviewSummary =
-    reviewData?.productreview ?? initialAverageReview ?? null;
+    reviewData?.cpProductReview ?? initialAverageReview ?? null;
   const averageRating =
     reviewSummary?.average && reviewSummary.average > 0
       ? reviewSummary.average.toFixed(1)
@@ -232,12 +232,12 @@ export default function ProductDetailPage({
 
   const productReviews = useMemo<ProductReview[]>(() => {
     const items =
-      productReviewsData?.productreviews ?? initialProductReviews ?? [];
+      productReviewsData?.cpProductReviews ?? initialProductReviews ?? [];
     if (!Array.isArray(items)) return [];
     return items.filter((entry): entry is ProductReview =>
       Boolean(entry && (!productId || entry.productId === productId))
     );
-  }, [productId, productReviewsData?.productreviews, initialProductReviews]);
+  }, [productId, productReviewsData?.cpProductReviews, initialProductReviews]);
 
   const userReview = useMemo(() => {
     if (!customerId) return null;

@@ -42,12 +42,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
   return (
     <ProductDetailPageClient
       initialProductId={productId}
-      initialProduct={detailResult.data?.poscProductDetail ?? null}
+      initialProduct={detailResult.data?.cpPoscProductDetail ?? null}
       initialSimilarProducts={
-        similaritiesResult.data?.poscProductSimilarities?.products ?? []
+        similaritiesResult.data?.cpPoscProductSimilarities?.products ?? []
       }
-      initialAverageReview={averageResult.data?.productreview ?? null}
-      initialProductReviews={reviewsResult.data?.productreviews ?? []}
+      initialAverageReview={averageResult.data?.cpProductReview ?? null}
+      initialProductReviews={reviewsResult.data?.cpProductReviews ?? []}
     />
   );
 }

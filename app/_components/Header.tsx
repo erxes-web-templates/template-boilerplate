@@ -166,7 +166,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
   }, []);
 
   const searchResults = useMemo(
-    () => searchData?.poscProducts ?? [],
+    () => searchData?.cpPoscProducts ?? [],
     [searchData]
   );
 

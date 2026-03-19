@@ -23,8 +23,8 @@ export default async function ProductsPage() {
 
   return (
     <ProductsPageClient
-      initialCategories={categoriesResult.data?.poscProductCategories ?? []}
-      initialProducts={productsResult.data?.poscProducts ?? []}
+      initialCategories={categoriesResult.data?.cpPoscProductCategories ?? []}
+      initialProducts={productsResult.data?.cpPoscProducts ?? []}
     />
   );
 }

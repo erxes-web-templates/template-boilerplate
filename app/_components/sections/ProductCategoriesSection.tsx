@@ -40,7 +40,7 @@ const ProductCategoriesSection = ({ section }: { section: Section }) => {
   );
 
   const categories = useMemo<ProductCategory[]>(() => {
-    const allCategories: ProductCategory[] = data?.poscProductCategories ?? [];
+    const allCategories: ProductCategory[] = data?.cpPoscProductCategories ?? [];
     if (!selectedCategories || selectedCategories.length === 0) {
       return allCategories;
     }

@@ -36,12 +36,12 @@ const removeLastView = gql`
   }
 `;
 export const ReviewAdd = gql`
-  mutation ProductreviewAdd(
+  mutation CpProductreviewAdd(
     $productId: String
     $customerId: String
     $review: Float
   ) {
-    productreviewAdd(
+    cpProductReviewAdd(
       productId: $productId
       customerId: $customerId
       review: $review
@@ -54,21 +54,21 @@ export const ReviewAdd = gql`
   }
 `;
 export const ReviewRemove = gql`
-  mutation ProductreviewRemove($id: String!) {
-    productreviewRemove(_id: $id) {
+  mutation CpProductreviewRemove($id: String!) {
+    cpProductReviewRemove(_id: $id) {
       _id
       review
     }
   }
 `;
 export const ReviewUpdate = gql`
-  mutation ProductreviewUpdate(
+  mutation CpProductreviewUpdate(
     $id: String!
     $productId: String
     $customerId: String
     $review: Float
   ) {
-    productreviewUpdate(
+    cpProductReviewUpdate(
       _id: $id
       productId: $productId
       customerId: $customerId
