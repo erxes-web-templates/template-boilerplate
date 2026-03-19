@@ -1,32 +1,8 @@
 import { gql } from '@apollo/client';
 
 const createInvoice = gql`
-  mutation CpInvoiceCreate(
-    $amount: Float!
-    $phone: String
-    $email: String
-    $description: String
-    $customerId: String
-    $customerType: String
-    $contentType: String
-    $contentTypeId: String
-    $redirectUri: String
-    $paymentIds: [String]
-    $data: JSON
-  ) {
-    cpInvoiceCreate(
-      amount: $amount
-      phone: $phone
-      email: $email
-      description: $description
-      customerId: $customerId
-      customerType: $customerType
-      contentType: $contentType
-      contentTypeId: $contentTypeId
-      redirectUri: $redirectUri
-      paymentIds: $paymentIds
-      data: $data
-    ) {
+  mutation CpInvoiceCreate($input: InvoiceInput!) {
+    cpInvoiceCreate(input: $input) {
       _id
       invoiceNumber
       amount
