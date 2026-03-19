@@ -3,7 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import { useMutation, useQuery } from "@apollo/client";
 import {
   Card,
@@ -105,7 +110,11 @@ const CheckoutPage = () => {
   const searchParams = useSearchParams();
   const params = useParams();
   const router = useRouter();
+  const pathname = usePathname();
   const stepParam = searchParams.get("step");
+  const currentUrl =
+    pathname +
+    (searchParams?.toString() ? `?${searchParams.toString()}` : "");
   const currentStep = Math.min(
     3,
     Math.max(1, Number.isNaN(Number(stepParam)) ? 1 : Number(stepParam))
@@ -542,7 +551,10 @@ const CheckoutPage = () => {
           {!erxesCustomerId && (
             <div className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
               Хүргэлтийн мэдээлэл оруулахын тулд{" "}
-              <Link href="/auth/login" className="underline">
+              <Link
+                href={`/auth/login?redirect=${encodeURIComponent(currentUrl)}`}
+                className="underline"
+              >
                 эхлээд нэвтэрнэ үү
               </Link>
               .

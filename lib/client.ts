@@ -1,4 +1,9 @@
-import { ApolloClient, HttpLink, InMemoryCache, type NormalizedCacheObject } from "@apollo/client";
+import {
+  ApolloClient,
+  HttpLink,
+  InMemoryCache,
+  type NormalizedCacheObject,
+} from "@apollo/client";
 
 const createClient = () =>
   new ApolloClient({
@@ -9,6 +14,7 @@ const createClient = () =>
       credentials: "include",
       headers: {
         "Access-Control-Allow-Origin": process.env.ERXES_URL || "",
+        "x-app-token": process.env.ERXES_APP_TOKEN || "",
       },
       fetchOptions: {
         // Use Next.js caching with 1 hour revalidation instead of no-store
@@ -18,4 +24,5 @@ const createClient = () =>
     }),
   });
 
-export const getClient = (): ApolloClient<NormalizedCacheObject> => createClient();
+export const getClient = (): ApolloClient<NormalizedCacheObject> =>
+  createClient();

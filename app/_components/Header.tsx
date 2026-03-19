@@ -528,7 +528,12 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                     disabled={!hasItems || isSyncing}
                     asChild
                   >
-                    <Link href={templateUrl("/checkout")}>Checkout</Link>
+                    <Link
+                      href={templateUrl("/checkout")}
+                      onClick={() => setIsCartSheetOpen(false)}
+                    >
+                      Checkout
+                    </Link>
                   </Button>
                   <Button
                     variant="outline"

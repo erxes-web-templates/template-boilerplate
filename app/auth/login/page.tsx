@@ -88,7 +88,8 @@ export default function LoginPage() {
       toast("Login successful", {
         description: "You have been logged in successfully.",
       });
-      router.push(templateUrl("/"));
+      const redirect = searchParams?.get("redirect");
+      router.push(redirect || templateUrl("/"));
     },
   });
 

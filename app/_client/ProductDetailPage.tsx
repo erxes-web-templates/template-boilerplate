@@ -362,6 +362,7 @@ export default function ProductDetailPage({
     [addToLastView, getLocalLastViewed, saveLocalLastViewed]
   );
 
+  const lastViewedKeyRef = useRef<string | null>(null);
   const [buttonState, setButtonState] = useState<ButtonState>("idle");
   const addTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -422,6 +423,12 @@ export default function ProductDetailPage({
     if (!product?._id) {
       return;
     }
+
+    const key = `${product._id}:${customerId ?? ""}`;
+    if (lastViewedKeyRef.current === key) {
+      return;
+    }
+    lastViewedKeyRef.current = key;
 
     if (customerId) {
       const run = async () => {

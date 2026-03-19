@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 const login = gql`
   mutation ClientPortalUserLoginWithCredentials(
@@ -32,7 +32,9 @@ const createUser = gql`
       firstName: $firstName
       lastName: $lastName
       userType: $userType
-    )
+    ) {
+      _id
+    }
   }
 `;
 

@@ -12,6 +12,7 @@ function makeClient() {
     headers: {
       "Access-Control-Allow-Origin": process.env.ERXES_URL || "", // CORS header
       "erxes-pos-token": process.env.NEXT_PUBLIC_POS_TOKEN || "",
+      "x-app-token": process.env.ERXES_APP_TOKEN || "",
     },
     fetchOptions: { cache: "no-store" }, // Disable caching for now
   });

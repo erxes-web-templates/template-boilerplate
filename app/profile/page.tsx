@@ -6,7 +6,7 @@ import {
   useRouter,
   useParams,
   useSearchParams,
-  redirect,
+  usePathname,
 } from "next/navigation";
 import { useMutation, useQuery } from "@apollo/client";
 import authQueries from "../../graphql/auth/queries";
@@ -70,7 +70,10 @@ export default function ProfilePage() {
   const router = useRouter();
   const params = useParams<{ id?: string }>();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const { toast } = useToast();
+
+  const currentUrl = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : "");
 
   const [activeTab, setActiveTab] = useState<SidebarKey>("profile");
 
@@ -417,9 +420,15 @@ export default function ProfilePage() {
     );
   }
 
-  if (error) {
-    redirect(templateUrl("/login"));
-  }
+  useEffect(() => {
+    if (error) {
+      router.push(
+        templateUrl("/auth/login") +
+          "?redirect=" +
+          encodeURIComponent(currentUrl)
+      );
+    }
+  }, [error]);
 
   if (!user) {
     return (
@@ -433,7 +442,15 @@ export default function ProfilePage() {
           </CardHeader>
           <CardFooter className="justify-center gap-3">
             <Button asChild variant="default">
-              <Link href={templateUrl("/login")}>Нэвтрэх</Link>
+              <Link
+                href={
+                  templateUrl("/auth/login") +
+                  "?redirect=" +
+                  encodeURIComponent(currentUrl)
+                }
+              >
+                Нэвтрэх
+              </Link>
             </Button>
             <Button asChild variant="outline">
               <Link href={templateUrl("/register")}>Бүртгүүлэх</Link>
