@@ -185,6 +185,67 @@ export default function ProductDetailPage({
   const [updateProductReview] = useMutation(
     ecommerceMutations.productReviewUpdate
   );
+
+  // Wishlist
+  const { data: wishlistData, refetch: refetchWishlist } = useQuery(
+    ecommerceQueries.wishlist,
+    {
+      variables: { customerId: customerId ?? "" },
+      skip: !customerId,
+      fetchPolicy: "cache-and-network",
+    }
+  );
+  const wishlistItems: Array<{ _id: string; product?: { _id?: string } | null }> =
+    wishlistData?.cpWishlist ?? [];
+  const wishEntry = wishlistItems.find(
+    (w) => w.product?._id === productId
+  ) ?? null;
+  const isWishlisted = !!wishEntry;
+  const [wishLoading, setWishLoading] = useState(false);
+
+  const [wishlistAdd] = useMutation(productMutations.wishlistAdd);
+  const [wishlistRemove] = useMutation(productMutations.wishlistRemove);
+
+  const handleToggleWishlist = useCallback(async () => {
+    if (!customerId) {
+      toast({
+        title: "Нэвтрэх шаардлагатай",
+        description: "Хүслийн жагсаалтад нэмэхийн тулд нэвтэрнэ үү.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (wishLoading || !productId) return;
+    setWishLoading(true);
+    try {
+      if (isWishlisted && wishEntry) {
+        await wishlistRemove({ variables: { id: wishEntry._id } });
+        toast({ title: "Хүслийн жагсаалтаас хасагдлаа" });
+      } else {
+        await wishlistAdd({ variables: { productId, customerId } });
+        toast({ title: "Хүслийн жагсаалтад нэмэгдлээ" });
+      }
+      await refetchWishlist();
+    } catch (err: any) {
+      toast({
+        title: "Алдаа гарлаа",
+        description: err?.message ?? "Дахин оролдоно уу.",
+        variant: "destructive",
+      });
+    } finally {
+      setWishLoading(false);
+    }
+  }, [
+    customerId,
+    isWishlisted,
+    productId,
+    refetchWishlist,
+    toast,
+    wishEntry,
+    wishLoading,
+    wishlistAdd,
+    wishlistRemove,
+  ]);
   const customFields = ((product as any)?.customFieldsData ?? {}) as Record<
     string,
     unknown
@@ -739,8 +800,17 @@ export default function ProductDetailPage({
                     variant="outline"
                     size="lg"
                     className="flex-none rounded-full p-0 sm:w-14"
+                    onClick={handleToggleWishlist}
+                    disabled={wishLoading}
+                    aria-label={isWishlisted ? "Хүслийн жагсаалтаас хасах" : "Хүслийн жагсаалтад нэмэх"}
                   >
-                    <Heart className="h-5 w-5" />
+                    <Heart
+                      className={`h-5 w-5 transition-colors ${
+                        isWishlisted
+                          ? "fill-red-500 stroke-red-500"
+                          : "stroke-current"
+                      }`}
+                    />
                   </Button>
                 </div>
 

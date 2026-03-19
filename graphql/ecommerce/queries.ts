@@ -24,8 +24,8 @@ const productreviews = gql`
 `;
 
 const wishlist = gql`
-  query Wishlist($customerId: String) {
-    wishlist(customerId: $customerId) {
+  query CpWishlist($customerId: String!) {
+    cpWishlist(customerId: $customerId) {
       _id
       customerId
       product {

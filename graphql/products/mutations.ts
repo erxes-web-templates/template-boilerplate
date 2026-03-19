@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 const wishlistAdd = gql`
-  mutation WishlistAdd($productId: String, $customerId: String) {
-    wishlistAdd(productId: $productId, customerId: $customerId) {
+  mutation CpWishlistAdd($productId: String!, $customerId: String!) {
+    cpWishlistAdd(productId: $productId, customerId: $customerId) {
       _id
       productId
       customerId
@@ -11,8 +11,8 @@ const wishlistAdd = gql`
 `;
 
 const wishlistRemove = gql`
-  mutation WishlistRemove($id: String!) {
-    wishlistRemove(_id: $id) {
+  mutation CpWishlistRemove($id: String!) {
+    cpWishlistRemove(_id: $id) {
       _id
     }
   }

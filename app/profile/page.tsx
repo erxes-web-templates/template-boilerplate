@@ -71,6 +71,7 @@ export default function ProfilePage() {
   const params = useParams<{ id?: string }>();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  const currentUrl = pathname ?? "/profile";
   const { toast } = useToast();
 
   const [activeTab, setActiveTab] = useState<SidebarKey>(
@@ -157,15 +158,25 @@ export default function ProfilePage() {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (error) {
+      router.push(
+        templateUrl("/auth/login") +
+          "?redirect=" +
+          encodeURIComponent(currentUrl),
+      );
+    }
+  }, [error]);
+
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
 
-  const orders = useMemo(() => ordersData?.fullOrders ?? [], [ordersData]);
+  const orders = useMemo(() => ordersData?.cpFullOrders ?? [], [ordersData]);
   const wishlistItems = useMemo(
-    () => wishlistData?.wishlist ?? [],
+    () => wishlistData?.cpWishlist ?? [],
     [wishlistData],
   );
   const viewedItems = useMemo(
@@ -419,16 +430,6 @@ export default function ProfilePage() {
       </div>
     );
   }
-
-  useEffect(() => {
-    if (error) {
-      router.push(
-        templateUrl("/auth/login") +
-          "?redirect=" +
-          encodeURIComponent(currentUrl),
-      );
-    }
-  }, [error]);
 
   if (!user) {
     return (
