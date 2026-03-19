@@ -281,7 +281,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           const response = await createOrder({
             variables: baseVariables,
           });
-          const newOrderId = response.data?.ordersAdd?._id ?? null;
+          const newOrderId = response.data?.cpOrdersAdd?._id ?? null;
           if (newOrderId) {
             setOrderId(newOrderId);
           }
@@ -346,8 +346,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
 
     const syncOrder = async () => {
-      const orders = Array.isArray(orderData.fullOrders)
-        ? orderData.fullOrders
+      const orders = Array.isArray(orderData.cpCurrentOrder)
+        ? orderData.cpCurrentOrder
         : [];
       const current = orders[0] ?? null;
       const localCartRaw = ensureOrderItemIds(readLocalCart());

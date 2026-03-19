@@ -173,7 +173,7 @@ const CheckoutPage = () => {
     fetchPolicy: "cache-and-network",
   });
 
-  const activeOrder = orderData?.fullOrders?.[0] ?? null;
+  const activeOrder = orderData?.cpCurrentOrder?.[0] ?? null;
   const deliveryInfoRaw = activeOrder?.deliveryInfo ?? null;
   const parsedDeliveryInfo = useMemo(() => {
     if (!deliveryInfoRaw) {

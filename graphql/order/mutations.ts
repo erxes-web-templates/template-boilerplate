@@ -5,16 +5,16 @@ const addEditParamDefs = `$items: [OrderItemInput], $totalAmount: Float!, $type:
 const addEditParams = `items: $items, totalAmount: $totalAmount, type: $type, customerId: $customerId, registerNumber: $registerNumber, billType: $billType, origin: $origin, dueDate: $dueDate, branchId: $branchId, deliveryInfo: $deliveryInfo, description: $description, saleStatus: $saleStatus`;
 
 const ordersAdd = gql`
-  mutation ordersAdd(${addEditParamDefs}) {
-    ordersAdd(${addEditParams}) {
+  mutation cpOrdersAdd(${addEditParamDefs}) {
+    cpOrdersAdd(${addEditParams}) {
      _id
     }
   }
 `;
 
 const ordersEdit = gql`
-  mutation ordersEdit($_id: String!, ${addEditParamDefs}) {
-    ordersEdit(_id: $_id, ${addEditParams}) {
+  mutation cpOrdersEdit($_id: String!, ${addEditParamDefs}) {
+    cpOrdersEdit(_id: $_id, ${addEditParams}) {
       _id,
       status
     }
@@ -22,16 +22,16 @@ const ordersEdit = gql`
 `;
 
 const orderChangeSaleStatus = gql`
-  mutation OrderChangeSaleStatus($_id: String!, $saleStatus: String) {
-    orderChangeSaleStatus(_id: $_id, saleStatus: $saleStatus) {
+  mutation CpOrderChangeSaleStatus($_id: String!, $saleStatus: String) {
+    cpOrderChangeSaleStatus(_id: $_id, saleStatus: $saleStatus) {
       _id
     }
   }
 `;
 
 const ordersCancel = gql`
-  mutation OrdersCancel($_id: String!) {
-    ordersCancel(_id: $_id)
+  mutation CpOrdersCancel($_id: String!) {
+    cpOrdersCancel(_id: $_id)
   }
 `;
 

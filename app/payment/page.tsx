@@ -85,7 +85,7 @@ const PaymentPage = () => {
   });
 
   const paymentOptions = useMemo(
-    () => paymentsData?.payments ?? [],
+    () => paymentsData?.cpPayments ?? [],
     [paymentsData]
   );
 
@@ -106,7 +106,7 @@ const PaymentPage = () => {
           }
         : undefined,
       onCompleted(data) {
-        const payload = data?.invoiceCreate;
+        const payload = data?.cpInvoiceCreate;
         if (payload) {
           setInvoice(payload);
           setInvoiceError(null);
@@ -136,7 +136,7 @@ const PaymentPage = () => {
     }
   }, [paymentOptions, selectedPaymentId]);
 
-  const activeOrder = orderData?.fullOrders?.[0] ?? null;
+  const activeOrder = orderData?.cpCurrentOrder?.[0] ?? null;
   const parsedDeliveryInfo = useMemo(() => {
     const raw = activeOrder?.deliveryInfo ?? null;
     if (!raw) {
