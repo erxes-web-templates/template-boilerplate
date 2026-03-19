@@ -25,6 +25,13 @@ import paymentQueries from "../../graphql/payment/queries";
 import paymentMutations from "../../graphql/payment/mutations";
 import authQueries from "../../graphql/auth/queries";
 import orderQueries from "../../graphql/order/queries";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../../components/ui/dialog";
 import { ArrowLeft, ExternalLink, RefreshCw } from "lucide-react";
 
 const formatCurrency = (value: number) =>
@@ -100,6 +107,7 @@ const PaymentPage = () => {
   const [invoice, setInvoice] = useState<any | null>(null);
   const [transaction, setTransaction] = useState<any | null>(null);
   const [invoiceError, setInvoiceError] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const mutationContext = appToken
     ? { headers: { "erxes-app-token": appToken } }
@@ -130,6 +138,7 @@ const PaymentPage = () => {
         if (payload) {
           setInvoice(payload);
           setInvoiceError(null);
+          setModalOpen(true);
           const paymentId = selectedPaymentIdRef.current;
           if (paymentId) {
             addTransaction({
@@ -457,99 +466,6 @@ const PaymentPage = () => {
             </Card>
           )}
 
-          {invoice && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Төлбөрийн мэдээлэл</CardTitle>
-                <CardDescription>
-                  QR кодыг уншуулж эсвэл холбоосоор төлбөрөө гүйцэтгэнэ үү.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                <div className="flex items-center justify-between">
-                  <span>И-Баримтын дугаар</span>
-                  <Badge variant="outline">{invoice.invoiceNumber}</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Үлдэгдэл дүн</span>
-                  <span className="font-semibold text-foreground">
-                    {formatCurrency(
-                      typeof invoice.remainingAmount === "number"
-                        ? invoice.remainingAmount
-                        : totalPrice
-                    )}
-                  </span>
-                </div>
-
-                {isAddingTransaction && (
-                  <div className="flex items-center justify-center gap-2 py-4 text-sm text-muted-foreground">
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                    QR код бэлдэж байна...
-                  </div>
-                )}
-
-                {transaction?.response && (() => {
-                  const res = transaction.response;
-                  const qrImage = res.qr_image || res.qrImage || res.qr_code || res.qrCode || null;
-                  const qrText = res.qr_text || res.qrText || res.qr || null;
-                  const redirectUrl = res.redirectUrl || res.redirect_url || res.paymentUrl || res.payment_url || res.url || invoiceRedirectUrl || null;
-
-                  return (
-                    <div className="space-y-3">
-                      {qrImage && (
-                        <div className="flex flex-col items-center gap-2 rounded-md border border-border p-4">
-                          <p className="text-xs text-muted-foreground">QR кодыг уншуулж төлнэ үү</p>
-                          <img
-                            src={qrImage.startsWith("data:") ? qrImage : `data:image/png;base64,${qrImage}`}
-                            alt="Payment QR"
-                            className="h-48 w-48 rounded"
-                          />
-                        </div>
-                      )}
-                      {!qrImage && qrText && (
-                        <div className="flex flex-col items-center gap-2 rounded-md border border-border p-4">
-                          <p className="text-xs text-muted-foreground">QR кодыг уншуулж төлнэ үү</p>
-                          <img
-                            src={`https://api.qrserver.com/v1/create-qr-code/?size=192x192&data=${encodeURIComponent(qrText)}`}
-                            alt="Payment QR"
-                            className="h-48 w-48 rounded"
-                          />
-                        </div>
-                      )}
-                      {redirectUrl && (
-                        <Button asChild className="w-full">
-                          <Link
-                            href={redirectUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2"
-                          >
-                            Төлбөр төлөх линк рүү очих
-                            <ExternalLink className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                      )}
-                    </div>
-                  );
-                })()}
-
-                {!isAddingTransaction && !transaction && invoiceRedirectUrl && (
-                  <Button asChild className="w-full">
-                    <Link
-                      href={invoiceRedirectUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2"
-                    >
-                      Төлбөр төлөх линк рүү очих
-                      <ExternalLink className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
           {invoiceError && (
             <Card>
               <CardContent className="p-4 text-sm text-destructive">
@@ -559,6 +475,109 @@ const PaymentPage = () => {
           )}
         </div>
       </div>
+
+      <Dialog open={modalOpen} onOpenChange={(open) => {
+        setModalOpen(open);
+        if (!open) {
+          setInvoice(null);
+          setTransaction(null);
+          setInvoiceError(null);
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Төлбөрийн мэдээлэл</DialogTitle>
+            <DialogDescription>
+              QR кодыг уншуулж эсвэл холбоосоор төлбөрөө гүйцэтгэнэ үү.
+            </DialogDescription>
+          </DialogHeader>
+
+          {invoice && (
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center justify-between">
+                <span>И-Баримтын дугаар</span>
+                <Badge variant="outline">{invoice.invoiceNumber}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Үлдэгдэл дүн</span>
+                <span className="font-semibold text-foreground">
+                  {formatCurrency(
+                    typeof invoice.remainingAmount === "number"
+                      ? invoice.remainingAmount
+                      : totalPrice
+                  )}
+                </span>
+              </div>
+
+              {isAddingTransaction && (
+                <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  QR код бэлдэж байна...
+                </div>
+              )}
+
+              {transaction?.response && (() => {
+                const res = transaction.response;
+                const qrImage = res.qr_image || res.qrImage || res.qr_code || res.qrCode || null;
+                const qrText = res.qr_text || res.qrText || res.qr || null;
+                const redirectUrl = res.redirectUrl || res.redirect_url || res.paymentUrl || res.payment_url || res.url || invoiceRedirectUrl || null;
+
+                return (
+                  <div className="space-y-3">
+                    {qrImage && (
+                      <div className="flex flex-col items-center gap-2 rounded-md border border-border p-4">
+                        <p className="text-xs text-muted-foreground">QR кодыг уншуулж төлнэ үү</p>
+                        <img
+                          src={qrImage.startsWith("data:") ? qrImage : `data:image/png;base64,${qrImage}`}
+                          alt="Payment QR"
+                          className="h-48 w-48 rounded"
+                        />
+                      </div>
+                    )}
+                    {!qrImage && qrText && (
+                      <div className="flex flex-col items-center gap-2 rounded-md border border-border p-4">
+                        <p className="text-xs text-muted-foreground">QR кодыг уншуулж төлнэ үү</p>
+                        <img
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=192x192&data=${encodeURIComponent(qrText)}`}
+                          alt="Payment QR"
+                          className="h-48 w-48 rounded"
+                        />
+                      </div>
+                    )}
+                    {redirectUrl && (
+                      <Button asChild className="w-full">
+                        <Link
+                          href={redirectUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2"
+                        >
+                          Төлбөр төлөх линк рүү очих
+                          <ExternalLink className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {!isAddingTransaction && !transaction && invoiceRedirectUrl && (
+                <Button asChild className="w-full">
+                  <Link
+                    href={invoiceRedirectUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2"
+                  >
+                    Төлбөр төлөх линк рүү очих
+                    <ExternalLink className="h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
