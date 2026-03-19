@@ -25,7 +25,7 @@ export const currentOrder = gql`
     $sortDirection: Int
     $statuses: [String]
   ) {
-    fullOrders(
+    cpCurrentOrder(
       customerId: $customerId
       saleStatus: $saleStatus
       perPage: $perPage
@@ -58,7 +58,7 @@ export const fullOrders = gql`
     $sortField: String
     $sortDirection: Int
   ) {
-    fullOrders(
+    cpFullOrders(
       customerId: $customerId
       statuses: $statuses
       perPage: $perPage

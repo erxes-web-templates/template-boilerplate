@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 const createInvoice = gql`
-  mutation InvoiceCreate(
+  mutation CpInvoiceCreate(
     $amount: Float!
     $phone: String
     $email: String
@@ -14,7 +14,7 @@ const createInvoice = gql`
     $paymentIds: [String]
     $data: JSON
   ) {
-    invoiceCreate(
+    cpInvoiceCreate(
       amount: $amount
       phone: $phone
       email: $email

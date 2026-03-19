@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 const payments = gql`
-  query Payments {
-    payments {
+  query CpPayments {
+    cpPayments {
       _id
       name
       kind
