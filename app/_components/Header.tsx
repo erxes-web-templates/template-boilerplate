@@ -8,12 +8,14 @@ import {
   type ChangeEvent,
   type FormEvent,
 } from "react";
+import { createPortal } from "react-dom";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { CPDetail, MenuItem } from "../../types/cms";
 import { useQuery } from "@apollo/client";
 import { GET_CMS_MENU_LIST } from "../../graphql/queries";
 import Image from "next/image";
 import { getFileUrl, templateUrl } from "@/lib/utils";
+import { isBuildMode } from "../../lib/buildMode";
 import {
   ShoppingCart,
   Search,
@@ -49,19 +51,28 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(
-    () => searchParams.get("searchValue") ?? ""
+    () => searchParams.get("searchValue") ?? "",
   );
   const [debouncedTerm, setDebouncedTerm] = useState(searchTerm.trim());
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [isCartSheetOpen, setIsCartSheetOpen] = useState(false);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const [dropdownRect, setDropdownRect] = useState<{ top: number; left: number; width: number } | null>(null);
 
   useEffect(
     () => () => {
       if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
     },
-    []
+    [],
   );
+
+  useEffect(() => {
+    if (showSearchResults && searchContainerRef.current) {
+      const rect = searchContainerRef.current.getBoundingClientRect();
+      setDropdownRect({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    }
+  }, [showSearchResults]);
 
   const { data } = useQuery(GET_CMS_MENU_LIST, {
     variables: { kind: "main" },
@@ -85,7 +96,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
     nestedMenus.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0));
     nestedMenus.forEach((menu) => {
       (menu.children as any[]).sort(
-        (a: any, b: any) => (a.order ?? 0) - (b.order ?? 0)
+        (a: any, b: any) => (a.order ?? 0) - (b.order ?? 0),
       );
     });
     return nestedMenus;
@@ -158,12 +169,12 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
 
   const searchResults = useMemo(
     () => searchData?.cpPoscProducts ?? [],
-    [searchData]
+    [searchData],
   );
 
   const handleNavigate = useCallback(
     (path: string) => router.push(templateUrl(path)),
-    [router]
+    [router],
   );
 
   const handleSearchSubmit = useCallback(
@@ -180,15 +191,20 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
       router.push(`${base}${separator}searchValue=${encodeURIComponent(term)}`);
       setShowSearchResults(false);
     },
-    [handleNavigate, router, searchTerm]
+    [handleNavigate, router, searchTerm],
   );
+
+  const isBuilder = isBuildMode();
 
   const handleProductSelect = useCallback(
     (productId: string) => {
-      handleNavigate(`/products/${productId}`);
+      const url = isBuilder
+        ? templateUrl(`/product&productId=${productId}`)
+        : `/products/${productId}`;
+      router.push(url);
       setShowSearchResults(false);
     },
-    [handleNavigate]
+    [router, isBuilder],
   );
 
   const handleFocus = () => {
@@ -206,6 +222,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
   };
 
   return (
+    <>
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
       <div className="container mx-auto flex h-14 items-center justify-between gap-6 px-4">
         {/* Logo */}
@@ -233,7 +250,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
         {/* Search */}
         <div className="hidden flex-1 items-center justify-center md:flex max-w-xs">
           <form onSubmit={handleSearchSubmit} className="w-full">
-            <div className="relative">
+            <div className="relative" ref={searchContainerRef}>
               <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
               <Input
                 type="search"
@@ -243,74 +260,6 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                 onBlur={handleBlur}
                 className="h-8 pl-9 pr-3 text-sm bg-muted/40 border-transparent focus:border-border focus:bg-background"
               />
-              {showSearchResults && (
-                <div className="absolute left-0 right-0 top-full z-20 mt-1 rounded-lg border border-border bg-background shadow-lg">
-                  {shouldQueryProducts ? (
-                    searchLoading ? (
-                      <div className="p-4 text-center text-sm text-muted-foreground">
-                        Searching…
-                      </div>
-                    ) : searchResults.length ? (
-                      <ul>
-                        {searchResults.map((item: any) => (
-                          <li key={item._id} className="border-b border-border last:border-0">
-                            <button
-                              type="button"
-                              onMouseDown={(e) => e.preventDefault()}
-                              onClick={() => handleProductSelect(item._id)}
-                              className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-muted transition-colors"
-                            >
-                              <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md bg-muted">
-                                {item.attachment?.url && (
-                                  <Image
-                                    src={item.attachment.url}
-                                    alt={item.name || ""}
-                                    fill
-                                    className="object-cover"
-                                  />
-                                )}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="truncate text-sm font-medium text-foreground">
-                                  {item.name}
-                                </p>
-                                {item.category?.name && (
-                                  <p className="truncate text-xs text-muted-foreground">
-                                    {item.category.name}
-                                  </p>
-                                )}
-                              </div>
-                              {Number.isFinite(item.unitPrice) && (
-                                <span className="shrink-0 text-sm font-semibold text-primary">
-                                  {formatCurrency(item.unitPrice)}
-                                </span>
-                              )}
-                            </button>
-                          </li>
-                        ))}
-                        <li>
-                          <button
-                            type="button"
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => handleSearchSubmit()}
-                            className="flex w-full items-center justify-center py-2.5 text-sm font-medium text-primary hover:bg-muted transition-colors"
-                          >
-                            View all results →
-                          </button>
-                        </li>
-                      </ul>
-                    ) : (
-                      <div className="p-4 text-center text-sm text-muted-foreground">
-                        No results found.
-                      </div>
-                    )
-                  ) : (
-                    <div className="p-4 text-center text-sm text-muted-foreground">
-                      Type at least 2 characters to search.
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </form>
         </div>
@@ -318,7 +267,11 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
         {/* Actions */}
         <div className="flex items-center gap-1">
           <Link href={templateUrl("/profile")}>
-            <Button variant="ghost" size="icon" className="hidden h-8 w-8 md:flex">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden h-8 w-8 md:flex"
+            >
               <User className="h-4 w-4" />
             </Button>
           </Link>
@@ -335,7 +288,10 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                 )}
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="flex w-full max-w-sm flex-col gap-4 p-6 sm:max-w-md">
+            <SheetContent
+              side="right"
+              className="flex w-full max-w-sm flex-col gap-4 p-6 sm:max-w-md"
+            >
               <SheetHeader className="text-left">
                 <SheetTitle className="text-base font-semibold">
                   Cart
@@ -384,17 +340,29 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                                 variant="outline"
                                 size="icon"
                                 className="h-6 w-6"
-                                onClick={() => void updateQuantity(item.id, item.quantity - 1)}
+                                onClick={() =>
+                                  void updateQuantity(
+                                    item.id,
+                                    item.quantity - 1,
+                                  )
+                                }
                                 disabled={item.quantity <= 1 || isSyncing}
                               >
                                 <Minus className="h-3 w-3" />
                               </Button>
-                              <span className="w-5 text-center text-sm">{item.quantity}</span>
+                              <span className="w-5 text-center text-sm">
+                                {item.quantity}
+                              </span>
                               <Button
                                 variant="outline"
                                 size="icon"
                                 className="h-6 w-6"
-                                onClick={() => void updateQuantity(item.id, item.quantity + 1)}
+                                onClick={() =>
+                                  void updateQuantity(
+                                    item.id,
+                                    item.quantity + 1,
+                                  )
+                                }
                                 disabled={isSyncing}
                               >
                                 <Plus className="h-3 w-3" />
@@ -429,7 +397,11 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                   </span>
                 </div>
                 <div className="flex gap-2">
-                  <Button className="flex-1" disabled={!hasItems || isSyncing} asChild>
+                  <Button
+                    className="flex-1"
+                    disabled={!hasItems || isSyncing}
+                    asChild
+                  >
                     <Link
                       href={templateUrl("/checkout")}
                       onClick={() => setIsCartSheetOpen(false)}
@@ -493,5 +465,85 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
         </div>
       </div>
     </header>
+    {showSearchResults && dropdownRect && typeof document !== "undefined" &&
+      createPortal(
+        <div
+          style={{
+            position: "fixed",
+            top: dropdownRect.top,
+            left: dropdownRect.left,
+            width: dropdownRect.width,
+            zIndex: 9999,
+          }}
+          className="rounded-lg border border-border bg-background shadow-lg"
+        >
+          {shouldQueryProducts ? (
+            searchLoading ? (
+              <div className="p-4 text-center text-sm text-muted-foreground">
+                Searching…
+              </div>
+            ) : searchResults.length ? (
+              <ul>
+                {searchResults.map((item: any) => (
+                  <li key={item._id} className="border-b border-border last:border-0">
+                    <button
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => handleProductSelect(item._id)}
+                      className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-muted transition-colors"
+                    >
+                      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md bg-muted">
+                        {item.attachment?.url && (
+                          <Image
+                            src={item.attachment?.url || ""}
+                            alt={item.name || ""}
+                            fill
+                            className="object-cover"
+                          />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="truncate text-sm font-medium text-foreground">
+                          {item.name}
+                        </p>
+                        {item.category?.name && (
+                          <p className="truncate text-xs text-muted-foreground">
+                            {item.category.name}
+                          </p>
+                        )}
+                      </div>
+                      {Number.isFinite(item.unitPrice) && (
+                        <span className="shrink-0 text-sm font-semibold text-primary">
+                          {formatCurrency(item.unitPrice)}
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                ))}
+                <li>
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => handleSearchSubmit()}
+                    className="flex w-full items-center justify-center py-2.5 text-sm font-medium text-primary hover:bg-muted transition-colors"
+                  >
+                    View all results →
+                  </button>
+                </li>
+              </ul>
+            ) : (
+              <div className="p-4 text-center text-sm text-muted-foreground">
+                No results found.
+              </div>
+            )
+          ) : (
+            <div className="p-4 text-center text-sm text-muted-foreground">
+              Type at least 2 characters to search.
+            </div>
+          )}
+        </div>,
+        document.body,
+      )}
+    </>
   );
 }
