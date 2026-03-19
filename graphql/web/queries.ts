@@ -27,6 +27,15 @@ const webDetail = gql`
         baseFont
         headingFont
       }
+      appearances {
+        backgroundColor
+        primaryColor
+        secondaryColor
+        accentColor
+        fontSans
+        fontHeading
+        fontMono
+      }
       language
     }
   }

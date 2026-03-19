@@ -141,7 +141,7 @@ const PaymentPage = () => {
   const [checkInvoiceMutation] = useMutation(paymentMutations.checkInvoice, {
     context: mutationContext,
     onCompleted(data) {
-      const status: string = data?.invoicesCheck ?? "";
+      const status: string = data?.cpInvoicesCheck ?? "";
       if (status === "paid") {
         stopPolling();
         setModalStatus("paid");

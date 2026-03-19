@@ -57,6 +57,7 @@ export default {
       fontFamily: {
         sans: ["var(--font-body)", ...defaultTheme.fontFamily.sans],
         heading: ["var(--font-heading)", ...defaultTheme.fontFamily.sans],
+        mono: ["var(--font-mono)", ...defaultTheme.fontFamily.mono],
       },
     },
   },

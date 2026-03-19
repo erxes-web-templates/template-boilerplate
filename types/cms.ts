@@ -42,6 +42,15 @@ type CPDetail = {
     headingFont: string;
     baseFont: string;
   };
+  appearances?: {
+    backgroundColor?: string;
+    primaryColor?: string;
+    secondaryColor?: string;
+    accentColor?: string;
+    fontSans?: string;
+    fontHeading?: string;
+    fontMono?: string;
+  };
   externalLinks: {
     phones: string[];
     emails: string[];

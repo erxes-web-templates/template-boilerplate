@@ -131,27 +131,26 @@ export default function ClientBoilerplateLayout() {
   }, [customPage, isCustomCmsPage, pageName]);
 
   useEffect(() => {
+    const appearances = cpDetail?.appearances;
     const styles = cpDetail?.styles;
-    if (!styles) {
-      return;
-    }
+    if (!appearances && !styles) return;
 
     const root = document.documentElement;
     const setVar = (variable: string, value?: string | null) => {
-      if (value) {
-        root.style.setProperty(variable, value);
-      }
+      if (value) root.style.setProperty(variable, value);
     };
 
-    setVar("--primary", styles.baseColor);
-    setVar("--background", styles.backgroundColor);
-    setVar("--accent", styles.activeTabColor);
+    setVar("--primary", appearances?.primaryColor || styles?.baseColor);
+    setVar("--background", appearances?.backgroundColor || styles?.backgroundColor);
+    setVar("--secondary-color", appearances?.secondaryColor);
+    setVar("--accent", appearances?.accentColor || (styles as any)?.activeTabColor);
 
-    const bodyFont = styles.baseFont || styles.fontBody;
-    const headingFont = styles.headingFont || styles.fontHeading;
+    const bodyFont = appearances?.fontSans || styles?.baseFont || (styles as any)?.fontBody;
+    const headingFont = appearances?.fontHeading || styles?.headingFont || (styles as any)?.fontHeading;
 
     setVar("--font-body", bodyFont);
     setVar("--font-heading", headingFont || bodyFont);
+    setVar("--font-mono", appearances?.fontMono);
   }, [cpDetail]);
 
   const renderPageContent = () => {

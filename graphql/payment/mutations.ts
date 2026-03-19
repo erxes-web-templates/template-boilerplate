@@ -45,8 +45,8 @@ export const addTransaction = gql`
 const transactionsAdd = addTransaction;
 
 const checkInvoice = gql`
-  mutation InvoicesCheck($id: String!) {
-    invoicesCheck(_id: $id)
+  mutation CpInvoicesCheck($id: String!) {
+    cpInvoicesCheck(_id: $id)
   }
 `;
 

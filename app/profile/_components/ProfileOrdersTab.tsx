@@ -392,7 +392,7 @@ function OrderPaymentDialog({
   const [checkInvoiceMutation] = useMutation(paymentMutations.checkInvoice, {
     context: mutationContext,
     onCompleted(data) {
-      if (data?.invoicesCheck === "paid") {
+      if (data?.cpInvoicesCheck === "paid") {
         stopPolling();
         setModalStatus("paid");
         if (order?._id) {

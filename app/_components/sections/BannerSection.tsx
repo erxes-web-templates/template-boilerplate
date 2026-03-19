@@ -73,9 +73,6 @@ const BannerSection = ({ section }: { section: Section }) => {
       )}
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60" />
       <div className="relative z-10 flex h-full flex-col justify-start gap-3 p-8 text-white sm:p-12">
-        <p className="text-sm uppercase tracking-wide text-white/70">
-          Featured
-        </p>
         <h2 className="text-3xl font-semibold leading-tight sm:text-4xl">
           {title}
         </h2>
