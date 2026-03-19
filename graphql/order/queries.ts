@@ -51,30 +51,65 @@ export const currentOrder = gql`
 `;
 
 export const fullOrders = gql`
-  query FullOrders(
-    $customerId: String
-    $statuses: [String]
-    $perPage: Int
-    $sortField: String
-    $sortDirection: Int
-  ) {
-    cpFullOrders(
-      customerId: $customerId
-      statuses: $statuses
-      perPage: $perPage
-      sortField: $sortField
-      sortDirection: $sortDirection
-    ) {
+  query CpFullOrders {
+    cpFullOrders {
       _id
       createdAt
-      paidDate
       status
-      totalAmount
+      saleStatus
+      customerId
       number
-      items {
-        productName
-        productImgUrl
+      cashAmount
+      mobileAmount
+      directDiscount
+      directIsAmount
+      billType
+      registerNumber
+      paidAmounts {
+        _id
+        type
+        info
+        amount
       }
+      paidDate
+      dueDate
+      modifiedAt
+      totalAmount
+      finalAmount
+      shouldPrintEbarimt
+      printedEbarimt
+      billId
+      oldBillId
+      type
+      branchId
+      deliveryInfo
+      description
+      isPre
+      origin
+      customer {
+        _id
+        firstName
+        lastName
+        primaryPhone
+        primaryEmail
+        primaryAddress
+        addresses
+      }
+      customerType
+      items {
+        _id
+        count
+        unitPrice
+        description
+        productImgUrl
+        productName
+        status
+        isTake
+        isPackage
+      }
+      returnInfo
+      slotCode
+      extraInfo
     }
   }
 `;
