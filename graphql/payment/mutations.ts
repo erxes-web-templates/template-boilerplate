@@ -28,18 +28,8 @@ const createInvoice = gql`
 const invoiceCreate = createInvoice;
 
 export const addTransaction = gql`
-  mutation TransactionsAdd(
-    $invoiceId: String!
-    $paymentId: String!
-    $amount: Float!
-    $details: JSON
-  ) {
-    paymentTransactionsAdd(
-      invoiceId: $invoiceId
-      paymentId: $paymentId
-      amount: $amount
-      details: $details
-    ) {
+  mutation CpPaymentTransactionsAdd($input: PaymentTransactionInput!) {
+    cpPaymentTransactionsAdd(input: $input) {
       _id
       amount
       invoiceId
