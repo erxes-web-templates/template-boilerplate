@@ -72,7 +72,9 @@ export default function ProfilePage() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
 
-  const [activeTab, setActiveTab] = useState<SidebarKey>("profile");
+  const [activeTab, setActiveTab] = useState<SidebarKey>(
+    () => (searchParams?.get("tab") as SidebarKey) || "profile"
+  );
 
   const { data, loading, error, refetch } = useQuery(authQueries.currentUser);
   const { data: userDetailData } = useQuery(authQueries.userDetail);
