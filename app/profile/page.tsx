@@ -55,7 +55,7 @@ type SidebarKey = (typeof SIDEBAR_ITEMS)[number]["id"];
 
 const resolveClientPortalId = (
   paramsValue?: string | string[],
-  searchValue?: string | null
+  searchValue?: string | null,
 ) => {
   if (searchValue) {
     return searchValue;
@@ -73,20 +73,20 @@ export default function ProfilePage() {
   const pathname = usePathname();
   const { toast } = useToast();
 
-  const currentUrl = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : "");
-
-  const [activeTab, setActiveTab] = useState<SidebarKey>("profile");
+  const [activeTab, setActiveTab] = useState<SidebarKey>(
+    () => (searchParams?.get("tab") as SidebarKey) || "profile",
+  );
 
   const { data, loading, error, refetch } = useQuery(authQueries.currentUser);
   const { data: userDetailData } = useQuery(authQueries.userDetail);
   const user: User | null = useMemo(
     () => data?.clientPortalCurrentUser ?? null,
-    [data]
+    [data],
   );
 
   const clientPortalId = resolveClientPortalId(
     params?.id,
-    searchParams?.get("clientPortalId")
+    searchParams?.get("clientPortalId"),
   );
 
   const {
@@ -166,11 +166,11 @@ export default function ProfilePage() {
   const orders = useMemo(() => ordersData?.fullOrders ?? [], [ordersData]);
   const wishlistItems = useMemo(
     () => wishlistData?.wishlist ?? [],
-    [wishlistData]
+    [wishlistData],
   );
   const viewedItems = useMemo(
     () => viewedData?.lastViewedItems ?? [],
-    [viewedData]
+    [viewedData],
   );
 
   const [updateUser, { loading: updating }] = useMutation(
@@ -190,7 +190,7 @@ export default function ProfilePage() {
         });
         refetch();
       },
-    }
+    },
   );
 
   const [logoutMutation, { loading: loggingOut }] = useMutation(
@@ -205,7 +205,7 @@ export default function ProfilePage() {
         });
         router.push("/auth/login");
       },
-    }
+    },
   );
 
   const [changePasswordMutation, { loading: changingPassword }] = useMutation(
@@ -229,7 +229,7 @@ export default function ProfilePage() {
           confirmPassword: "",
         });
       },
-    }
+    },
   );
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -256,7 +256,7 @@ export default function ProfilePage() {
 
   const handlePasswordFormChange = (
     field: keyof typeof passwordForm,
-    value: string
+    value: string,
   ) => {
     setPasswordForm((prev) => ({
       ...prev,
@@ -265,7 +265,7 @@ export default function ProfilePage() {
   };
 
   const handlePasswordSubmit = async (
-    event: React.FormEvent<HTMLFormElement>
+    event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
 
@@ -425,7 +425,7 @@ export default function ProfilePage() {
       router.push(
         templateUrl("/auth/login") +
           "?redirect=" +
-          encodeURIComponent(currentUrl)
+          encodeURIComponent(currentUrl),
       );
     }
   }, [error]);

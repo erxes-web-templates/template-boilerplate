@@ -20,6 +20,7 @@ import { useToast } from "../../hooks/use-toast";
 import { useCart } from "../../lib/CartContext";
 import paymentQueries from "../../graphql/payment/queries";
 import paymentMutations from "../../graphql/payment/mutations";
+import orderMutations from "../../graphql/order/mutations";
 import authQueries from "../../graphql/auth/queries";
 import orderQueries from "../../graphql/order/queries";
 import {
@@ -29,7 +30,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../components/ui/dialog";
-import { ArrowLeft, ExternalLink, RefreshCw } from "lucide-react";
+import { ArrowLeft, CheckCircle, Clock, ExternalLink, RefreshCw, XCircle } from "lucide-react";
+
+const POLL_INTERVAL_MS = 3000;
+const TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+
+type ModalStatus = "pending" | "paid" | "expired" | "cancelled";
 
 const formatCurrency = (value: number) =>
   `₮${Math.round(value).toLocaleString()}`;
@@ -45,7 +51,7 @@ interface PaymentOption {
 const PaymentPage = () => {
   const router = useRouter();
   const { toast } = useToast();
-  const { items: cartItems, totalPrice, totalItems, orderId } = useCart();
+  const { items: cartItems, totalPrice, totalItems, orderId, clearCart } = useCart();
 
   const { data: userData } = useQuery(authQueries.currentUser, {
     fetchPolicy: "cache-first",
@@ -59,21 +65,18 @@ const PaymentPage = () => {
   });
   const appToken = configData?.currentConfig?.erxesAppToken ?? null;
 
-  const { data: orderData, loading: orderLoading } = useQuery(
-    orderQueries.currentOrder,
-    {
-      variables: {
-        customerId: erxesCustomerId,
-        saleStatus: "cart",
-        perPage: 1,
-        sortField: "createdAt",
-        sortDirection: -1,
-        statuses: [],
-      },
-      skip: !erxesCustomerId,
-      fetchPolicy: "cache-and-network",
+  const { data: orderData } = useQuery(orderQueries.currentOrder, {
+    variables: {
+      customerId: erxesCustomerId,
+      saleStatus: "cart",
+      perPage: 1,
+      sortField: "createdAt",
+      sortDirection: -1,
+      statuses: [],
     },
-  );
+    skip: !erxesCustomerId,
+    fetchPolicy: "cache-and-network",
+  });
 
   const {
     data: paymentsData,
@@ -88,9 +91,7 @@ const PaymentPage = () => {
     [paymentsData],
   );
 
-  const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(
-    null,
-  );
+  const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
   const selectedPaymentIdRef = useRef<string | null>(null);
   useEffect(() => {
     selectedPaymentIdRef.current = selectedPaymentId;
@@ -100,10 +101,90 @@ const PaymentPage = () => {
   const [transaction, setTransaction] = useState<any | null>(null);
   const [invoiceError, setInvoiceError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalStatus, setModalStatus] = useState<ModalStatus>("pending");
+
+  // Polling refs
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const invoiceIdRef = useRef<string | null>(null);
+
+  const stopPolling = useCallback(() => {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
+      pollIntervalRef.current = null;
+    }
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }, []);
 
   const mutationContext = appToken
     ? { headers: { "erxes-app-token": appToken } }
     : undefined;
+
+  const [checkInvoiceMutation] = useMutation(paymentMutations.checkInvoice, {
+    context: mutationContext,
+    onCompleted(data) {
+      const status: string = data?.invoicesCheck ?? "";
+      if (status === "paid") {
+        stopPolling();
+        setModalStatus("paid");
+        clearCart();
+        if (orderId) {
+          changeSaleStatus({
+            variables: { _id: orderId, saleStatus: "confirmed" },
+          });
+        }
+      }
+    },
+  });
+
+  const [changeSaleStatus] = useMutation(orderMutations.orderChangeSaleStatus, {
+    onCompleted() {
+      setTimeout(() => {
+        router.push("/profile?tab=orders");
+      }, 3000);
+    },
+  });
+
+  const [cancelOrderMutation, { loading: isCancelling }] = useMutation(
+    orderMutations.ordersCancel,
+    {
+      onCompleted() {
+        setModalStatus("cancelled");
+        stopPolling();
+        clearCart();
+        setTimeout(() => {
+          setModalOpen(false);
+          router.push("/products");
+        }, 2000);
+      },
+    },
+  );
+
+  const startPolling = useCallback(
+    (invoiceId: string) => {
+      invoiceIdRef.current = invoiceId;
+
+      pollIntervalRef.current = setInterval(() => {
+        if (invoiceIdRef.current) {
+          checkInvoiceMutation({
+            variables: { id: invoiceIdRef.current },
+          });
+        }
+      }, POLL_INTERVAL_MS);
+
+      timeoutRef.current = setTimeout(() => {
+        stopPolling();
+        setModalStatus("expired");
+      }, TIMEOUT_MS);
+    },
+    [checkInvoiceMutation, stopPolling],
+  );
+
+  // Clean up on unmount
+  useEffect(() => () => stopPolling(), [stopPolling]);
 
   const [addTransaction, { loading: isAddingTransaction }] = useMutation(
     paymentMutations.addTransaction,
@@ -113,6 +194,9 @@ const PaymentPage = () => {
         const tx = data?.cpPaymentTransactionsAdd;
         if (tx) {
           setTransaction(tx);
+          if (invoiceIdRef.current) {
+            startPolling(invoiceIdRef.current);
+          }
         }
       },
       onError(error) {
@@ -130,7 +214,9 @@ const PaymentPage = () => {
         if (payload) {
           setInvoice(payload);
           setInvoiceError(null);
+          setModalStatus("pending");
           setModalOpen(true);
+          invoiceIdRef.current = payload._id;
           const paymentId = selectedPaymentIdRef.current;
           if (paymentId) {
             addTransaction({
@@ -168,9 +254,7 @@ const PaymentPage = () => {
   const activeOrder = orderData?.cpCurrentOrder?.[0] ?? null;
   const parsedDeliveryInfo = useMemo(() => {
     const raw = activeOrder?.deliveryInfo ?? null;
-    if (!raw) {
-      return null;
-    }
+    if (!raw) return null;
     if (typeof raw === "string") {
       try {
         return JSON.parse(raw);
@@ -182,9 +266,7 @@ const PaymentPage = () => {
   }, [activeOrder?.deliveryInfo]);
 
   const invoiceRedirectUrl = useMemo(() => {
-    if (!invoice?.data) {
-      return null;
-    }
+    if (!invoice?.data) return null;
     return (
       invoice.data.redirectUrl ||
       invoice.data.paymentUrl ||
@@ -207,8 +289,7 @@ const PaymentPage = () => {
     if (!orderId || totalItems === 0) {
       toast({
         title: "Захиалгын мэдээлэл дутуу байна",
-        description:
-          "Сагс хоосон эсвэл захиалга үүсээгүй байна. Эхлээд сагсаа баталгаажуулна уу.",
+        description: "Сагс хоосон эсвэл захиалга үүсээгүй байна.",
         variant: "destructive",
       });
       router.push("/checkout?step=1");
@@ -244,7 +325,36 @@ const PaymentPage = () => {
     totalPrice,
   ]);
 
-  if (totalItems === 0) {
+  const handleCancelOrder = useCallback(() => {
+    stopPolling();
+    if (orderId) {
+      cancelOrderMutation({ variables: { _id: orderId } });
+    } else {
+      setModalStatus("cancelled");
+      setModalOpen(false);
+      router.push("/products");
+    }
+  }, [cancelOrderMutation, orderId, router, stopPolling]);
+
+  const handleCloseModal = useCallback(
+    (open: boolean) => {
+      if (!open && modalStatus === "pending") {
+        // Don't allow closing while payment is pending — user must cancel explicitly
+        return;
+      }
+      setModalOpen(open);
+      if (!open) {
+        stopPolling();
+        setInvoice(null);
+        setTransaction(null);
+        setInvoiceError(null);
+        setModalStatus("pending");
+      }
+    },
+    [modalStatus, stopPolling],
+  );
+
+  if (totalItems === 0 && modalStatus !== "paid" && modalStatus !== "cancelled") {
     return (
       <div className="mx-auto max-w-3xl px-4 py-10">
         <Card>
@@ -323,9 +433,7 @@ const PaymentPage = () => {
                 {paymentOptions.map((option: PaymentOption) => {
                   const checked = option._id === selectedPaymentId;
                   const config =
-                    (option.config as {
-                      description?: string;
-                    } | null) ?? null;
+                    (option.config as { description?: string } | null) ?? null;
 
                   return (
                     <label
@@ -350,10 +458,7 @@ const PaymentPage = () => {
                           {config?.description ?? option.kind}
                         </span>
                         {option.status !== "active" && (
-                          <Badge
-                            variant="outline"
-                            className="mt-2 w-fit text-xs"
-                          >
+                          <Badge variant="outline" className="mt-2 w-fit text-xs">
                             Түр идэвхгүй
                           </Badge>
                         )}
@@ -380,9 +485,7 @@ const PaymentPage = () => {
               </Button>
               <Button
                 onClick={handleCreateInvoice}
-                disabled={
-                  !selectedPaymentId || isCreatingInvoice || isAddingTransaction
-                }
+                disabled={!selectedPaymentId || isCreatingInvoice || isAddingTransaction}
               >
                 {isCreatingInvoice || isAddingTransaction
                   ? "Төлбөрийн мэдээлэл бэлдэж байна..."
@@ -458,9 +561,7 @@ const PaymentPage = () => {
                     ? `, ${parsedDeliveryInfo.district}`
                     : ""}
                 </p>
-                {parsedDeliveryInfo.street && (
-                  <p>{parsedDeliveryInfo.street}</p>
-                )}
+                {parsedDeliveryInfo.street && <p>{parsedDeliveryInfo.street}</p>}
               </CardContent>
             </Card>
           )}
@@ -475,27 +576,66 @@ const PaymentPage = () => {
         </div>
       </div>
 
-      <Dialog
-        open={modalOpen}
-        onOpenChange={(open) => {
-          setModalOpen(open);
-          if (!open) {
-            setInvoice(null);
-            setTransaction(null);
-            setInvoiceError(null);
-          }
-        }}
-      >
-        <DialogContent className="sm:max-w-md">
+      {/* Payment Modal */}
+      <Dialog open={modalOpen} onOpenChange={handleCloseModal}>
+        <DialogContent className="sm:max-w-md" onInteractOutside={(e) => {
+          if (modalStatus === "pending") e.preventDefault();
+        }}>
           <DialogHeader>
-            <DialogTitle>Төлбөрийн мэдээлэл</DialogTitle>
+            <DialogTitle>
+              {modalStatus === "paid" && "Төлбөр амжилттай"}
+              {modalStatus === "expired" && "Хугацаа дууссан"}
+              {modalStatus === "cancelled" && "Захиалга цуцлагдлаа"}
+              {modalStatus === "pending" && "Төлбөрийн мэдээлэл"}
+            </DialogTitle>
             <DialogDescription>
-              QR кодыг уншуулж эсвэл холбоосоор төлбөрөө гүйцэтгэнэ үү.
+              {modalStatus === "paid" && "Таны захиалга баталгаажлаа. Удахгүй нүүр хуудас руу шилжинэ."}
+              {modalStatus === "expired" && "Төлбөрийн хугацаа (5 мин) дууссан. Дахин оролдоно уу."}
+              {modalStatus === "cancelled" && "Захиалга цуцлагдлаа. Дэлгүүр рүү буцаж байна..."}
+              {modalStatus === "pending" && "QR кодыг уншуулж эсвэл холбоосоор төлбөрөө гүйцэтгэнэ үү."}
             </DialogDescription>
           </DialogHeader>
 
-          {invoice && (
-            <div className="space-y-3 text-sm">
+          {/* Success */}
+          {modalStatus === "paid" && (
+            <div className="flex flex-col items-center gap-4 py-6 text-center">
+              <CheckCircle className="h-16 w-16 text-green-500" />
+              <p className="text-sm text-muted-foreground">
+                Захиалгын дугаар: <span className="font-medium text-foreground">{activeOrder?.number}</span>
+              </p>
+            </div>
+          )}
+
+          {/* Expired */}
+          {modalStatus === "expired" && (
+            <div className="flex flex-col items-center gap-4 py-6 text-center">
+              <Clock className="h-16 w-16 text-amber-500" />
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => {
+                  setModalOpen(false);
+                  setInvoice(null);
+                  setTransaction(null);
+                  setModalStatus("pending");
+                }}>
+                  Дахин оролдох
+                </Button>
+                <Button variant="destructive" onClick={handleCancelOrder} disabled={isCancelling}>
+                  Захиалга цуцлах
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Cancelled */}
+          {modalStatus === "cancelled" && (
+            <div className="flex flex-col items-center gap-4 py-6 text-center">
+              <XCircle className="h-16 w-16 text-destructive" />
+            </div>
+          )}
+
+          {/* Pending — QR / invoice info */}
+          {modalStatus === "pending" && invoice && (
+            <div className="space-y-4 text-sm">
               <div className="flex items-center justify-between">
                 <span>И-Баримтын дугаар</span>
                 <Badge variant="outline">{invoice.invoiceNumber}</Badge>
@@ -504,99 +644,82 @@ const PaymentPage = () => {
                 <span>Үлдэгдэл дүн</span>
                 <span className="font-semibold text-foreground">
                   {formatCurrency(
-                    typeof invoice.amount === "number"
-                      ? invoice.amount
-                      : totalPrice,
+                    typeof invoice.amount === "number" ? invoice.amount : totalPrice,
                   )}
                 </span>
               </div>
 
               {isAddingTransaction && (
-                <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
+                <div className="flex items-center justify-center gap-2 py-6 text-muted-foreground">
                   <RefreshCw className="h-4 w-4 animate-spin" />
                   QR код бэлдэж байна...
                 </div>
               )}
 
-              {transaction?.response &&
-                (() => {
-                  const res = transaction.response;
-                  const qrImage =
-                    res.qr_image ||
-                    res.qrImage ||
-                    res.qr_code ||
-                    res.qrCode ||
-                    null;
-                  const qrText = res.qr_text || res.qrText || res.qr || null;
-                  const redirectUrl =
-                    res.redirectUrl ||
-                    res.redirect_url ||
-                    res.paymentUrl ||
-                    res.payment_url ||
-                    res.url ||
-                    invoiceRedirectUrl ||
-                    null;
+              {transaction?.response && (() => {
+                const res = transaction.response;
+                const qrImage = res.qr_image || res.qrImage || res.qr_code || res.qrCode || null;
+                const qrText = res.qr_text || res.qrText || res.qr || null;
+                const redirectUrl =
+                  res.redirectUrl || res.redirect_url || res.paymentUrl ||
+                  res.payment_url || res.url || invoiceRedirectUrl || null;
 
-                  return (
-                    <div className="space-y-3">
-                      {qrImage && (
-                        <div className="flex flex-col items-center gap-2 rounded-md border border-border p-4">
-                          <p className="text-xs text-muted-foreground">
-                            QR кодыг уншуулж төлнэ үү
-                          </p>
-                          <img
-                            src={
-                              qrImage.startsWith("data:")
-                                ? qrImage
-                                : `data:image/png;base64,${qrImage}`
-                            }
-                            alt="Payment QR"
-                            className="h-48 w-48 rounded"
-                          />
-                        </div>
-                      )}
-                      {!qrImage && qrText && (
-                        <div className="flex flex-col items-center gap-2 rounded-md border border-border p-4">
-                          <p className="text-xs text-muted-foreground">
-                            QR кодыг уншуулж төлнэ үү
-                          </p>
-                          <img
-                            src={`https://api.qrserver.com/v1/create-qr-code/?size=192x192&data=${encodeURIComponent(qrText)}`}
-                            alt="Payment QR"
-                            className="h-48 w-48 rounded"
-                          />
-                        </div>
-                      )}
-                      {redirectUrl && (
-                        <Button asChild className="w-full">
-                          <Link
-                            href={redirectUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2"
-                          >
-                            Төлбөр төлөх линк рүү очих
-                            <ExternalLink className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                      )}
-                    </div>
-                  );
-                })()}
+                return (
+                  <div className="space-y-3">
+                    {qrImage && (
+                      <div className="flex flex-col items-center gap-2 rounded-md border border-border p-4">
+                        <p className="text-xs text-muted-foreground">QR кодыг уншуулж төлнэ үү</p>
+                        <img
+                          src={qrImage.startsWith("data:") ? qrImage : `data:image/png;base64,${qrImage}`}
+                          alt="Payment QR"
+                          className="h-48 w-48 rounded"
+                        />
+                      </div>
+                    )}
+                    {!qrImage && qrText && (
+                      <div className="flex flex-col items-center gap-2 rounded-md border border-border p-4">
+                        <p className="text-xs text-muted-foreground">QR кодыг уншуулж төлнэ үү</p>
+                        <img
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=192x192&data=${encodeURIComponent(qrText)}`}
+                          alt="Payment QR"
+                          className="h-48 w-48 rounded"
+                        />
+                      </div>
+                    )}
+                    {redirectUrl && (
+                      <Button asChild className="w-full">
+                        <Link href={redirectUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2">
+                          Төлбөр төлөх линк рүү очих
+                          <ExternalLink className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
+                );
+              })()}
 
               {!isAddingTransaction && !transaction && invoiceRedirectUrl && (
                 <Button asChild className="w-full">
-                  <Link
-                    href={invoiceRedirectUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2"
-                  >
+                  <Link href={invoiceRedirectUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2">
                     Төлбөр төлөх линк рүү очих
                     <ExternalLink className="h-4 w-4" />
                   </Link>
                 </Button>
               )}
+
+              <div className="flex items-center justify-center gap-2 pt-2 text-xs text-muted-foreground">
+                <RefreshCw className="h-3 w-3 animate-spin" />
+                Төлбөрийн байдлыг шалгаж байна...
+              </div>
+
+              <Button
+                variant="ghost"
+                className="w-full text-destructive hover:text-destructive"
+                onClick={handleCancelOrder}
+                disabled={isCancelling}
+              >
+                {isCancelling ? "Цуцалж байна..." : "Захиалга цуцлах"}
+              </Button>
             </div>
           )}
         </DialogContent>
