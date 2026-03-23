@@ -642,3 +642,13 @@ export const TOUR_GROUP_DETAIL_QUERY = gql`
     }
   }
 `;
+
+export const GET_TAGS = gql`
+  query Tags($type: String) {
+    cpTags(type: $type) {
+      _id
+      name
+      __typename
+    }
+  }
+`;
