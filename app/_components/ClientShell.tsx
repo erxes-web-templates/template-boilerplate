@@ -5,6 +5,7 @@ import { ApolloWrapper } from "../../lib/apollo-wrapper";
 import { CartProvider } from "../../lib/CartContext";
 import Header from "./Header";
 import Footer from "./Footer";
+import SyncConfigOnLoad from "./SyncConfigOnLoad";
 import { getEnv } from "@/lib/utils";
 import type { CPDetail } from "../../types/cms";
 
@@ -26,6 +27,7 @@ export default function ClientShell({ children, cpDetail }: ClientShellProps) {
 
   return (
     <ApolloWrapper>
+      <SyncConfigOnLoad />
       {cpDetail?.messengerBrandCode && baseUrl && (
         <Script
           id="erxes"

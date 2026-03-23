@@ -239,8 +239,8 @@ const PaymentPage = () => {
                 input: {
                   invoiceId: payload._id,
                   paymentId,
-                  amount: 50,
-                  // amount: payload.amount,
+                  // amount: 50,
+                  amount: payload.amount,
                 },
               },
             });
