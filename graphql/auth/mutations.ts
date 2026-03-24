@@ -23,6 +23,8 @@ const createUser = gql`
     $firstName: String
     $lastName: String
     $userType: CPUserType
+    $code: String
+    $propertiesData: JSON
   ) {
     clientPortalUserRegister(
       email: $email
@@ -32,6 +34,8 @@ const createUser = gql`
       firstName: $firstName
       lastName: $lastName
       userType: $userType
+      code: $code
+      propertiesData: $propertiesData
     ) {
       _id
     }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter, useParams, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@apollo/client";
 import { mutations } from "../../../graphql/auth";
 import {
@@ -64,13 +64,7 @@ const storeTokens = (response: LoginResponse) => {
 
 export default function LoginPage() {
   const router = useRouter();
-  const params = useParams<{ id?: string }>();
   const searchParams = useSearchParams();
-
-  const clientPortalId = resolveClientPortalId(
-    process.env.ERXES_CP_ID || params?.id,
-    searchParams?.get("clientPortalId")
-  );
 
   const [credentials, setCredentials] = useState({
     login: "",
@@ -84,7 +78,7 @@ export default function LoginPage() {
       });
     },
     onCompleted(data) {
-      storeTokens(data?.clientPortalLogin);
+      storeTokens(data?.clientPortalUserLoginWithCredentials);
       toast("Login successful", {
         description: "You have been logged in successfully.",
       });
@@ -94,20 +88,14 @@ export default function LoginPage() {
   });
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    console.log("xd");
     event.preventDefault();
 
-    if (!clientPortalId) {
-      toast("Client portal not configured", {
-        description: "Please contact the administrator.",
-      });
-      return;
-    }
+    const isEmail = credentials.login.includes("@");
 
     await loginMutation({
       variables: {
-        clientPortalId,
-        login: credentials.login,
+        email: isEmail ? credentials.login : undefined,
+        phone: !isEmail ? credentials.login : undefined,
         password: credentials.password,
       },
     });
