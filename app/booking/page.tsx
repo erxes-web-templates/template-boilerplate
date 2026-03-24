@@ -6,11 +6,12 @@ import { useQuery } from "@apollo/client";
 import pmsRoomQueries from "../../graphql/pms/rooms/queries";
 import pmsConfigQueries from "../../graphql/pms/config/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import TourBookingForm from "./_components/BookingForm";
+
+const TEMPLATE_TYPE = process.env.TEMPLATE_TYPE || process.env.NEXT_PUBLIC_TEMPLATE_TYPE || "";
 
 const parsePipelineConfig = (value: unknown) => {
-  if (!value) {
-    return null;
-  }
+  if (!value) return null;
   if (typeof value === "string") {
     try {
       return JSON.parse(value);
@@ -18,24 +19,18 @@ const parsePipelineConfig = (value: unknown) => {
       return null;
     }
   }
-  if (typeof value === "object") {
-    return value;
-  }
+  if (typeof value === "object") return value;
   return null;
 };
 
 const toIsoDate = (value: string | null) => {
-  if (!value) {
-    return null;
-  }
+  if (!value) return null;
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return null;
-  }
+  if (Number.isNaN(parsed.getTime())) return null;
   return parsed.toISOString();
 };
 
-const BookingPage = () => {
+const HotelBookingPage = () => {
   const searchParams = useSearchParams();
   const startDateRaw = searchParams.get("startDate");
   const endDateRaw = searchParams.get("endDate");
@@ -45,9 +40,7 @@ const BookingPage = () => {
 
   const { data: branchData, loading: branchLoading } = useQuery(
     pmsConfigQueries.PmsBranchList,
-    {
-      variables: { page: 1, perPage: 1 },
-    }
+    { variables: { page: 1, perPage: 1 } }
   );
 
   const pipelineId = useMemo(() => {
@@ -66,11 +59,7 @@ const BookingPage = () => {
     loading: roomsLoading,
     error: roomsError,
   } = useQuery(pmsRoomQueries.checkRooms, {
-    variables: {
-      pipelineId,
-      startDate,
-      endDate,
-    },
+    variables: { pipelineId, startDate, endDate },
     skip: !shouldQuery,
   });
 
@@ -139,6 +128,13 @@ const BookingPage = () => {
       </div>
     </section>
   );
+};
+
+const BookingPage = () => {
+  if (TEMPLATE_TYPE === "tour") {
+    return <TourBookingForm />;
+  }
+  return <HotelBookingPage />;
 };
 
 export default BookingPage;
