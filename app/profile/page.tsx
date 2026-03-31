@@ -13,6 +13,7 @@ import authQueries from "../../graphql/auth/queries";
 import authMutations from "../../graphql/auth/mutations";
 import orderQueries from "../../graphql/order/queries";
 import ecommerceQueries from "../../graphql/ecommerce/queries";
+import { queries as tmsQueries } from "../../graphql/tms";
 import {
   Card,
   CardContent,
@@ -40,6 +41,44 @@ type User = {
   email?: string | null;
   phone?: string | null;
   erxesCustomerId?: string | null;
+};
+
+type ProfileOrder = {
+  _id: string;
+  createdAt?: string | null;
+  modifiedAt?: string | null;
+  paidDate?: string | null;
+  number?: string | null;
+  totalAmount?: number | null;
+  finalAmount?: number | null;
+  cashAmount?: number | null;
+  mobileAmount?: number | null;
+  status?: string | null;
+  saleStatus?: string | null;
+  type?: string | null;
+  description?: string | null;
+  deliveryInfo?: any;
+  customer?: {
+    firstName?: string | null;
+    lastName?: string | null;
+    primaryPhone?: string | null;
+    primaryEmail?: string | null;
+    primaryAddress?: string | null;
+  } | null;
+  items?: Array<{
+    _id?: string | null;
+    productName?: string | null;
+    productImgUrl?: string | null;
+    count?: number | null;
+    unitPrice?: number | null;
+    status?: string | null;
+    description?: string | null;
+  }>;
+  source?: "pos" | "bms";
+  numberOfPeople?: number | null;
+  tourId?: string | null;
+  parent?: string | null;
+  additionalCustomers?: string[] | null;
 };
 
 const SIDEBAR_ITEMS = [
@@ -85,6 +124,8 @@ export default function ProfilePage() {
     [data],
   );
 
+  console.log(userDetailData, "udd");
+
   const clientPortalId = resolveClientPortalId(
     params?.id,
     searchParams?.get("clientPortalId"),
@@ -113,7 +154,17 @@ export default function ProfilePage() {
     fetchPolicy: "cache-and-network",
   });
 
-  console.log("ordersData,", ordersData);
+  const { data: bmsOrdersData, loading: bmsOrdersLoading } = useQuery(
+    tmsQueries.BMS_ORDERS_QUERY,
+    {
+      variables: {
+        customerId: user?.erxesCustomerId ?? undefined,
+        limit: 50,
+      },
+      skip: !user?.erxesCustomerId,
+      fetchPolicy: "cache-and-network",
+    },
+  );
 
   const {
     data: wishlistData,
@@ -176,7 +227,42 @@ export default function ProfilePage() {
     confirmPassword: "",
   });
 
-  const orders = useMemo(() => ordersData?.cpFullOrders ?? [], [ordersData]);
+  const orders = useMemo<ProfileOrder[]>(() => {
+    const fullOrders: ProfileOrder[] = (ordersData?.cpFullOrders ?? []).map(
+      (order: any) => ({
+        ...order,
+        source: "pos",
+      }),
+    );
+
+    const bmsOrders: ProfileOrder[] = (
+      bmsOrdersData?.cpBmsOrders?.list ?? []
+    ).map((order: any) => ({
+      _id: order._id,
+      createdAt: null,
+      modifiedAt: null,
+      paidDate: null,
+      number: null,
+      totalAmount: order.amount ?? 0,
+      finalAmount: order.amount ?? 0,
+      cashAmount: null,
+      mobileAmount: null,
+      status: order.status ?? null,
+      saleStatus: null,
+      type: order.type ?? "tour",
+      description: order.note ?? null,
+      deliveryInfo: null,
+      customer: null,
+      items: [],
+      source: "bms",
+      numberOfPeople: order.numberOfPeople ?? null,
+      tourId: order.tourId ?? null,
+      parent: order.parent ?? null,
+      additionalCustomers: order.additionalCustomers ?? [],
+    }));
+
+    return [...fullOrders, ...bmsOrders];
+  }, [bmsOrdersData, ordersData]);
   const wishlistItems = useMemo(
     () => wishlistData?.cpWishlist ?? [],
     [wishlistData],
@@ -515,7 +601,10 @@ export default function ProfilePage() {
               <CardContent>
                 {activeTab === "profile" && renderProfileForm()}
                 {activeTab === "orders" && (
-                  <ProfileOrdersTab orders={orders} loading={ordersLoading} />
+                  <ProfileOrdersTab
+                    orders={orders}
+                    loading={ordersLoading || bmsOrdersLoading}
+                  />
                 )}
                 {activeTab === "wishlist" && (
                   <ProfileWishlistTab
