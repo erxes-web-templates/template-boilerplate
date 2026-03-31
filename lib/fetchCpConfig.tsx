@@ -10,7 +10,7 @@ export async function fetchCpConfig(cpId: string) {
       variables: { _id: cpId },
     });
 
-    return data.clientPortalGetConfig;
+    return data.cpGetWebDetail;
   } catch (error) {
     console.error("Error fetching CP Config:", error);
     return null;

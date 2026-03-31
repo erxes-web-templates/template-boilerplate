@@ -73,7 +73,7 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
           <div className="container mx-auto max-w-6xl px-4 py-16 relative z-10 flex flex-col items-center text-center gap-6">
             {cpDetail?.logo && (
               <Image
-                src={getFileUrl(cpDetail.logo)}
+                src={getFileUrl(cpDetail.logo?.url || cpDetail.logo)}
                 alt={cpDetail?.name || "Logo"}
                 width={180}
                 height={64}
@@ -111,7 +111,7 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
             <Link href={templateUrl("/")} className="inline-block">
               {cpDetail?.logo ? (
                 <Image
-                  src={getFileUrl(cpDetail.logo)}
+                  src={getFileUrl(cpDetail.logo?.url || cpDetail.logo)}
                   alt={cpDetail?.name || "Logo"}
                   width={140}
                   height={48}

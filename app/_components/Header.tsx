@@ -229,7 +229,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
         <Link href={templateUrl("/")} className="shrink-0">
           {cpDetail?.logo ? (
             <Image
-              src={getFileUrl(cpDetail.logo)}
+              src={getFileUrl(cpDetail.logo?.url || cpDetail.logo)}
               alt={cpDetail.name}
               width={40}
               height={40}

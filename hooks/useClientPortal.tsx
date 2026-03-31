@@ -9,7 +9,7 @@ const useClientPortal = ({ id }: { id: string }) => {
     skip: !id,
   });
 
-  const cpDetail = data?.clientPortalGetConfig || {};
+  const cpDetail = data?.cpGetWebDetail || {};
 
   return { cpDetail, loading, error, id };
 };

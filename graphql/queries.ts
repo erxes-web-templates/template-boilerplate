@@ -44,121 +44,31 @@ export const TOUR_DETAIL_QUERY = gql`
 `;
 
 export const CP_GET_CONFIG = gql`
-  query clientPortalGetConfig($_id: String!) {
-    clientPortalGetConfig(_id: $_id) {
+  query CpGetWebDetail($_id: String!) {
+    cpGetWebDetail(_id: $_id) {
       _id
+      clientPortalId
       name
-      template
-      templateId
-      url
-      externalLinks
-      copyright
-      keywords
-      kind
       description
-      logo
-      icon
-      headerHtml
-      footerHtml
+      keywords
       domain
-      dnsStatus
-      messengerBrandCode
-      knowledgeBaseLabel
-      knowledgeBaseTopicId
-      ticketLabel
-      dealLabel
-      purchaseLabel
-      taskPublicPipelineId
-      taskPublicBoardId
-      taskPublicLabel
-      taskLabel
-      taskStageId
-      taskPipelineId
-      taskBoardId
-      ticketStageId
-      ticketPipelineId
-      ticketBoardId
-      dealStageId
-      dealPipelineId
-      dealBoardId
-      purchaseStageId
-      purchasePipelineId
-      purchaseBoardId
-      styles {
-        bodyColor
-        headerColor
-        footerColor
-        helpColor
-        backgroundColor
-        activeTabColor
-        baseColor
-        headingColor
-        linkColor
-        linkHoverColor
-        baseFont
-        headingFont
-        dividerColor
-        primaryBtnColor
-        secondaryBtnColor
+      copyright
+      logo {
+        url
+        name
       }
-      mobileResponsive
-      googleCredentials
-      googleClientId
-      googleClientSecret
-      googleRedirectUri
-      facebookAppId
+      favicon {
+        url
+        name
+      }
+      thumbnail {
+        url
+        name
+      }
+      externalLinks
+      templateId
+      templateType
       erxesAppToken
-      kbToggle
-      publicTaskToggle
-      ticketToggle
-      taskToggle
-      dealToggle
-      purchaseToggle
-      otpConfig {
-        smsTransporterType
-        content
-        codeLength
-        loginWithOTP
-        expireAfter
-        emailSubject
-      }
-      twoFactorConfig {
-        smsTransporterType
-        content
-        codeLength
-        enableTwoFactor
-        expireAfter
-        emailSubject
-      }
-      mailConfig {
-        subject
-        invitationContent
-        registrationContent
-      }
-      manualVerificationConfig {
-        userIds
-        verifyCustomer
-        verifyCompany
-      }
-      passwordVerificationConfig {
-        verifyByOTP
-        emailSubject
-        emailContent
-        smsContent
-      }
-      socialpayConfig {
-        certId
-        publicKey
-      }
-      testUserEmail
-      testUserPhone
-      testUserPassword
-      testUserOTP
-      tokenExpiration
-      refreshTokenExpiration
-      tokenPassMethod
-      vendorParentProductCategoryId
-      language
     }
   }
 `;
