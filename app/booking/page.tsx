@@ -8,7 +8,8 @@ import pmsConfigQueries from "../../graphql/pms/config/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import TourBookingForm from "./_components/BookingForm";
 
-const TEMPLATE_TYPE = process.env.TEMPLATE_TYPE || process.env.NEXT_PUBLIC_TEMPLATE_TYPE || "";
+const TEMPLATE_TYPE =
+  process.env.TEMPLATE_TYPE || process.env.NEXT_PUBLIC_TEMPLATE_TYPE || "tour";
 
 const parsePipelineConfig = (value: unknown) => {
   if (!value) return null;
@@ -40,7 +41,7 @@ const HotelBookingPage = () => {
 
   const { data: branchData, loading: branchLoading } = useQuery(
     pmsConfigQueries.PmsBranchList,
-    { variables: { page: 1, perPage: 1 } }
+    { variables: { page: 1, perPage: 1 } },
   );
 
   const pipelineId = useMemo(() => {
@@ -134,7 +135,8 @@ const BookingPage = () => {
   if (TEMPLATE_TYPE === "tour") {
     return <TourBookingForm />;
   }
-  return <HotelBookingPage />;
+  return <TourBookingForm />;
+  // return <HotelBookingPage />;
 };
 
 export default BookingPage;

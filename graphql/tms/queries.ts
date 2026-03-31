@@ -13,6 +13,15 @@ const TOUR_GROUP_DETAIL_QUERY = gql`
         content
         duration
         itineraryId
+        itinerary {
+          _id
+          name
+          groupDays {
+            day
+            title
+            content
+          }
+        }
         startDate
         endDate
         groupSize

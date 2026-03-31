@@ -27,7 +27,7 @@ const BlogsPage = () => {
     },
   });
 
-  const posts = data?.cmsPosts || [];
+  const posts = data?.cpPosts || [];
 
   if (loading) {
     return "Loading ...";

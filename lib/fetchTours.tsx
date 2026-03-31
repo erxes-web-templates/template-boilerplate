@@ -13,15 +13,12 @@ import {
   BmToursGroupVariables,
 } from "../types/tours";
 
-export async function fetchBmTours(
-  limit: number,
-  config?: any
-) {
+export async function fetchBmTours(limit: number, config?: any) {
   const client = getClient();
 
   console.log(
     `[BM Tours] Request params - limit: ${limit}, config:`,
-    JSON.stringify(config)
+    JSON.stringify(config),
   );
 
   try {
@@ -43,19 +40,19 @@ export async function fetchBmTours(
     if ((error as any).graphQLErrors) {
       console.error(
         "[BM Tours] GraphQL errors:",
-        JSON.stringify((error as any).graphQLErrors)
+        JSON.stringify((error as any).graphQLErrors),
       );
     }
     if ((error as any).networkError) {
       console.error(
         "[BM Tours] Network error details:",
-        (error as any).networkError
+        (error as any).networkError,
       );
       // For 400 errors, the response might contain more information
       if ((error as any).networkError.result) {
         console.error(
           "[BM Tours] Error response:",
-          JSON.stringify((error as any).networkError.result)
+          JSON.stringify((error as any).networkError.result),
         );
       }
     }
@@ -97,7 +94,7 @@ export async function fetchBmToursGroup(limit: number) {
       BmToursGroupVariables
     >({
       query: TOURS_GROUP_QUERY,
-      variables: { status: "website", limit },
+      variables: { status: "published", limit },
       context: {
         headers: {
           "erxes-app-token": process.env.ERXES_APP_TOKEN,
@@ -121,7 +118,7 @@ export async function fetchBmToursGroupDetail(groupCode: string) {
       BmTourGroupDetailVariables
     >({
       query: TOUR_GROUP_DETAIL_QUERY,
-      variables: { groupCode, status: "website" },
+      variables: { groupCode, status: "published" },
       context: {
         headers: {
           "erxes-app-token": process.env.ERXES_APP_TOKEN,

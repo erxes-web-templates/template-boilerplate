@@ -20,6 +20,10 @@ import {
 } from "@/components/ui/dialog";
 import { useCart } from "../../lib/CartContext";
 import { templateUrl } from "../../lib/utils";
+import TourBookingForm from "../booking/_components/BookingForm";
+
+const TEMPLATE_TYPE =
+  process.env.TEMPLATE_TYPE || process.env.NEXT_PUBLIC_TEMPLATE_TYPE || "";
 
 const parsePipelineConfig = (value: unknown) => {
   if (!value) {
@@ -49,7 +53,7 @@ const toIsoDate = (value: string | null) => {
   return parsed.toISOString();
 };
 
-const BookingPage = () => {
+const HotelBookingPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pageName = searchParams.get("pageName");
@@ -83,7 +87,7 @@ const BookingPage = () => {
     pmsConfigQueries.PmsBranchList,
     {
       variables: { page: 1, perPage: 1 },
-    }
+    },
   );
 
   const pipelineId = useMemo(() => {
@@ -102,7 +106,7 @@ const BookingPage = () => {
         parentId: categoryId,
         withChild: true,
       },
-    }
+    },
   );
 
   useEffect(() => {
@@ -125,12 +129,12 @@ const BookingPage = () => {
               pipelineId: pipelineId || undefined,
             },
             fetchPolicy: "network-only",
-          })
-        )
+          }),
+        ),
       );
 
       const ids = results.flatMap(
-        (result) => result.data?.products?.map((item: any) => item._id) ?? []
+        (result) => result.data?.products?.map((item: any) => item._id) ?? [],
       );
 
       if (active) {
@@ -148,7 +152,7 @@ const BookingPage = () => {
   }, [categoryData, pipelineId, client]);
 
   const shouldQuery = Boolean(
-    startDate && endDate && pipelineId && productIds.length
+    startDate && endDate && pipelineId && productIds.length,
   );
 
   const {
@@ -185,13 +189,12 @@ const BookingPage = () => {
           {
             id: room._id,
             name: room.name ?? "Room",
-            unitPrice:
-              typeof room.unitPrice === "number" ? room.unitPrice : 0,
+            unitPrice: typeof room.unitPrice === "number" ? room.unitPrice : 0,
             description: room.description ?? null,
             imageUrl: room.attachment?.url ?? null,
             categoryName: room.category?.name ?? null,
           },
-          1
+          1,
         ),
         new Promise((resolve) => {
           addTimer.current = setTimeout(resolve, 350);
@@ -361,6 +364,14 @@ const BookingPage = () => {
       </Dialog>
     </div>
   );
+};
+
+const BookingPage = () => {
+  if (TEMPLATE_TYPE === "tour") {
+    return <TourBookingForm />;
+  }
+  return <TourBookingForm />;
+  // return <HotelBookingPage />;
 };
 
 export default BookingPage;

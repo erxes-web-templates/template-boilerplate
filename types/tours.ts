@@ -1,5 +1,6 @@
 interface BmTour {
   _id: string;
+  branchId?: string;
   content: string;
   startDate: string;
   endDate: string;

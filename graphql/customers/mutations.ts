@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 const addCpUser = gql`
-  mutation clientPortalUsersInvite(
+  mutation clientPortalUserRegister(
     $firstName: String
     $lastName: String
     $email: String
@@ -11,7 +11,7 @@ const addCpUser = gql`
     $disableVerificationMail: Boolean
     $password: String
   ) {
-    clientPortalUsersInvite(
+    clientPortalUserRegister(
       firstName: $firstName
       lastName: $lastName
       email: $email
@@ -56,12 +56,12 @@ const addCustomer = gql`
 `;
 
 const editCustomer = gql`
-  mutation CustomersEdit(
+  mutation clientPortalCustomerEdit(
     $id: String!
     $registrationNumber: String
     $sex: Int
   ) {
-    customersEdit(
+    clientPortalCustomerEdit(
       _id: $id
       registrationNumber: $registrationNumber
       sex: $sex

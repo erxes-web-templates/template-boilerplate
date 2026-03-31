@@ -20,7 +20,7 @@ export default async function ToursPage() {
     return <ToursPageClient />;
   }
 
-  const data = await fetchBmTours(100, { status: "website" });
+  const data = await fetchBmTours(100, { status: "published" });
   const tours = data?.list || [];
 
   return (
@@ -33,10 +33,13 @@ export default async function ToursPage() {
           Discover our collection of amazing tours and experiences
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:gap-10">
         {tours.map((tour: BmTour) => (
-          <Card key={tour._id} className="flex flex-col overflow-hidden transition-shadow hover:shadow-lg">
+          <Card
+            key={tour._id}
+            className="flex flex-col overflow-hidden transition-shadow hover:shadow-lg"
+          >
             <CardHeader className="p-0">
               {tour.imageThumbnail && (
                 <div className="relative w-full h-[240px] overflow-hidden">
@@ -50,13 +53,17 @@ export default async function ToursPage() {
               )}
             </CardHeader>
             <CardContent className="flex-1 p-6">
-              <CardTitle className="mb-3 text-xl line-clamp-2">{tour.name}</CardTitle>
+              <CardTitle className="mb-3 text-xl line-clamp-2">
+                {tour.name}
+              </CardTitle>
               <CardDescription className="line-clamp-3">
                 <div dangerouslySetInnerHTML={{ __html: tour.content }} />
               </CardDescription>
             </CardContent>
             <CardFooter className="flex justify-between items-center p-6 pt-0 mt-auto">
-              <span className="text-xl font-bold text-primary">{tour.cost}</span>
+              <span className="text-xl font-bold text-primary">
+                {tour.cost}
+              </span>
               <Link href={`/tours/${tour._id}`}>
                 <Button>Read more</Button>
               </Link>

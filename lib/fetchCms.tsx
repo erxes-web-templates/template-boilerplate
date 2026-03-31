@@ -33,7 +33,7 @@ export async function fetchCmsPosts(variables: any) {
       variables,
     });
 
-    return data.cmsPosts ?? [];
+    return data.cpPosts ?? [];
   } catch (error) {
     console.error("Error fetching CMS Posts:", error);
     return [];

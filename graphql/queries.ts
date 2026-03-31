@@ -29,6 +29,7 @@ export const TOUR_DETAIL_QUERY = gql`
     bmTourDetail(_id: $id, branchId: $branchId) {
       _id
       branchId
+      groupCode
       content
       cost
       name
@@ -223,8 +224,8 @@ export const GET_CMS_MENU_LIST = gql`
       parentId
       clientPortalId
       label
-      objectType
-      objectId
+      contentType
+      contentTypeId
       kind
       icon
       url
@@ -249,47 +250,41 @@ export const GET_CMS_PAGES = gql`
 `;
 
 export const GET_CMS_POSTS = gql`
-  query CmsPosts(
-    $clientPortalId: String
+  query CpPosts(
+    $webId: String
+    $language: String
+    $limit: Int
     $featured: Boolean
-    $categoryId: String
+    $type: String
     $categoryIds: [String]
     $searchValue: String
     $status: PostStatus
-    $page: Int
-    $perPage: Int
     $tagIds: [String]
-    $language: String
+    $sortField: String
+    $sortDirection: String
+    $dateField: PostDateField
+    $dateFrom: Date
+    $dateTo: Date
   ) {
-    cmsPosts(
-      clientPortalId: $clientPortalId
+    cpPosts(
+      webId: $webId
+      language: $language
+      limit: $limit
       featured: $featured
-      categoryId: $categoryId
+      type: $type
       categoryIds: $categoryIds
       searchValue: $searchValue
       status: $status
-      page: $page
-      perPage: $perPage
       tagIds: $tagIds
-      language: $language
+      sortField: $sortField
+      sortDirection: $sortDirection
+      dateField: $dateField
+      dateFrom: $dateFrom
+      dateTo: $dateTo
     ) {
       _id
-      authorKind
-      authorId
-      author {
-        ... on User {
-          _id
-          details {
-            avatar
-            firstName
-            lastName
-            description
-            fullName
-          }
-          isOwner
-        }
-      }
-      clientPortalId
+      type
+      webId
       title
       slug
       content
@@ -298,15 +293,13 @@ export const GET_CMS_POSTS = gql`
       status
       tagIds
       featured
+      publishedDate
+      scheduledDate
       thumbnail {
         url
         name
       }
       images {
-        url
-        name
-      }
-      audio {
         url
         name
       }

@@ -79,7 +79,7 @@ export default function ClientBoilerplateLayout() {
   const env = getEnv();
   const posToken = env.NEXT_PUBLIC_POS_TOKEN || "";
   const missingPosToken = !posToken;
-  console.log(cpDetail, "api");
+
   const baseUrl = new URL(env.NEXT_PUBLIC_API_URL).origin.replace(
     ".api.",
     ".app.",
@@ -141,12 +141,22 @@ export default function ClientBoilerplateLayout() {
     };
 
     setVar("--primary", appearances?.primaryColor || styles?.baseColor);
-    setVar("--background", appearances?.backgroundColor || styles?.backgroundColor);
+    setVar(
+      "--background",
+      appearances?.backgroundColor || styles?.backgroundColor,
+    );
     setVar("--secondary-color", appearances?.secondaryColor);
-    setVar("--accent", appearances?.accentColor || (styles as any)?.activeTabColor);
+    setVar(
+      "--accent",
+      appearances?.accentColor || (styles as any)?.activeTabColor,
+    );
 
-    const bodyFont = appearances?.fontSans || styles?.baseFont || (styles as any)?.fontBody;
-    const headingFont = appearances?.fontHeading || styles?.headingFont || (styles as any)?.fontHeading;
+    const bodyFont =
+      appearances?.fontSans || styles?.baseFont || (styles as any)?.fontBody;
+    const headingFont =
+      appearances?.fontHeading ||
+      styles?.headingFont ||
+      (styles as any)?.fontHeading;
 
     setVar("--font-body", bodyFont);
     setVar("--font-heading", headingFont || bodyFont);

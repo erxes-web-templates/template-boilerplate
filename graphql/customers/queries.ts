@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 const customersMain = gql`
-  query customersMain($ids: [String]) {
-    customersMain(ids: $ids) {
+  query cpCustomers($ids: [String]) {
+    cpCustomers(ids: $ids) {
       list {
         _id
         firstName
@@ -18,7 +18,7 @@ const customersMain = gql`
 
 const findCustomerByEmail = gql`
   query FindCustomerByEmail($email: String) {
-    customersMain(searchValue: $email) {
+    cpCustomers(searchValue: $email) {
       list {
         _id
         primaryEmail

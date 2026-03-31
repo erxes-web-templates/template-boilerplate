@@ -33,7 +33,7 @@ const CmsPostsSection = ({ section }: { section: Section }) => {
     },
   });
 
-  const posts = data?.cmsPosts || [];
+  const posts = data?.cpPosts || [];
   const isBuilder = isBuildMode();
 
   return (

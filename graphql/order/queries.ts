@@ -188,7 +188,7 @@ const orderDetail = gql`
 
 const invoices = `
   query Invoices($contentType: String, $contentTypeId: String) {
-    invoices(contentType: $contentType, contentTypeId: $contentTypeId) {
+    cpInvoices(contentType: $contentType, contentTypeId: $contentTypeId) {
       _id
       amount
       status

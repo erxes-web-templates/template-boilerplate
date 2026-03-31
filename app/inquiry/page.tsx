@@ -14,7 +14,7 @@ export default function InquiryPage() {
 
   const { data: groupToursData } = useQuery(TOUR_GROUP_DETAIL_QUERY, {
     variables: {
-      status: "website",
+      status: "published",
       groupCode: selectedTourId || "",
     },
   });

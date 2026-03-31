@@ -4,34 +4,28 @@ import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import { gql } from "@apollo/client";
-import { mutations as tmsMutations, queries as tmsQueries } from "@/graphql/tms";
-import { mutations as customerMutations } from "@/graphql/customers";
-import paymentMutations from "@/graphql/payment/mutations";
-import paymentQueries from "@/graphql/payment/queries";
-import authQueries from "@/graphql/auth/queries";
+import {
+  mutations as tmsMutations,
+  queries as tmsQueries,
+} from "../../../graphql/tms";
+import { mutations as customerMutations } from "../../../graphql/customers";
+import paymentMutations from "../../../graphql/payment/mutations";
+import paymentQueries from "../../../graphql/payment/queries";
+import authQueries from "../../../graphql/auth/queries";
 import { toast } from "sonner";
 import TravelerDetailsAndSummary from "./TravelerDetailsAndSummary";
 import BookingSummarySidebar from "./BookingSummarySidebar";
 import CompleteSection from "./CompleteSection";
 import PaymentSection from "./PaymentSection";
 import { validateBookingStepOne } from "./bookingSchemas";
-import type { BmTour } from "@/types/tours";
+import type { BmTour } from "../../../types/tours";
 import { Check } from "lucide-react";
-import generateRandomPassword from "@/lib/password-generator";
+import generateRandomPassword from "../../../lib/password-generator";
+import { getFileUrl } from "../../../lib/utils";
 
 // Constants
 const TAX_RATE = 0.04;
 const PAYMENT_CHECK_INTERVAL = 3000;
-
-// Invoice by order query (reuse existing invoices query)
-const INVOICE_BY_ORDER = gql`
-  query InvoicesByOrder($contentType: String, $contentTypeId: String) {
-    invoices(contentType: $contentType, contentTypeId: $contentTypeId) {
-      _id
-      amount
-    }
-  }
-`;
 
 export type BookingFormData = {
   selectedDate: string | null;
@@ -94,51 +88,55 @@ export default function BookingForm() {
       remaining: params.get("remaining"),
       amount: params.get("amount"),
     }),
-    [params]
+    [params],
   );
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [couponCode, setCouponCode] = useState("");
-  const [couponError, setCouponError] = useState<string | null>(null);
-  const [discount, setDiscount] = useState(0);
-  const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
   const [showErrors, setShowErrors] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [invoiceId, setInvoiceId] = useState<string | null>(null);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+  const [transaction, setTransaction] = useState<any | null>(null);
+  const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(
+    null,
+  );
+  const selectedPaymentIdRef = useRef<string | null>(null);
   const [nextLoading, setNextLoading] = useState(false);
   const [paidByCheck, setPaidByCheck] = useState(false);
   const [serverRegNumber, setServerRegNumber] = useState<string | null>(null);
   const [serverSex, setServerSex] = useState<number | null>(null);
-  const invoiceCreationInitiated = useRef<Set<string>>(new Set());
 
   // Current user
   const { data: userData } = useQuery(authQueries.currentUser);
   const currentUser = userData?.clientPortalCurrentUser || null;
 
   // Tour group data
-  const { data: groupToursData } = useQuery(tmsQueries.TOUR_GROUP_DETAIL_QUERY, {
-    variables: {
-      status: "website",
-      groupCode: urlParams.tourId || "",
+  const { data: groupToursData } = useQuery(
+    tmsQueries.TOUR_GROUP_DETAIL_QUERY,
+    {
+      variables: {
+        status: "published",
+        groupCode: urlParams.tourId || "",
+      },
+      skip: !urlParams.tourId,
     },
-    skip: !urlParams.tourId,
-  });
+  );
 
   const groupTourItems = useMemo(
     () => (groupToursData?.cpBmToursGroupDetail?.items ?? []) as BmTour[],
-    [groupToursData]
+    [groupToursData],
   );
 
   const selectedItem = useMemo(
     () =>
-      groupTourItems.find(
-        (it) =>
-          it?.startDate &&
-          urlParams.startDate &&
-          it.startDate.slice(0, 10) === urlParams.startDate.slice(0, 10)
-      ),
-    [groupTourItems, urlParams.startDate]
+      urlParams.startDate
+        ? groupTourItems.find(
+            (it) =>
+              it?.startDate &&
+              it.startDate.slice(0, 10) === urlParams.startDate!.slice(0, 10),
+          )
+        : groupTourItems[0],
+    [groupTourItems, urlParams.startDate],
   );
 
   const [formData, setFormData] = useState<BookingFormData>({
@@ -197,7 +195,9 @@ export default function BookingForm() {
     const needsFreshPayment = isPendingPayment || isPrepaidRemaining;
 
     if (!needsFreshPayment) {
-      const savedInvoice = safeSessionStorage.get(`invoice:${urlParams.orderId}`);
+      const savedInvoice = safeSessionStorage.get(
+        `invoice:${urlParams.orderId}`,
+      );
       const savedPayUrl = safeSessionStorage.get(`payurl:${urlParams.orderId}`);
       if (savedInvoice) setInvoiceId(savedInvoice);
       if (savedPayUrl) setPaymentUrl(savedPayUrl);
@@ -208,7 +208,7 @@ export default function BookingForm() {
   const [fetchCustomersByIds] = useLazyQuery(
     gql`
       query BookingCustomersMain($ids: [String]) {
-        customersMain(ids: $ids) {
+        cpCustomers(ids: $ids) {
           list {
             _id
             registrationNumber
@@ -217,14 +217,14 @@ export default function BookingForm() {
         }
       }
     `,
-    { fetchPolicy: "no-cache" }
+    { fetchPolicy: "no-cache" },
   );
 
   useEffect(() => {
     const id = currentUser?.erxesCustomerId;
     if (!id) return;
     fetchCustomersByIds({ variables: { ids: [id] } }).then(({ data }) => {
-      const customer = data?.customersMain?.list?.[0];
+      const customer = data?.cpCustomers?.list?.[0];
       if (!customer) return;
       setServerRegNumber(customer.registrationNumber || null);
       setServerSex(typeof customer.sex === "number" ? customer.sex : null);
@@ -243,9 +243,8 @@ export default function BookingForm() {
 
   // Pricing
   const pricePerPerson = useMemo(
-    () =>
-      Number(urlParams.pricePerPerson || 0) || groupTourItems[0]?.cost || 0,
-    [urlParams.pricePerPerson, groupTourItems]
+    () => Number(urlParams.pricePerPerson || 0) || groupTourItems[0]?.cost || 0,
+    [urlParams.pricePerPerson, groupTourItems],
   );
 
   const { totalPrice, totalWithTax } = useMemo(() => {
@@ -253,16 +252,16 @@ export default function BookingForm() {
       !!urlParams.remaining && Number(urlParams.remaining) > 0;
     const basePrice = isRemaining
       ? Number(urlParams.remaining)
-      : Math.max(0, formData.travelers * pricePerPerson - discount);
+      : Math.max(0, formData.travelers * pricePerPerson);
     return {
       totalPrice: basePrice,
       totalWithTax: Math.round(basePrice * (1 + TAX_RATE)),
     };
-  }, [urlParams.remaining, formData.travelers, pricePerPerson, discount]);
+  }, [urlParams.remaining, formData.travelers, pricePerPerson]);
 
   // Mutations
   const [orderAddMutation, { loading: creatingOrder }] = useMutation(
-    tmsMutations.BM_ORDER_ADD
+    tmsMutations.BM_ORDER_ADD,
   );
   const [editOrder] = useMutation(tmsMutations.BM_ORDER_EDIT);
   const [addCpUser] = useMutation(customerMutations.addCpUser);
@@ -284,25 +283,38 @@ export default function BookingForm() {
         }
 
         const tx = created?.transactions?.[0];
-        if (tx?.paymentId) {
+        const paymentId = tx?.paymentId || selectedPaymentIdRef.current;
+
+        if (paymentId) {
           try {
             const { data: txData } = await addTransaction({
               variables: {
                 input: {
                   invoiceId: newInvoiceId,
-                  paymentId: tx.paymentId,
+                  paymentId,
                   amount: Number(created?.amount || 0),
-                  details: tx.response || null,
                 },
               },
             });
-            const payUrl =
-              txData?.cpPaymentTransactionsAdd?.details?.invoice ||
-              txData?.cpPaymentTransactionsAdd?.response?.invoice;
-            if (payUrl) {
-              setPaymentUrl(payUrl);
-              if (orderId) {
-                safeSessionStorage.set(`payurl:${orderId}`, payUrl);
+            const newTx = txData?.cpPaymentTransactionsAdd;
+            if (newTx) {
+              setTransaction(newTx);
+              const res = newTx.response;
+              const payUrl =
+                res?.invoice ||
+                res?.redirectUrl ||
+                res?.redirect_url ||
+                res?.paymentUrl ||
+                res?.payment_url ||
+                res?.url ||
+                newTx.details?.invoice ||
+                newTx.details?.redirectUrl ||
+                newTx.details?.url;
+              if (payUrl) {
+                setPaymentUrl(payUrl);
+                if (orderId) {
+                  safeSessionStorage.set(`payurl:${orderId}`, payUrl);
+                }
               }
             }
           } catch {
@@ -310,22 +322,19 @@ export default function BookingForm() {
           }
         }
       },
-    }
+    },
   );
 
   const [addTransaction] = useMutation(paymentMutations.transactionsAdd);
   const [checkInvoice] = useMutation(paymentMutations.checkInvoice);
-  const [fetchPayments] = useLazyQuery(paymentQueries.payments);
-  const [fetchInvoiceByOrder] = useLazyQuery(INVOICE_BY_ORDER, {
-    fetchPolicy: "no-cache",
-  });
-  const [fetchInvoiceDetail] = useLazyQuery(paymentQueries.invoiceDetail);
+  const { data: paymentsData } = useQuery(paymentQueries.payments);
+  const payments = paymentsData?.cpPayments || [];
 
   // Find customer by email
   const [findCustomerQuery] = useLazyQuery(
     gql`
       query FindCustomerByEmail($email: String) {
-        customersMain(searchValue: $email) {
+        cpCustomers(searchValue: $email) {
           list {
             _id
             primaryEmail
@@ -333,208 +342,79 @@ export default function BookingForm() {
         }
       }
     `,
-    { fetchPolicy: "no-cache" }
+    { fetchPolicy: "no-cache" },
   );
 
   const handleFindCustomer = useCallback(
     async (email: string) => {
       const { data } = await findCustomerQuery({ variables: { email } });
-      const list = data?.customersMain?.list || [];
-      return list.find(
-        (c: any) =>
-          c.primaryEmail?.toLowerCase() === email.toLowerCase()
-      ) || null;
+      const list = data?.cpCustomers?.list || [];
+      return (
+        list.find(
+          (c: any) => c.primaryEmail?.toLowerCase() === email.toLowerCase(),
+        ) || null
+      );
     },
-    [findCustomerQuery]
+    [findCustomerQuery],
   );
 
-  const getPaymentIds = useCallback(async (): Promise<string[]> => {
-    const { data } = await fetchPayments();
-    return (data?.payments || []).map((p: { _id: string }) => p._id);
-  }, [fetchPayments]);
+  const handleSelectPayment = useCallback((id: string) => {
+    setSelectedPaymentId(id);
+    selectedPaymentIdRef.current = id;
+  }, []);
 
-  const submitInvoice = useCallback(
-    async (
-      paymentAmount: string,
-      currentOrderId: string,
-      extras?: {
-        phone?: string;
-        email?: string;
-        customerId?: string;
-        customerType?: string;
-        description?: string;
-        paymentIds?: string[];
-      }
-    ) => {
-      const amount = Number(paymentAmount);
-      if (!amount || amount <= 0 || isNaN(amount)) {
-        throw new Error("Amount is required and must be greater than 0");
-      }
-      return await createInvoice({
+  const handlePay = useCallback(async () => {
+    if (!selectedPaymentId || !orderId) {
+      toast.error("Please select a payment method");
+      return;
+    }
+
+    let amount: number;
+    if (urlParams.remaining && Number(urlParams.remaining) > 0) {
+      amount = Math.round(Number(urlParams.remaining) * (1 + TAX_RATE));
+    } else if (urlParams.paymentType === "prepaid" && urlParams.downPayment) {
+      amount = Math.floor(Number(urlParams.downPayment) * (1 + TAX_RATE));
+    } else if (urlParams.paymentType === "pending" && urlParams.amount) {
+      amount = Math.round(Number(urlParams.amount) * (1 + TAX_RATE));
+    } else {
+      amount = totalWithTax;
+    }
+
+    if (!amount || amount <= 0) {
+      toast.error("Invalid payment amount");
+      return;
+    }
+
+    try {
+      await createInvoice({
         variables: {
           input: {
             amount,
-            phone: extras?.phone,
-            email: extras?.email,
-            description: extras?.description || "Booking payment",
-            customerId: extras?.customerId,
-            customerType: extras?.customerType || "visitor",
-            contentTypeId: currentOrderId,
-            paymentIds: extras?.paymentIds,
+            phone: currentUser?.phone || undefined,
+            email: currentUser?.email || undefined,
+            description: `Booking #${orderId}`,
+            customerId: currentUser?.erxesCustomerId,
+            customerType: currentUser?.erxesCustomerId ? "customer" : "visitor",
+            contentTypeId: orderId,
+            paymentIds: [selectedPaymentId],
           },
         },
       });
-    },
-    [createInvoice]
-  );
-
-  // Invoice creation effect
-  useEffect(() => {
-    const createOrFindInvoice = async () => {
-      if (
-        !orderId ||
-        invoiceId ||
-        invoiceCreationInitiated.current.has(orderId)
-      ) {
-        return;
-      }
-
-      invoiceCreationInitiated.current.add(orderId);
-
-      const isPendingPayment = urlParams.paymentType === "pending";
-      const isPrepaidRemaining =
-        !!urlParams.remaining && Number(urlParams.remaining) > 0;
-
-      try {
-        const paymentIds = await getPaymentIds();
-
-        if (isPendingPayment) {
-          const baseAmount = urlParams.amount
-            ? Number(urlParams.amount)
-            : totalPrice;
-          const amountWithTax = Math.round(baseAmount * (1 + TAX_RATE));
-          if (!amountWithTax || amountWithTax <= 0) throw new Error("Invalid payment amount");
-
-          const result = await submitInvoice(String(amountWithTax), orderId, {
-            phone: currentUser?.phone || undefined,
-            email: currentUser?.email || undefined,
-            customerId: currentUser?.erxesCustomerId,
-            customerType: currentUser?.erxesCustomerId ? "customer" : "visitor",
-            description: `Booking payment for order ${orderId}`,
-            paymentIds: paymentIds.length > 0 ? paymentIds : undefined,
-          });
-          if (result?.data?.cpInvoiceCreate?._id) return;
-
-          invoiceCreationInitiated.current.delete(orderId);
-          toast.error("Payment initialization failed");
-          return;
-        }
-
-        if (isPrepaidRemaining) {
-          const remainingBase = Number(urlParams.remaining);
-          const remainingWithTax = Math.round(remainingBase * (1 + TAX_RATE));
-
-          const result = await submitInvoice(String(remainingWithTax), orderId, {
-            phone: currentUser?.phone || undefined,
-            email: currentUser?.email || undefined,
-            customerId: currentUser?.erxesCustomerId,
-            customerType: currentUser?.erxesCustomerId ? "customer" : "visitor",
-            description: `Remaining payment for order ${orderId}`,
-            paymentIds: paymentIds.length > 0 ? paymentIds : undefined,
-          });
-          if (result?.data?.cpInvoiceCreate?._id) return;
-
-          invoiceCreationInitiated.current.delete(orderId);
-          toast.error("Payment initialization failed");
-          return;
-        }
-
-        // Try to find existing invoice
-        const { data } = await fetchInvoiceByOrder({
-          variables: { contentType: "pos:orders", contentTypeId: orderId },
-        });
-        const existingInvoiceId = data?.invoices?.[0]?._id;
-
-        if (!existingInvoiceId) {
-          let paymentAmount: number;
-          if (urlParams.paymentType === "prepaid" && urlParams.downPayment) {
-            paymentAmount = Math.floor(
-              Number(urlParams.downPayment) * (1 + TAX_RATE)
-            );
-          } else {
-            paymentAmount = totalWithTax;
-          }
-
-          const result = await submitInvoice(String(paymentAmount), orderId, {
-            phone: currentUser?.phone || undefined,
-            email: currentUser?.email || undefined,
-            customerId: currentUser?.erxesCustomerId,
-            customerType: currentUser?.erxesCustomerId ? "customer" : "visitor",
-            description: `Booking payment for order ${orderId}`,
-            paymentIds: paymentIds.length > 0 ? paymentIds : undefined,
-          });
-          if (!result?.data?.cpInvoiceCreate?._id) {
-            invoiceCreationInitiated.current.delete(orderId);
-          }
-          return;
-        }
-
-        // Use existing invoice
-        setInvoiceId(existingInvoiceId);
-        safeSessionStorage.set(`invoice:${orderId}`, existingInvoiceId);
-
-        if (!paymentUrl) {
-          const { data: invDetail } = await fetchInvoiceDetail({
-            variables: { id: existingInvoiceId },
-          });
-          const amount = Number(invDetail?.invoiceDetail?.amount || 0);
-          const firstPaymentId = paymentIds[0];
-
-          if (firstPaymentId && amount > 0) {
-            const { data: txData } = await addTransaction({
-              variables: {
-                input: {
-                  invoiceId: existingInvoiceId,
-                  paymentId: firstPaymentId,
-                  amount,
-                },
-              },
-            });
-            const payUrl =
-              txData?.cpPaymentTransactionsAdd?.details?.invoice ||
-              txData?.cpPaymentTransactionsAdd?.response?.invoice;
-            if (payUrl) {
-              setPaymentUrl(payUrl);
-              safeSessionStorage.set(`payurl:${orderId}`, payUrl);
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Invoice creation error:", error);
-        invoiceCreationInitiated.current.delete(orderId);
-        toast.error("Payment initialization failed", {
-          description: "Unable to process payment. Please try again.",
-        });
-      }
-    };
-
-    void createOrFindInvoice();
+    } catch (error) {
+      toast.error("Payment initialization failed", {
+        description: "Unable to process payment. Please try again.",
+      });
+    }
   }, [
+    selectedPaymentId,
     orderId,
-    invoiceId,
-    paymentUrl,
-    urlParams.paymentType,
+    currentUser,
+    totalWithTax,
     urlParams.remaining,
+    urlParams.paymentType,
     urlParams.downPayment,
     urlParams.amount,
-    currentUser,
-    totalPrice,
-    totalWithTax,
-    getPaymentIds,
-    submitInvoice,
-    fetchInvoiceByOrder,
-    fetchInvoiceDetail,
-    addTransaction,
+    createInvoice,
   ]);
 
   // Poll payment status
@@ -546,8 +426,7 @@ export default function BookingForm() {
     const pollPaymentStatus = async () => {
       try {
         const { data } = await checkInvoice({ variables: { id: invoiceId } });
-        const isPaid =
-          String(data?.cpInvoicesCheck).toLowerCase() === "paid";
+        const isPaid = String(data?.cpInvoicesCheck).toLowerCase() === "paid";
 
         if (isPaid && active && orderId) {
           setPaidByCheck(true);
@@ -564,9 +443,7 @@ export default function BookingForm() {
             urlParams.downPayment
           ) {
             const downPaymentBase = Number(urlParams.downPayment);
-            const parent = String(
-              Math.max(0, totalPrice - downPaymentBase)
-            );
+            const parent = String(Math.max(0, totalPrice - downPaymentBase));
             await editOrder({
               variables: {
                 id: orderId,
@@ -669,27 +546,28 @@ export default function BookingForm() {
       if (lead.email?.trim()) {
         const existing = await handleFindCustomer(lead.email);
         if (existing?._id) {
-          toast.info("You are already registered. Please log in.");
-          return undefined;
+          leadCustomerId = existing._id;
         }
       }
 
-      try {
-        const { data: cpData } = await addCpUser({
-          variables: {
-            clientPortalId: process.env.ERXES_CP_ID,
-            type: "customer",
-            disableVerificationMail: false,
-            password: generateRandomPassword(),
-            firstName: lead.firstName,
-            lastName: lead.lastName,
-            phone: lead.phone,
-            email: lead.email,
-          },
-        });
-        leadCustomerId = cpData?.clientPortalUsersInvite?.erxesCustomerId;
-      } catch {
-        // Continue without customer ID
+      if (!leadCustomerId) {
+        try {
+          const { data: cpData } = await addCpUser({
+            variables: {
+              clientPortalId: process.env.ERXES_CP_ID,
+              type: "customer",
+              disableVerificationMail: false,
+              password: generateRandomPassword(),
+              firstName: lead.firstName,
+              lastName: lead.lastName,
+              phone: lead.phone,
+              email: lead.email,
+            },
+          });
+          leadCustomerId = cpData?.clientPortalUserRegister?.erxesCustomerId;
+        } catch {
+          // Continue without customer ID
+        }
       }
     }
 
@@ -797,7 +675,7 @@ export default function BookingForm() {
             },
           });
 
-          const newOrderId = data?.bmOrderAdd?._id;
+          const newOrderId = data?.cpBmsOrderAdd?._id;
           if (newOrderId) {
             setOrderId(newOrderId);
           }
@@ -857,48 +735,44 @@ export default function BookingForm() {
   ];
 
   return (
-    <div className="min-h-screen text-gray-800">
+    <div className="min-h-screen bg-gray-50">
       {/* Hero + Stepper */}
       <div
-        className="relative w-full h-[440px] bg-center bg-cover"
+        className="relative w-full h-[360px] bg-center bg-cover"
         style={{
-          backgroundImage: selectedItem?.imageThumbnail
-            ? `url("${selectedItem.imageThumbnail}")`
+          backgroundImage: getFileUrl(selectedItem?.imageThumbnail || "")
+            ? `url("${getFileUrl(selectedItem?.imageThumbnail || "")}")`
             : `url("/images/tour-bg.jpg")`,
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/60" />
-        <div className="relative z-10 px-3 pt-8 mx-auto max-w-5xl sm:px-4 lg:px-6 md:pt-10">
-          <h1 className="text-2xl font-extrabold text-white drop-shadow md:text-3xl lg:text-4xl">
-            {selectedItem?.name || "Tour Booking"}
-          </h1>
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-        {/* Stepper bar */}
-        <div className="absolute right-0 bottom-0 left-0 z-20 border-t backdrop-blur-sm bg-black/40 border-white/10">
-          <div className="container flex justify-center items-center py-4 md:hidden">
-            <div className="flex gap-3 items-center sm:gap-6">
+        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+          <div className="container mx-auto max-w-5xl">
+            <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg mb-4">
+              {selectedItem?.name || "Tour Booking"}
+            </h1>
+
+            {/* Stepper */}
+            <div className="flex items-center gap-2">
               {steps.map((step, idx) => (
-                <div key={step.num} className="flex items-center gap-3">
-                  <div className="flex flex-col gap-2 items-center">
+                <div key={step.num} className="flex items-center gap-2">
+                  <div className="flex items-center gap-2">
                     <span
-                      className={`flex justify-center items-center w-8 h-8 text-xs font-bold rounded-full transition-all duration-300 ${
+                      className="flex justify-center items-center w-8 h-8 text-xs font-bold rounded-full transition-all duration-300"
+                      style={
                         currentStep > step.num
-                          ? "bg-white text-green-600 shadow-lg ring-2 ring-green-500/50"
+                          ? { backgroundColor: "var(--primary)", color: "#fff" }
                           : currentStep === step.num
-                          ? "bg-white text-gray-800 shadow-lg ring-2 ring-white/50"
-                          : "bg-white/20 text-white/60 backdrop-blur-sm"
-                      }`}
+                            ? { backgroundColor: "#fff", color: "var(--primary)" }
+                            : { backgroundColor: "rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.6)" }
+                      }
                     >
-                      {currentStep > step.num ? (
-                        <Check className="w-4 h-4" />
-                      ) : (
-                        String(step.num)
-                      )}
+                      {currentStep > step.num ? <Check className="w-4 h-4" /> : String(step.num)}
                     </span>
                     <span
-                      className={`text-xs font-semibold whitespace-nowrap transition-colors duration-300 ${
-                        currentStep >= step.num ? "text-white" : "text-white/60"
+                      className={`text-sm font-semibold whitespace-nowrap transition-colors duration-300 ${
+                        currentStep >= step.num ? "text-white" : "text-white/50"
                       }`}
                     >
                       {step.label}
@@ -906,51 +780,8 @@ export default function BookingForm() {
                   </div>
                   {idx < steps.length - 1 && (
                     <div
-                      className={`w-8 h-0.5 transition-all duration-300 sm:w-16 ${
-                        currentStep > step.num ? "bg-white/60" : "bg-white/20"
-                      }`}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="container hidden items-center py-6 md:flex">
-            <div className="flex relative gap-3 items-center">
-              {steps.map((step, idx) => (
-                <div key={step.num} className="flex items-center gap-3">
-                  <div className="flex gap-3 items-center">
-                    <span
-                      className={`flex justify-center items-center w-10 h-10 text-sm font-bold rounded-full transition-all duration-300 ${
-                        currentStep > step.num
-                          ? "bg-white text-green-600 shadow-lg ring-2 ring-green-500/50"
-                          : currentStep === step.num
-                          ? "bg-white text-gray-800 shadow-lg ring-2 ring-white/50"
-                          : "bg-white/20 text-white/60 backdrop-blur-sm"
-                      }`}
-                    >
-                      {currentStep > step.num ? (
-                        <Check className="w-5 h-5" />
-                      ) : (
-                        String(step.num)
-                      )}
-                    </span>
-                    <span
-                      className={`text-base font-semibold whitespace-nowrap transition-colors duration-300 ${
-                        currentStep >= step.num ? "text-white" : "text-white/60"
-                      }`}
-                    >
-                      {step.label}
-                    </span>
-                  </div>
-                  {idx < steps.length - 1 && (
-                    <div
-                      className={`w-16 h-0.5 mx-4 transition-all duration-300 ${
-                        currentStep > step.num
-                          ? "bg-gradient-to-r from-white/60 to-white/30"
-                          : "bg-white/20"
-                      }`}
+                      className="w-8 h-0.5 mx-1 transition-all duration-300 sm:w-12"
+                      style={{ backgroundColor: currentStep > step.num ? "var(--primary)" : "rgba(255,255,255,0.2)" }}
                     />
                   )}
                 </div>
@@ -961,7 +792,7 @@ export default function BookingForm() {
       </div>
 
       {/* Content */}
-      <div className="container py-4 lg:py-6">
+      <div className="container mx-auto max-w-5xl px-4 py-8">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             {currentStep === 1 && (
@@ -970,13 +801,6 @@ export default function BookingForm() {
                 updateFormData={updateFormData}
                 selectedItem={selectedItem}
                 urlStartDate={urlParams.startDate}
-                couponCode={couponCode}
-                setCouponCode={setCouponCode}
-                couponError={couponError}
-                setCouponError={setCouponError}
-                couponSuccess={couponSuccess}
-                setCouponSuccess={setCouponSuccess}
-                setDiscount={setDiscount}
                 pricePerPerson={pricePerPerson}
                 totalPrice={totalPrice}
                 handleContinue={handleContinue}
@@ -993,24 +817,22 @@ export default function BookingForm() {
             {currentStep === 2 && (
               <PaymentSection
                 paymentUrl={paymentUrl}
+                transaction={transaction}
                 loading={creatingInvoice}
+                payments={payments}
+                selectedPaymentId={selectedPaymentId}
+                onSelectPayment={handleSelectPayment}
+                onPay={handlePay}
               />
             )}
 
             {currentStep === 3 && <CompleteSection />}
           </div>
 
-          <div className="z-50 lg:col-span-1 lg:-mt-28">
+          <div className="lg:col-span-1">
             <BookingSummarySidebar
               selectedItem={selectedItem}
               formData={formData}
-              couponCode={couponCode}
-              setCouponCode={setCouponCode}
-              couponError={couponError}
-              setCouponError={setCouponError}
-              couponSuccess={couponSuccess}
-              setCouponSuccess={setCouponSuccess}
-              setDiscount={setDiscount}
               pricePerPerson={pricePerPerson}
               totalPrice={totalPrice}
               currentStep={currentStep}

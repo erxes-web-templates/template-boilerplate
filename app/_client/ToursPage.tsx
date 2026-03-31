@@ -1,11 +1,18 @@
 "use client";
 
-import { TOURS_QUERY } from "../../graphql/queries";
+import { TOURS_GROUP_QUERY } from "../../graphql/queries";
 import { useQuery } from "@apollo/client";
 import Link from "next/link";
 import Image from "next/image";
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getFileUrl, templateUrl } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
@@ -18,11 +25,13 @@ const ToursPage = () => {
 
   const PageContent = usePage(pageName);
 
-  const { data, loading } = useQuery(TOURS_QUERY, {
-    variables: { limit: 100, status: "website" },
+  const { data, loading } = useQuery(TOURS_GROUP_QUERY, {
+    variables: { limit: 100, status: "published" },
   });
 
-  const tours = data?.cpBmsTours?.list || [];
+  const tours = (data?.cpBmToursGroup?.list || []).map(
+    (group: any) => group.items?.[0],
+  ).filter(Boolean);
 
   if (loading) {
     return "Loading ...";
@@ -36,7 +45,12 @@ const ToursPage = () => {
             <CardHeader>
               {tour.imageThumbnail && (
                 <div className="relative w-full h-[200px]">
-                  <Image src={getFileUrl(tour.imageThumbnail)} alt={tour.name} fill className="rounded-md h-[200px]" />
+                  <Image
+                    src={getFileUrl(tour.imageThumbnail)}
+                    alt={tour.name}
+                    fill
+                    className="rounded-md h-[200px]"
+                  />
                 </div>
               )}
             </CardHeader>
@@ -48,7 +62,7 @@ const ToursPage = () => {
             </CardContent>
             <CardFooter className="flex justify-between items-center">
               <span className="text-lg font-bold">{tour.cost}</span>
-              <Link href={templateUrl(`/tour&tourId=${tour._id}`)}>
+              <Link href={templateUrl(`/tour&tourId=${tour.groupCode}`)}>
                 {" "}
                 <Button>Read more</Button>
               </Link>

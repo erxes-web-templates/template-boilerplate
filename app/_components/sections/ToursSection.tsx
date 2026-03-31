@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "../../../components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,12 +8,12 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "../../../components/ui/card";
 import React from "react";
 import Link from "next/link";
 import { useQuery } from "@apollo/client";
 import { TOURS_GROUP_QUERY } from "../../../graphql/queries";
-import { getFileUrl, templateUrl } from "@/lib/utils";
+import { getFileUrl, templateUrl } from "../../../lib/utils";
 import { isBuildMode } from "../../../lib/buildMode";
 import { toHtml } from "../../../lib/html";
 import { Section } from "../../../types/sections";
@@ -24,7 +24,7 @@ const ToursSection = ({ section }: { section: Section }) => {
   const { data } = useQuery(TOURS_GROUP_QUERY, {
     variables: {
       limit: section?.config?.limit || 6,
-      status: "website",
+      status: "published",
     },
   });
 
@@ -91,8 +91,8 @@ const ToursSection = ({ section }: { section: Section }) => {
                 <Link
                   href={
                     isBuilder
-                      ? templateUrl(`/tour&tourId=${tour.items[0]._id}`)
-                      : `/tours/${tour.items[0]._id}`
+                      ? templateUrl(`/tour&tourId=${tour.items[0].groupCode}`)
+                      : `/tours/${tour.items[0].groupCode}`
                   }
                 >
                   <Button size="sm">
@@ -107,7 +107,11 @@ const ToursSection = ({ section }: { section: Section }) => {
         {section.config?.primaryCtaUrl && (
           <div className="mt-10 text-center">
             <Link
-              href={isBuilder ? templateUrl(section.config.primaryCtaUrl) : section.config.primaryCtaUrl}
+              href={
+                isBuilder
+                  ? templateUrl(section.config.primaryCtaUrl)
+                  : section.config.primaryCtaUrl
+              }
               className="text-sm font-medium text-primary hover:underline"
             >
               {section.config.primaryCta || "View all"}

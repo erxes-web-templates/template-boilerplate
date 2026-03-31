@@ -20,7 +20,7 @@ export default async function ToursPage() {
     return <ToursPageClient />;
   }
 
-  const data = await fetchBmTours(100, { status: "website" });
+  const data = await fetchBmTours(100, { status: "published" });
   const tours = data?.list || [];
 
   return (
