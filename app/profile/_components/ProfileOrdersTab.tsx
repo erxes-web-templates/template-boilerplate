@@ -111,8 +111,7 @@ const statusLabel: Record<string, string> = {
 const PAYABLE_STATUSES = new Set(["new", "doing", "reDoing", "pending"]);
 
 const isPayable = (order: Order) =>
-  order.saleStatus !== "confirmed" &&
-  PAYABLE_STATUSES.has(order.status ?? "");
+  order.saleStatus !== "confirmed" && PAYABLE_STATUSES.has(order.status ?? "");
 
 const deliveryAddress = (order: Order): string | null => {
   const info = order.deliveryInfo;
@@ -246,7 +245,9 @@ function OrderDetailDialog({
                           {formatCurrency(item.unitPrice)} × {item.count ?? 1}
                         </p>
                       </div>
-                      <p className="font-semibold">{formatCurrency(lineTotal)}</p>
+                      <p className="font-semibold">
+                        {formatCurrency(lineTotal)}
+                      </p>
                     </div>
                   );
                 })}
@@ -325,7 +326,7 @@ function OrderPaymentDialog({
   });
   const appToken = configData?.currentConfig?.erxesAppToken ?? null;
   const mutationContext = appToken
-    ? { headers: { "erxes-app-token": appToken } }
+    ? { headers: { "x-app-token": appToken } }
     : undefined;
 
   const { data: paymentsData, loading: loadingPayments } = useQuery(
@@ -452,7 +453,11 @@ function OrderPaymentDialog({
           if (paymentId) {
             addTransaction({
               variables: {
-                input: { invoiceId: payload._id, paymentId, amount: payload.amount },
+                input: {
+                  invoiceId: payload._id,
+                  paymentId,
+                  amount: payload.amount,
+                },
               },
             });
           }
@@ -645,7 +650,10 @@ function OrderPaymentDialog({
                           {(opt.config as any)?.description ?? opt.kind}
                         </span>
                         {opt.status !== "active" && (
-                          <Badge variant="outline" className="mt-1 w-fit text-xs">
+                          <Badge
+                            variant="outline"
+                            className="mt-1 w-fit text-xs"
+                          >
                             Түр идэвхгүй
                           </Badge>
                         )}
@@ -706,7 +714,11 @@ function OrderPaymentDialog({
               (() => {
                 const res = transaction.response;
                 const qrImage =
-                  res.qr_image || res.qrImage || res.qr_code || res.qrCode || null;
+                  res.qr_image ||
+                  res.qrImage ||
+                  res.qr_code ||
+                  res.qrCode ||
+                  null;
                 const qrText = res.qr_text || res.qrText || res.qr || null;
                 const redirectUrl =
                   res.redirectUrl ||
@@ -871,10 +883,7 @@ const ProfileOrdersTab = ({ orders, loading }: ProfileOrdersTabProps) => {
 
             <CardFooter className="flex justify-end gap-2">
               {isPayable(order) && (
-                <Button
-                  size="sm"
-                  onClick={() => setPayOrder(order)}
-                >
+                <Button size="sm" onClick={() => setPayOrder(order)}>
                   Төлбөр төлөх
                 </Button>
               )}

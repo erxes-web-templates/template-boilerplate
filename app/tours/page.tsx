@@ -20,9 +20,10 @@ export default async function ToursPage() {
     return <ToursPageClient />;
   }
 
-  const data = await fetchBmTours(100, { status: "published" });
-  const tours = data?.list || [];
-
+  const data = (await fetchBmTours(100, { status: "published" })) as any;
+  const tours = (data?.list || [])
+    .map((group: any) => group.items?.[0])
+    .filter(Boolean);
   return (
     <div className="container mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <div className="mb-12 text-center">
@@ -64,7 +65,10 @@ export default async function ToursPage() {
               <span className="text-xl font-bold text-primary">
                 {tour.cost}
               </span>
-              <Link href={`/tours/${tour._id}`}>
+              <Link
+                href={`/tours/${tour.groupCode || tour._id}`}
+                className="ml-auto"
+              >
                 <Button>Read more</Button>
               </Link>
             </CardFooter>

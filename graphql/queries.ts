@@ -540,6 +540,30 @@ export const TOUR_GROUP_DETAIL_QUERY = gql`
         info5
         extra
         images
+        itinerary {
+          _id
+          branchId
+          color
+          content
+          extra
+          duration
+          driverCost
+          totalCost
+          status
+          personCost
+          name
+          modifiedAt
+          images
+          guideCostExtra
+          guideCost
+          groupDays {
+            day
+            title
+            images
+            content
+          }
+          createdAt
+        }
         imageThumbnail
       }
     }

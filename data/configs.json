@@ -1,58 +1,62 @@
 {
-  "cpId": "uWi-qkgaePtkcED5z9Qle",
-  "template": "tour",
-  "templateId": "tour-template-2",
+  "cpId": "kqv9OXMrbaIY_f3Ns9fyk",
+  "templateId": "template-boilerplate",
+  "templateType": "tour",
   "meta": {
-    "title": "new",
-    "description": "new",
+    "title": "Tour booking",
+    "description": "Tour booking",
     "logo": "",
     "favicon": "",
     "keywords": "",
-    "author": "tourism"
+    "author": "localhost",
+    "url": ""
   },
   "appearance": {
     "theme": "light",
-    "baseFont": "Roboto, sans-serif",
-    "headingFont": "Roboto, sans-serif",
-    "baseColor": "#3f51b5",
-    "backgroundColor": "#f5f5f5"
+    "baseFont": "'Roboto', sans-serif",
+    "headingFont": "'Roboto', sans-serif",
+    "baseColor": "#000000",
+    "backgroundColor": "#ffffff"
   },
   "menus": {
     "main": [
-      { "label": "Home", "url": "/", "icon": null, "parentId": null },
-      { "label": "About", "url": "about", "icon": "", "parentId": null },
-      { "label": "Tours", "url": "tours", "icon": "", "parentId": null },
-      { "label": "Login", "url": "login", "icon": "", "parentId": null },
       {
-        "label": "Child menu 1",
-        "url": "child-menu-1",
-        "icon": "",
-        "parentId": "5wtF9_XNbRSvAz09F9p8p"
+        "_id": "IIfimDCL4W8IpROkarFDW",
+        "label": "Home",
+        "url": "/",
+        "parentId": null,
+        "order": 1
       },
       {
-        "label": "Child dmenu 2",
-        "url": "child-dmenu-2",
-        "icon": "",
-        "parentId": "5wtF9_XNbRSvAz09F9p8p"
+        "_id": "aquNzs-pWavYA_zaJQetB",
+        "label": "About",
+        "url": "/about",
+        "parentId": null,
+        "order": 1
       },
       {
-        "label": "Child child menu 1",
-        "url": "child-child-menu-1",
+        "_id": "n0HjDEiNxM3Nc1vUxqc1X",
+        "label": "Neg",
+        "url": "/tour",
         "icon": "",
-        "parentId": "mB56hYZWKQeiiJXCaFStQ"
+        "parentId": "IIfimDCL4W8IpROkarFDW",
+        "order": 1
       }
     ],
-    "footerMenu": []
+    "footerMenu": [
+      {
+        "_id": "JookZEG2vC2Wv5EJbR3r9",
+        "label": "Neg",
+        "url": "/neg",
+        "icon": "",
+        "parentId": null,
+        "order": 1
+      }
+    ]
   },
   "additional": {
-    "copyright": { "text": "All rights reserved." },
-    "social": [
-      { "name": "facebook", "url": "https://facebook.com" },
-      { "name": "whatsapp", "url": "+976 88779603" },
-      { "name": "phones", "url": ["+ 976 9999999"] },
-      { "name": "emails", "url": ["info@erxes.io"] },
-      { "name": "address", "url": "address" }
-    ],
-    "integrations": { "messengerId": "MSXUVA" }
+    "copyright": { "text": "All rights reserved.", "url": "" },
+    "social": [],
+    "integrations": {}
   }
 }

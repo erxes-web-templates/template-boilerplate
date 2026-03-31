@@ -10,9 +10,9 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_PMS_TOKEN: "",
     TEMPLATE_TYPE: "tour",
     NEXT_PUBLIC_POS_TOKEN: "o16LbW3jTsTspBuECzqY1nCPrFvvD858",
-    ERXES_WEB_ID: "nAeMKgoCmiWIcTc0mluyG",
+    ERXES_WEB_ID: "RiW86babHSW2AyuBRJA6l",
     ERXES_APP_TOKEN:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRQb3J0YWxJZCI6IktpM0V1S3JXUFM3MjZ2Y2F0LW9jRCIsImlhdCI6MTc3Mzg5Mjc2OH0.eFhAP6r_EyAlTWHNHd4AD-1DeQl7sqVkimF80o4vCnQ",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRQb3J0YWxJZCI6ImtxdjlPWE1yYmFJWV9mM05zOWZ5ayIsImlhdCI6MTc3NDU4OTU3M30.Ck4ZhMyi86axeie9d56Yc3rnbCUqosjP_x97fyoSSXM",
   },
   images: {
     unoptimized: true,

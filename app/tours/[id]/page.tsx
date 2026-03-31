@@ -26,17 +26,15 @@ export default async function TourDetailPage({ params }: PageProps) {
     return <TourDetailPageClient initialTourId={id} />;
   }
 
-  const tour = await fetchBmTourDetail(id);
+  const tourDetail = await fetchBmTourDetail(id);
 
-  if (!tour) {
+  if (!tourDetail) {
     return <div className="container mx-auto p-4">Tour not found.</div>;
   }
 
-  const groupDetail = tour.groupCode
-    ? await fetchBmToursGroupDetail(tour.groupCode)
-    : null;
-  const groupTourItems: any[] = (groupDetail as any)?.items || [];
-
+  const tour = tourDetail.items[0] || "";
+  const groupTourItems = tourDetail.items || [];
+  console.log(tour.itinerary);
   return (
     <div className="container mx-auto p-4 py-10">
       {/* Back */}
@@ -104,21 +102,30 @@ export default async function TourDetailPage({ params }: PageProps) {
             <div className="bg-white rounded-2xl p-6 border border-border/40 shadow-sm">
               <h2 className="text-xl font-semibold mb-4">Itinerary</h2>
               <Accordion type="single" collapsible className="w-full">
-                {tour.itinerary.map((itinerary: any, index: number) => (
-                  <AccordionItem key={index} value={`item-${index}`}>
-                    <AccordionTrigger>{itinerary.name}</AccordionTrigger>
-                    <AccordionContent>{itinerary.content}</AccordionContent>
-                  </AccordionItem>
-                ))}
+                {tour.itinerary.groupDays.map(
+                  (itinerary: any, index: number) => (
+                    <AccordionItem key={index} value={`item-${index}`}>
+                      <AccordionTrigger>{itinerary.title}</AccordionTrigger>
+                      <AccordionContent>
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: itinerary.content,
+                          }}
+                        />
+                      </AccordionContent>
+                    </AccordionItem>
+                  ),
+                )}
               </Accordion>
             </div>
           )}
 
           <div className="bg-white rounded-2xl p-6 border border-border/40 shadow-sm">
             <h2 className="text-xl font-semibold mb-2">Description</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              {tour.content}
-            </p>
+            <p
+              className="text-muted-foreground leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: tour.content }}
+            />
           </div>
 
           {groupTourItems.length > 1 && (

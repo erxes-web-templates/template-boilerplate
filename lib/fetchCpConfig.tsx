@@ -1,13 +1,13 @@
 import { CP_GET_CONFIG } from "../graphql/queries";
 import { getClient } from "./client";
 
-export async function fetchCpConfig(cpId: string) {
+export async function fetchCpConfig() {
   const client = getClient();
-
+  const webId = process.env.ERXES_WEB_ID || "";
   try {
     const { data } = await client.query({
       query: CP_GET_CONFIG,
-      variables: { _id: cpId },
+      variables: { _id: webId },
     });
 
     return data.cpGetWebDetail;

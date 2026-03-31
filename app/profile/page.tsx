@@ -115,6 +115,7 @@ export default function ProfilePage() {
 
   console.log("ordersData,", ordersData);
 
+  console.log(userDetailData, "udd");
   const {
     data: wishlistData,
     loading: wishlistLoading,

@@ -22,17 +22,21 @@ export async function fetchBmTours(limit: number, config?: any) {
   );
 
   try {
-    const { data } = await client.query<BmToursData>({
-      query: TOURS_QUERY,
+    const { data, error } = await client.query<{
+      cpBmToursGroup: BmToursData;
+    }>({
+      query: TOURS_GROUP_QUERY,
       variables: { limit, ...config },
       context: {
         headers: {
-          "erxes-app-token": process.env.ERXES_APP_TOKEN,
+          "x-app-token": process.env.ERXES_APP_TOKEN,
         },
       },
     });
 
-    return data.cpBmsTours;
+    console.log(data.cpBmToursGroup, "data", error, "error---------------");
+
+    return data.cpBmToursGroup;
   } catch (error) {
     console.error("[BM Tours] Error fetching data:", error);
 
@@ -61,24 +65,25 @@ export async function fetchBmTours(limit: number, config?: any) {
   }
 }
 
-export async function fetchBmTourDetail(id: string, branchId?: string) {
+export async function fetchBmTourDetail(id: string) {
   const client = getClient();
 
   try {
     const { data } = await client.query<
-      { bmTourDetail: BmTourDetail },
-      BmTourDetailVariables
+      { cpBmToursGroupDetail: BmTourDetail },
+      BmTourGroupDetailVariables
     >({
-      query: TOUR_DETAIL_QUERY,
-      variables: { id, branchId },
+      query: TOUR_GROUP_DETAIL_QUERY,
+      variables: { groupCode: id, status: "published" },
       context: {
         headers: {
-          "erxes-app-token": process.env.ERXES_APP_TOKEN,
+          "x-app-token": process.env.ERXES_APP_TOKEN,
         },
       },
     });
+    console.log(data, "daaaaaaaaaa");
 
-    return data.bmTourDetail;
+    return data.cpBmToursGroupDetail;
   } catch (error) {
     console.error("Error fetching BM Tour Detail:", error);
     return null;
@@ -97,7 +102,7 @@ export async function fetchBmToursGroup(limit: number) {
       variables: { status: "published", limit },
       context: {
         headers: {
-          "erxes-app-token": process.env.ERXES_APP_TOKEN,
+          "x-app-token": process.env.ERXES_APP_TOKEN,
         },
       },
     });
@@ -121,7 +126,7 @@ export async function fetchBmToursGroupDetail(groupCode: string) {
       variables: { groupCode, status: "published" },
       context: {
         headers: {
-          "erxes-app-token": process.env.ERXES_APP_TOKEN,
+          "x-app-token": process.env.ERXES_APP_TOKEN,
         },
       },
     });

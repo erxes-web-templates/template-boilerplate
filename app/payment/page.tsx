@@ -135,7 +135,7 @@ const PaymentPage = () => {
   }, []);
 
   const mutationContext = appToken
-    ? { headers: { "erxes-app-token": appToken } }
+    ? { headers: { "x-app-token": appToken } }
     : undefined;
 
   const [checkInvoiceMutation] = useMutation(paymentMutations.checkInvoice, {

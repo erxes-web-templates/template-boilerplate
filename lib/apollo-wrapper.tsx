@@ -1,6 +1,11 @@
 "use client";
 
-import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client";
+import {
+  ApolloClient,
+  ApolloLink,
+  HttpLink,
+  InMemoryCache,
+} from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { ApolloProvider } from "@apollo/client";
 import { AuthProvider } from "./AuthContext";
@@ -8,10 +13,12 @@ import { AuthProvider } from "./AuthContext";
 // Create the Apollo Client instance
 function makeClient() {
   const httpLink = new HttpLink({
-    uri: process.env.NEXT_PUBLIC_ERXES_API_URL || "http://localhost:4000/graphql",
+    uri:
+      process.env.NEXT_PUBLIC_ERXES_API_URL || "http://localhost:4000/graphql",
     credentials: "include",
     headers: {
       "erxes-pos-token": process.env.NEXT_PUBLIC_POS_TOKEN || "",
+      "x-app-token": process.env.ERXES_APP_TOKEN || "",
     },
     fetchOptions: { cache: "no-store" },
   });
