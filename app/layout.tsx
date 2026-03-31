@@ -52,7 +52,7 @@ export default async function RootLayout({
 }) {
   const cpDetail = isBuildMode()
     ? fallbackCpDetail()
-    : (await fetchCpConfig(data.cpId)) || fallbackCpDetail();
+    : (await fetchCpConfig()) || fallbackCpDetail();
 
   return (
     <html lang="en">

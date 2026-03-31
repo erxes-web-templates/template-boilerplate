@@ -1,5 +1,27 @@
 import { gql } from "@apollo/client";
 
+const BMS_ORDERS_QUERY = gql`
+  query CpBmsOrders($customerId: String, $limit: Int) {
+    cpBmsOrders(customerId: $customerId, limit: $limit) {
+      totalCount
+      list {
+        _id
+        branchId
+        customerId
+        tourId
+        amount
+        status
+        note
+        numberOfPeople
+        type
+        additionalCustomers
+        isChild
+        parent
+      }
+    }
+  }
+`;
+
 const TOUR_GROUP_DETAIL_QUERY = gql`
   query CpBmToursGroupDetail($groupCode: String, $status: String) {
     cpBmToursGroupDetail(groupCode: $groupCode, status: $status) {
@@ -47,5 +69,5 @@ const TOUR_GROUP_DETAIL_QUERY = gql`
   }
 `;
 
-const queries = { TOUR_GROUP_DETAIL_QUERY };
+const queries = { BMS_ORDERS_QUERY, TOUR_GROUP_DETAIL_QUERY };
 export default queries;

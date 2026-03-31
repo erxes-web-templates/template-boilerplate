@@ -2,10 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { isBuildMode } from "../../../lib/buildMode";
 import TourDetailPageClient from "../../_client/TourDetailPage";
-import {
-  fetchBmTourDetail,
-  fetchBmToursGroupDetail,
-} from "../../../lib/fetchTours";
+import { fetchBmTourDetail } from "../../../lib/fetchTours";
 import { getFileUrl } from "../../../lib/utils";
 import {
   Accordion,
@@ -32,9 +29,13 @@ export default async function TourDetailPage({ params }: PageProps) {
     return <div className="container mx-auto p-4">Tour not found.</div>;
   }
 
-  const tour = tourDetail.items[0] || "";
-  const groupTourItems = tourDetail.items || [];
-  console.log(tour.itinerary);
+  const groupTourItems = tourDetail.items ?? [];
+  const tour = groupTourItems[0];
+
+  if (!tour) {
+    return <div className="container mx-auto p-4">Tour not found.</div>;
+  }
+
   return (
     <div className="container mx-auto p-4 py-10">
       {/* Back */}
@@ -85,9 +86,6 @@ export default async function TourDetailPage({ params }: PageProps) {
           <div className="bg-white rounded-2xl p-6 border border-border/40 shadow-sm space-y-2">
             <p>
               <strong>Reference Number:</strong> {tour.refNumber}
-            </p>
-            <p>
-              <strong>Status:</strong> {tour.status}
             </p>
             <p>
               <strong>Start Date:</strong>{" "}

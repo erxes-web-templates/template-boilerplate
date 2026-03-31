@@ -51,8 +51,16 @@ export const currentOrder = gql`
 `;
 
 export const fullOrders = gql`
-  query CpFullOrders {
-    cpFullOrders {
+  query CpFullOrders(
+    $customerId: String
+    $isPaid: Boolean
+    $saleStatus: String
+  ) {
+    cpFullOrders(
+      customerId: $customerId
+      isPaid: $isPaid
+      saleStatus: $saleStatus
+    ) {
       _id
       createdAt
       status

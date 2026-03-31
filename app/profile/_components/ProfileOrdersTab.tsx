@@ -74,6 +74,11 @@ type Order = {
     primaryAddress?: string | null;
   } | null;
   items?: OrderItem[];
+  source?: "pos" | "bms";
+  numberOfPeople?: number | null;
+  tourId?: string | null;
+  parent?: string | null;
+  additionalCustomers?: string[] | null;
 };
 
 type PaymentOption = {
@@ -111,7 +116,9 @@ const statusLabel: Record<string, string> = {
 const PAYABLE_STATUSES = new Set(["new", "doing", "reDoing", "pending"]);
 
 const isPayable = (order: Order) =>
-  order.saleStatus !== "confirmed" && PAYABLE_STATUSES.has(order.status ?? "");
+  order.source !== "bms" &&
+  order.saleStatus !== "confirmed" &&
+  PAYABLE_STATUSES.has(order.status ?? "");
 
 const deliveryAddress = (order: Order): string | null => {
   const info = order.deliveryInfo;
@@ -154,6 +161,14 @@ function OrderDetailDialog({
                   {statusLabel[order.status ?? ""] ?? order.status ?? "—"}
                 </Badge>
               </div>
+              {order.source && (
+                <div>
+                  <p className="text-xs text-muted-foreground">Төрөл</p>
+                  <p className="font-medium">
+                    {order.source === "bms" ? "Tour booking" : "Store order"}
+                  </p>
+                </div>
+              )}
               <div>
                 <p className="text-xs text-muted-foreground">
                   Борлуулалтын төлөв
@@ -164,6 +179,18 @@ function OrderDetailDialog({
                     "—"}
                 </p>
               </div>
+              {order.tourId && (
+                <div>
+                  <p className="text-xs text-muted-foreground">Tour ID</p>
+                  <p className="font-medium">{order.tourId}</p>
+                </div>
+              )}
+              {order.numberOfPeople != null && (
+                <div>
+                  <p className="text-xs text-muted-foreground">Аялагчдын тоо</p>
+                  <p className="font-medium">{order.numberOfPeople}</p>
+                </div>
+              )}
               <div>
                 <p className="text-xs text-muted-foreground">Огноо</p>
                 <p className="font-medium">{formatDate(order.createdAt)}</p>
@@ -280,6 +307,24 @@ function OrderDetailDialog({
                   Тэмдэглэл
                 </p>
                 <p className="text-muted-foreground">{order.description}</p>
+              </div>
+            )}
+
+            {order.source === "bms" && (
+              <div className="rounded-lg border p-4">
+                <p className="mb-1 text-xs font-semibold uppercase text-muted-foreground">
+                  Захиалгын мэдээлэл
+                </p>
+                <div className="space-y-1 text-muted-foreground">
+                  {order.tourId && <p>Tour ID: {order.tourId}</p>}
+                  {order.numberOfPeople != null && (
+                    <p>Аялагчид: {order.numberOfPeople}</p>
+                  )}
+                  {order.parent && <p>Үлдэгдэл: {order.parent}</p>}
+                  {!!order.additionalCustomers?.length && (
+                    <p>Нэмэлт аялагчид: {order.additionalCustomers.length}</p>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -817,9 +862,6 @@ const ProfileOrdersTab = ({ orders, loading }: ProfileOrdersTabProps) => {
       </p>
     );
   }
-
-  console.log(orders, "ppppppp");
-
   return (
     <>
       <div className="space-y-4">
@@ -828,57 +870,92 @@ const ProfileOrdersTab = ({ orders, loading }: ProfileOrdersTabProps) => {
             <CardHeader className="flex flex-row items-center justify-between gap-3">
               <div>
                 <CardTitle className="text-base font-semibold">
-                  Захиалга #{order.number ?? order._id.slice(-6)}
+                  {order.source === "bms" ? "Аяллын захиалга" : "Захиалга"} #
+                  {order.number ?? order._id.slice(-6)}
                 </CardTitle>
                 <CardDescription>
                   {formatDate(order.createdAt)} · Нийт:{" "}
                   <span className="font-medium text-foreground">
                     {formatCurrency(order.totalAmount)}
                   </span>
+                  {order.source === "bms" && order.numberOfPeople != null && (
+                    <span className="text-muted-foreground">
+                      {" "}
+                      · {order.numberOfPeople} аялагч
+                    </span>
+                  )}
                 </CardDescription>
               </div>
-              <Badge variant="outline">
-                {statusLabel[order.status ?? ""] ??
-                  order.status ??
-                  "Төлөв тодорхойгүй"}
-              </Badge>
+              <div className="flex items-center gap-2">
+                {order.source === "bms" && (
+                  <Badge variant="secondary">BMS</Badge>
+                )}
+                <Badge variant="outline">
+                  {statusLabel[order.status ?? ""] ??
+                    order.status ??
+                    "Төлөв тодорхойгүй"}
+                </Badge>
+              </div>
             </CardHeader>
 
             <CardContent className="grid gap-3 md:grid-cols-3">
-              {order.items?.slice(0, 3).map((item, index) => {
-                const imageUrl = item?.productImgUrl
-                  ? getFileUrl(item.productImgUrl)
-                  : undefined;
-                return (
-                  <div
-                    key={`${order._id}-item-${index}`}
-                    className="flex gap-3 rounded-lg border bg-muted/30 p-3"
-                  >
-                    <div className="relative h-16 w-16 overflow-hidden rounded-md bg-muted">
-                      {imageUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={imageUrl}
-                          alt={item?.productName ?? "Product"}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
-                          No image
-                        </div>
-                      )}
+              {!!order.items?.length &&
+                order.items.slice(0, 3).map((item, index) => {
+                  const imageUrl = item?.productImgUrl
+                    ? getFileUrl(item.productImgUrl)
+                    : undefined;
+                  return (
+                    <div
+                      key={`${order._id}-item-${index}`}
+                      className="flex gap-3 rounded-lg border bg-muted/30 p-3"
+                    >
+                      <div className="relative h-16 w-16 overflow-hidden rounded-md bg-muted">
+                        {imageUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={imageUrl}
+                            alt={item?.productName ?? "Product"}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+                            No image
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex flex-1 flex-col justify-between text-sm">
+                        <p className="font-medium">
+                          {item?.productName ?? "Бараа"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Тоо: {item?.count ?? 1}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex flex-1 flex-col justify-between text-sm">
-                      <p className="font-medium">
-                        {item?.productName ?? "Бараа"}
+                  );
+                })}
+
+              {!order.items?.length && (
+                <div className="rounded-lg border bg-muted/30 p-4 md:col-span-3">
+                  <div className="flex flex-col gap-1 text-sm">
+                    <p className="font-medium">
+                      {order.source === "bms"
+                        ? "Tour booking record"
+                        : "Захиалгын мэдээлэл"}
+                    </p>
+                    {order.tourId && (
+                      <p className="text-muted-foreground">
+                        Tour ID: {order.tourId}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        Тоо: {item?.count ?? 1}
+                    )}
+                    {order.description && (
+                      <p className="text-muted-foreground">
+                        {order.description}
                       </p>
-                    </div>
+                    )}
                   </div>
-                );
-              })}
+                </div>
+              )}
             </CardContent>
 
             <CardFooter className="flex justify-end gap-2">
