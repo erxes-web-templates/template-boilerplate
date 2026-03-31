@@ -18,18 +18,14 @@ import { getFileUrl, templateUrl } from "@/lib/utils";
 import { isBuildMode } from "../../../lib/buildMode";
 import { toHtml } from "../../../lib/html";
 import { Section } from "../../../types/sections";
-import { useParams } from "next/navigation";
 import { CmsPost } from "../../../types/cms";
 
 const CmsPostsSection = ({ section }: { section: Section }) => {
-  const params = useParams();
 
   const { data } = useQuery(GET_CMS_POSTS, {
     variables: {
-      perPage: section.config.perPage,
-      page: 1,
-      clientPortalId: params.id || process.env.ERXES_CP_ID,
-      categoryId: section.config.categoryId,
+      limit: section.config.perPage,
+      ...(section.config.categoryId ? { categoryIds: [section.config.categoryId] } : {}),
     },
   });
 

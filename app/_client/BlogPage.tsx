@@ -4,7 +4,7 @@ import { GET_CMS_POSTS } from "../../graphql/queries";
 import usePage from "../../lib/usePage";
 import { CmsPost } from "../../types/cms";
 import { useQuery } from "@apollo/client";
-import { useParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from "@/components/ui/card";
 import Image from "next/image";
@@ -14,16 +14,13 @@ import { Button } from "@/components/ui/button";
 
 const BlogsPage = () => {
   const searchParams = useSearchParams();
-  const params = useParams();
   const pageName = searchParams.get("pageName"); //pageName = about, tours, contact etc
 
   const PageContent = usePage(pageName);
 
   const { data, loading } = useQuery(GET_CMS_POSTS, {
     variables: {
-      perPage: 10,
-      page: 1,
-      clientPortalId: params.id || process.env.ERXES_CP_ID,
+      limit: 10,
     },
   });
 

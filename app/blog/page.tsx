@@ -22,9 +22,8 @@ export default async function BlogsPage() {
   }
 
   const posts = await fetchCmsPosts({
-    perPage: 10,
-    page: 1,
-    clientPortalId: data.cpId,
+    limit: 10,
+    webId: data.cpId,
   });
 
   return (
