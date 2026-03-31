@@ -23,6 +23,7 @@ type Props = {
   totalPrice: number;
   handleContinue: () => void;
   showErrors: boolean;
+  travelers: number;
   leadDisabled?: boolean;
   leadPassportDisabled?: boolean;
   leadGenderDisabled?: boolean;
@@ -33,6 +34,7 @@ export default function TravelerDetailsAndSummary(props: Props) {
     formData,
     updateFormData,
     showErrors,
+    travelers,
     leadDisabled,
     leadPassportDisabled,
     leadGenderDisabled,
@@ -47,7 +49,7 @@ export default function TravelerDetailsAndSummary(props: Props) {
         </div>
 
         <div className="space-y-8">
-          {Array.from({ length: Math.max(1, Number(formData.travelers || 1)) }).map((_, idx) => {
+          {Array.from({ length: Math.max(1, travelers) }).map((_, idx) => {
             const isLead = idx === 0;
             const traveler = isLead
               ? formData.leadTraveler

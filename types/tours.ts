@@ -12,6 +12,7 @@ interface BmTour {
   refNumber: string;
   images: string[];
   imageThumbnail: string;
+  groupCode?: string;
 }
 
 interface BmToursData {

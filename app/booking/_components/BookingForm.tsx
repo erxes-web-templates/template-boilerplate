@@ -805,6 +805,7 @@ export default function BookingForm() {
                 totalPrice={totalPrice}
                 handleContinue={handleContinue}
                 showErrors={showErrors}
+                travelers={Math.max(1, Number(urlParams.travelers) || Number(formData.travelers) || 1)}
                 leadDisabled={!!currentUser}
                 leadPassportDisabled={
                   !!serverRegNumber &&
