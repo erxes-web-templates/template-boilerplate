@@ -1,16 +1,24 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-
 import usePage from "../../lib/usePage";
+import RoomsPage from "./RoomsPage";
+import RoomDetailPage from "./RoomDetailPage";
 
 export default function TourBoilerPlateHome() {
   const searchParams = useSearchParams();
+  const pageName = searchParams.get("pageName");
 
-  const pageName = searchParams.get("pageName"); //pageName = about, tours, contact etc
+  if (pageName === "rooms") {
+    return <RoomsPage />;
+  }
+
+  if (pageName === "room") {
+    return <RoomDetailPage />;
+  }
+
   const PageContent = usePage(pageName);
 
-  console.log("about", pageName);
   return (
     <div>
       <PageContent />

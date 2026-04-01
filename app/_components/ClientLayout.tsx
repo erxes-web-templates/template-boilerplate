@@ -32,6 +32,7 @@ import { CartProvider } from "../../lib/CartContext";
 import PaymentPage from "../payment/page";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import BookingPage from "../_client/BookingPage";
+import RoomsPage from "../_client/RoomsPage";
 
 const standardComponentRegistry = {
   home: TourBoilerPlateHome,
@@ -52,6 +53,7 @@ const standardComponentRegistry = {
   profile: ProfilePage,
   payment: PaymentPage,
   booking: BookingPage,
+  room: RoomsPage,
 };
 
 export default function ClientBoilerplateLayout() {

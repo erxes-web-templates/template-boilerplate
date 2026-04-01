@@ -1,5 +1,14 @@
 import { gql } from "@apollo/client";
 
+const cpTags = gql`
+  query RoomTags($searchValue: String, $type: String) {
+    cpTags(searchValue: $searchValue, type: $type) {
+      _id
+      name
+    }
+  }
+`;
+
 const rooms = gql`
   query rooms(
     $pipelineId: String
@@ -107,5 +116,48 @@ const checkRooms = gql`
   }
 `;
 
-const queries = { rooms, roomCategories, checkRooms };
+const cpProducts = gql`
+  query CpProducts(
+    $ids: [String]
+    $categoryId: String
+    $tag: String
+    $searchValue: String
+    $page: Int
+    $perPage: Int
+    $sortField: String
+    $sortDirection: Int
+    $tagIds: [String]
+  ) {
+    cpProducts(
+      ids: $ids
+      categoryId: $categoryId
+      tag: $tag
+      searchValue: $searchValue
+      page: $page
+      perPage: $perPage
+      sortField: $sortField
+      sortDirection: $sortDirection
+      tagIds: $tagIds
+    ) {
+      _id
+      name
+      code
+      description
+      unitPrice
+      categoryId
+      category {
+        _id
+        name
+      }
+      attachment {
+        url
+      }
+      attachmentMore {
+        url
+      }
+    }
+  }
+`;
+
+const queries = { rooms, roomCategories, checkRooms, cpProducts, cpTags };
 export default queries;

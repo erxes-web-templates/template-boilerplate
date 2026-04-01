@@ -88,12 +88,16 @@ export const templateUrl = (slug: string) => {
         const tourId = sanitizedSlug.split("tours/")[1];
         newUrl.searchParams.append("pageName", "tour");
         newUrl.searchParams.append("tourId", tourId);
+      } else if (sanitizedSlug.includes("rooms/")) {
+        const roomId = sanitizedSlug.split("rooms/")[1];
+        newUrl.searchParams.append("pageName", "room");
+        newUrl.searchParams.append("roomId", roomId);
       } else {
         newUrl.searchParams.append("pageName", sanitizedSlug);
       }
 
       currentParams.forEach((value, key) => {
-        if (key !== "template" && key !== "pageName" && key !== "tourId") {
+        if (key !== "template" && key !== "pageName" && key !== "tourId" && key !== "roomId") {
           newUrl.searchParams.append(key, value);
         }
       });
