@@ -36,6 +36,7 @@ const sectionComponents = {
   banner: BannerSection,
   bookingForm: BookingFormSection,
   content: TextSection,
+  rooms: ProductsSection,
 };
 
 // In build mode this is rendered inside the web builder (client-side, live Apollo).

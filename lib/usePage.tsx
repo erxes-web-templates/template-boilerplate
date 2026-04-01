@@ -22,6 +22,7 @@ import CarouselSection from "../app/_components/sections/CarouselSection";
 import LastViewedProductsSection from "../app/_components/sections/LastViewedProductsSection";
 import BannerSection from "../app/_components/sections/BannerSection";
 import BookingFormSection from "../app/_components/sections/BookingFormSection";
+import RoomsSection from "../app/_components/sections/RoomsSection";
 const usePage = (slug: string | null) => {
   const params = useParams<{ id: string }>();
   const { data: pageData, loading } = useQuery(GET_WEB_PAGE, {
@@ -76,6 +77,8 @@ const usePage = (slug: string | null) => {
         return <BannerSection section={section} />;
       case "booking-form":
         return <BookingFormSection section={section} />;
+      case "rooms":
+        return <RoomsSection section={section} />;
       default:
         return null;
     }
