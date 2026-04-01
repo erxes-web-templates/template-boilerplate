@@ -25,6 +25,8 @@ const PmsBranchList = gql`
       roomCategories
       time
       discount
+      checkintime
+      checkouttime
       user {
         _id
         details {
@@ -68,6 +70,8 @@ const PmsBranchDetail = gql`
       roomCategories
       time
       discount
+      checkintime
+      checkouttime
     }
   }
 `;

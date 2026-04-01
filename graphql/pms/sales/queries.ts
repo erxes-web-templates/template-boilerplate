@@ -116,6 +116,8 @@ const dealDetail = gql`
         _id
         lastName
         firstName
+        primaryPhone
+        primaryEmail
       }
       products
       stageId
@@ -125,6 +127,22 @@ const dealDetail = gql`
       paymentsData
       tagIds
       number
+      amount
+      stage {
+        _id
+        name
+        code
+      }
+      tags {
+        _id
+        name
+        type
+        colorCode
+      }
+      labels {
+        _id
+        name
+      }
     }
   }
 `;

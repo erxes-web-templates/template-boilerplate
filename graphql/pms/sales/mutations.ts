@@ -23,8 +23,8 @@ const commonParams = `
 `;
 
 const dealsAdd = gql`
-  mutation DealsAdd(${commonFields} $customerIds: [String] $labelIds: [String], $tagIds: [String]) {
-    dealsAdd(${commonParams} customerIds: $customerIds labelIds: $labelIds, tagIds: $tagIds) {
+  mutation DealsAdd(${commonFields} $customerIds: [String] $companyIds: [String] $labelIds: [String], $tagIds: [String]) {
+    dealsAdd(${commonParams} customerIds: $customerIds companyIds: $companyIds labelIds: $labelIds, tagIds: $tagIds) {
       _id
     }
   }
@@ -130,6 +130,25 @@ const addLabel = gql`
   }
 `;
 
+const addTag = gql`
+  mutation tagsAdd(
+    $name: String!
+    $type: String!
+    $colorCode: String
+    $parentId: String
+  ) {
+    tagsAdd(
+      name: $name
+      type: $type
+      colorCode: $colorCode
+      parentId: $parentId
+    ) {
+      _id
+      __typename
+    }
+  }
+`;
+
 const mutations = {
   dealsAdd,
   dealsEdit,
@@ -138,5 +157,6 @@ const mutations = {
   addPayment,
   changeDeal,
   addLabel,
+  addTag,
 };
 export default mutations;

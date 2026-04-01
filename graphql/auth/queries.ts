@@ -8,6 +8,7 @@ const currentUser = gql`
       lastName
       avatar
       erxesCustomerId
+      erxesCompanyId
       phone
       email
     }

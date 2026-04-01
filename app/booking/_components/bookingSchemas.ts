@@ -47,3 +47,49 @@ export function validateBookingStepOne(data: BookingFormData) {
   if (errors.length === 0) return { ok: true as const, errors };
   return { ok: false as const, errors };
 }
+
+export const hotelGuestSchema = z.object({
+  firstName: z.string().trim().min(1, "First Name is required"),
+  lastName: z.string().trim().min(1, "Last Name is required"),
+  email: z.string().trim().email("Valid Email is required"),
+  phone: z.string().trim().min(1, "Phone is required"),
+});
+
+export type HotelStepOneInput = z.infer<typeof hotelGuestSchema>;
+
+export function validateHotelBookingStepOne(data: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  selectedRoomIds: string[];
+  requestedRoomCount?: number;
+}) {
+  const errors: string[] = [];
+
+  const parsed = hotelGuestSchema.safeParse({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+  });
+
+  if (!parsed.success) {
+    errors.push(...parsed.error.issues.map((e) => e.message));
+  }
+
+  if (data.selectedRoomIds.length === 0) {
+    errors.push("At least one room must be selected");
+  }
+
+  if (
+    typeof data.requestedRoomCount === "number" &&
+    data.requestedRoomCount > 0 &&
+    data.selectedRoomIds.length < data.requestedRoomCount
+  ) {
+    errors.push(`Please select ${data.requestedRoomCount} room(s)`);
+  }
+
+  if (errors.length === 0) return { ok: true as const, errors };
+  return { ok: false as const, errors };
+}

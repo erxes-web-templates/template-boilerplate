@@ -38,6 +38,16 @@ const invoiceDetail = gql`
   }
 `;
 
-const queries = { payment, payments, invoiceDetail };
+const invoices = gql`
+  query CpInvoices($contentType: String, $contentTypeId: String) {
+    cpInvoices(contentType: $contentType, contentTypeId: $contentTypeId) {
+      _id
+      amount
+      status
+    }
+  }
+`;
+
+const queries = { payment, payments, invoiceDetail, invoices };
 
 export default queries;
