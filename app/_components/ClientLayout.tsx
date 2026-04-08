@@ -33,6 +33,8 @@ import PaymentPage from "../payment/page";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import BookingPage from "../_client/BookingPage";
 import RoomsPage from "../_client/RoomsPage";
+import RoomDetailPage from "../_client/RoomDetailPage";
+import ConfirmationPage from "../_client/ConfirmationPage";
 
 const standardComponentRegistry = {
   home: TourBoilerPlateHome,
@@ -40,6 +42,7 @@ const standardComponentRegistry = {
   tour: TourDetailPage,
   about: AboutPage,
   login: LoginPage,
+  "auth/login": LoginPage,
   register: RegisterPage,
   contact: ContactPage,
   terms: LegalPage,
@@ -53,7 +56,9 @@ const standardComponentRegistry = {
   profile: ProfilePage,
   payment: PaymentPage,
   booking: BookingPage,
-  room: RoomsPage,
+  rooms: RoomsPage,
+  room: RoomDetailPage,
+  confirmation: ConfirmationPage,
 };
 
 export default function ClientBoilerplateLayout() {

@@ -8,7 +8,6 @@ const customersMain = gql`
         firstName
         lastName
         primaryEmail
-        registrationNumber
         sex
       }
       totalCount

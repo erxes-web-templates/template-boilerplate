@@ -23,16 +23,16 @@ const commonParams = `
 `;
 
 const dealsAdd = gql`
-  mutation DealsAdd(${commonFields} $customerIds: [String] $companyIds: [String] $labelIds: [String], $tagIds: [String]) {
-    dealsAdd(${commonParams} customerIds: $customerIds companyIds: $companyIds labelIds: $labelIds, tagIds: $tagIds) {
+  mutation CpDealsAdd(${commonFields} $customerIds: [String] $labelIds: [String], $tagIds: [String]) {
+    cpDealsAdd(${commonParams} customerIds: $customerIds labelIds: $labelIds, tagIds: $tagIds) {
       _id
     }
   }
 `;
 
 const dealsEdit = gql`
-  mutation DealsEdit($id: String!, ${commonFields}, $tagIds: [String]) {
-    dealsEdit(
+  mutation CpDealsEdit($id: String!, ${commonFields}, $tagIds: [String]) {
+    cpDealsEdit(
       _id: $id
       tagIds: $tagIds
       ${commonParams}
@@ -81,7 +81,7 @@ const addPayment = gql`
     $paymentsData: JSON
     $stageId: String
   ) {
-    dealsEdit(
+    cpDealsEdit(
       _id: $id
       proccessId: $proccessId
       paymentsData: $paymentsData
@@ -114,12 +114,12 @@ const changeDeal = gql`
 `;
 
 const addLabel = gql`
-  mutation salesPipelineLabelsAdd(
+  mutation CpSalesPipelineLabelsAdd(
     $name: String!
     $colorCode: String!
     $pipelineId: String!
   ) {
-    salesPipelineLabelsAdd(
+    cpSalesPipelineLabelsAdd(
       name: $name
       colorCode: $colorCode
       pipelineId: $pipelineId
@@ -130,20 +130,25 @@ const addLabel = gql`
   }
 `;
 
-const addTag = gql`
-  mutation tagsAdd(
+const tagsAdd = gql`
+  mutation CpTagsAdd(
     $name: String!
-    $type: String!
+    $type: String
     $colorCode: String
     $parentId: String
+    $isGroup: Boolean
+    $description: String
   ) {
-    tagsAdd(
+    cpTagsAdd(
       name: $name
       type: $type
       colorCode: $colorCode
       parentId: $parentId
+      isGroup: $isGroup
+      description: $description
     ) {
       _id
+      name
       __typename
     }
   }
@@ -157,6 +162,6 @@ const mutations = {
   addPayment,
   changeDeal,
   addLabel,
-  addTag,
+  tagsAdd,
 };
 export default mutations;

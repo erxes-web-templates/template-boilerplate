@@ -7,26 +7,15 @@ const webDetail = gql`
       name
       description
       domain
-      dnsStatus
-      template
       templateId
-      url
-      logo
-      icon
-      copyright
-      headerHtml
-      footerHtml
-      styles {
-        bodyColor
-        headerColor
-        footerColor
-        backgroundColor
-        baseColor
-        headingColor
-        linkColor
-        baseFont
-        headingFont
+      templateType
+      logo {
+        url
       }
+      favicon {
+        url
+      }
+      copyright
       appearances {
         backgroundColor
         primaryColor
@@ -36,13 +25,17 @@ const webDetail = gql`
         fontHeading
         fontMono
       }
-      language
     }
   }
 `;
 
 const webPage = gql`
-  query CpWebPage($id: String, $slug: String, $language: String, $webId: String) {
+  query CpWebPage(
+    $id: String
+    $slug: String
+    $language: String
+    $webId: String
+  ) {
     cpWebPage(_id: $id, slug: $slug, language: $language, webId: $webId) {
       _id
       webId
@@ -97,7 +90,12 @@ const webPages = gql`
 `;
 
 const webPost = gql`
-  query CpWebPost($id: String, $slug: String, $language: String, $webId: String) {
+  query CpWebPost(
+    $id: String
+    $slug: String
+    $language: String
+    $webId: String
+  ) {
     cpWebPost(_id: $id, slug: $slug, language: $language, webId: $webId) {
       _id
       webId

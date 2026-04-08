@@ -3,7 +3,11 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRoomsQuery, useTagsQuery, type RoomSummary } from "../../../graphql/pms/rooms";
+import {
+  useRoomsQuery,
+  useTagsQuery,
+  type RoomSummary,
+} from "../../../graphql/pms/rooms";
 import { Section } from "../../../types/sections";
 import { toHtml } from "../../../lib/html";
 import { templateUrl } from "@/lib/utils";
@@ -164,7 +168,7 @@ const RoomsSection = ({ section }: { section: Section }) => {
                       <Link
                         href={
                           isBuilder
-                            ? templateUrl(`/rooms/${room._id}`)
+                            ? templateUrl(`/room&roomId=${room._id}`)
                             : `/rooms/${room._id}`
                         }
                       >
@@ -175,7 +179,7 @@ const RoomsSection = ({ section }: { section: Section }) => {
                       <Link
                         href={
                           isBuilder
-                            ? templateUrl(`/rooms/${room._id}?book=true`)
+                            ? templateUrl(`/room&roomId=${room._id}&book=true`)
                             : `/rooms/${room._id}?book=true`
                         }
                       >

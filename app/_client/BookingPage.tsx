@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { useApolloClient, useQuery } from "@apollo/client";
 import pmsRoomQueries from "../../graphql/pms/rooms/queries";
 import pmsConfigQueries from "../../graphql/pms/config/queries";
@@ -21,9 +21,7 @@ import {
 import { useCart } from "../../lib/CartContext";
 import { templateUrl } from "../../lib/utils";
 import TourBookingForm from "../booking/_components/BookingForm";
-
-const TEMPLATE_TYPE =
-  process.env.TEMPLATE_TYPE || process.env.NEXT_PUBLIC_TEMPLATE_TYPE || "";
+import webQueries from "../../graphql/web/queries";
 
 const parsePipelineConfig = (value: unknown) => {
   if (!value) {
@@ -367,11 +365,19 @@ const HotelBookingPage = () => {
 };
 
 const BookingPage = () => {
-  if (TEMPLATE_TYPE === "tour") {
-    return <TourBookingForm />;
+  const params = useParams<{ id: string }>();
+
+  const { data: webDetailData } = useQuery(webQueries.webDetail, {
+    variables: { id: params.id },
+    skip: !params.id,
+  });
+
+  const templateType = webDetailData?.cpGetWebDetail?.templateType ?? "";
+
+  if (templateType === "hotel") {
+    return <HotelBookingPage />;
   }
   return <TourBookingForm />;
-  // return <HotelBookingPage />;
 };
 
 export default BookingPage;

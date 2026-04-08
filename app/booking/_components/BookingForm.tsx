@@ -56,7 +56,9 @@ export default function BookingForm() {
                 travelers={booking.formData.travelers}
                 leadDisabled={!!booking.currentUser}
                 leadPassportDisabled={!!booking.serverRegNumber}
-                leadGenderDisabled={booking.serverSex === 1 || booking.serverSex === 2}
+                leadGenderDisabled={
+                  booking.serverSex === 1 || booking.serverSex === 2
+                }
               />
             )}
 
@@ -86,7 +88,9 @@ export default function BookingForm() {
               onSubmit={booking.handlePay}
               onBack={booking.handleBack}
               nextLoading={booking.nextLoading}
-              submitDisabled={!booking.selectedPaymentId || booking.creatingInvoice}
+              submitDisabled={
+                !booking.selectedPaymentId || booking.creatingInvoice
+              }
               groupTourItems={booking.groupTourItems}
               paymentType={booking.urlParams.paymentType}
               downPayment={booking.urlParams.downPayment}

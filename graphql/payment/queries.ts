@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 const payments = gql`
   query CpPayments {
@@ -9,7 +9,6 @@ const payments = gql`
       status
       config
       createdAt
-      __typename
     }
   }
 `;

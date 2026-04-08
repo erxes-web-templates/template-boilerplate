@@ -37,6 +37,8 @@ export default function RoomBookingWidget({ room }: Props) {
   const [guests, setGuests] = useState(1);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authTab, setAuthTab] = useState<AuthTab>("login");
+  const [loginError, setLoginError] = useState("");
+  const [registerError, setRegisterError] = useState("");
 
   const [loginForm, setLoginForm] = useState({ login: "", password: "" });
   const [registerForm, setRegisterForm] = useState({
@@ -45,6 +47,7 @@ export default function RoomBookingWidget({ room }: Props) {
     email: "",
     phone: "",
     password: "",
+    confirmPassword: "",
   });
 
   const { data: userData, refetch: refetchUser } = useQuery(
@@ -57,12 +60,13 @@ export default function RoomBookingWidget({ room }: Props) {
     authMutations.login,
     {
       onError(error) {
-        toast.error("Login failed", { description: error.message });
+        setLoginError(error.message);
       },
       onCompleted(data) {
         storeTokens(data?.clientPortalUserLoginWithCredentials);
         toast.success("Logged in successfully");
         setShowAuthModal(false);
+        setLoginError("");
         refetchUser().then(() => {
           router.push(buildBookingUrl());
         });
@@ -74,12 +78,20 @@ export default function RoomBookingWidget({ room }: Props) {
     authMutations.createUser,
     {
       onError(error) {
-        toast.error("Registration failed", { description: error.message });
+        setRegisterError(error.message);
       },
       onCompleted() {
         toast.success("Account created! Please log in.");
         setAuthTab("login");
-        setRegisterForm({ firstName: "", lastName: "", email: "", phone: "", password: "" });
+        setRegisterError("");
+        setRegisterForm({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          password: "",
+          confirmPassword: "",
+        });
       },
     },
   );
@@ -101,6 +113,7 @@ export default function RoomBookingWidget({ room }: Props) {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoginError("");
     const isEmail = loginForm.login.includes("@");
     await loginMutation({
       variables: {
@@ -113,6 +126,11 @@ export default function RoomBookingWidget({ room }: Props) {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setRegisterError("");
+    if (registerForm.password !== registerForm.confirmPassword) {
+      setRegisterError("Passwords do not match");
+      return;
+    }
     await registerMutation({
       variables: {
         clientPortalId: process.env.ERXES_CP_ID,
@@ -134,7 +152,10 @@ export default function RoomBookingWidget({ room }: Props) {
         <div className="flex items-center gap-2 mb-4">
           <Tag className="w-5 h-5" style={{ color: "var(--primary)" }} />
           <span className="text-sm text-muted-foreground">From</span>
-          <span className="text-3xl font-bold" style={{ color: "var(--primary)" }}>
+          <span
+            className="text-3xl font-bold"
+            style={{ color: "var(--primary)" }}
+          >
             ₮{Number(room.unitPrice ?? 0).toLocaleString()}
           </span>
         </div>
@@ -142,7 +163,7 @@ export default function RoomBookingWidget({ room }: Props) {
         <div className="border-t border-border/40 mb-5" />
 
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="check-in">Check-in</Label>
               <Input
@@ -219,7 +240,7 @@ export default function RoomBookingWidget({ room }: Props) {
                 className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
                   authTab === "login" ? "bg-white shadow text-foreground" : "text-muted-foreground"
                 }`}
-                onClick={() => setAuthTab("login")}
+                onClick={() => { setAuthTab("login"); setLoginError(""); setRegisterError(""); }}
               >
                 Login
               </button>
@@ -227,7 +248,7 @@ export default function RoomBookingWidget({ room }: Props) {
                 className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
                   authTab === "register" ? "bg-white shadow text-foreground" : "text-muted-foreground"
                 }`}
-                onClick={() => setAuthTab("register")}
+                onClick={() => { setAuthTab("register"); setLoginError(""); setRegisterError(""); }}
               >
                 Register
               </button>
@@ -255,6 +276,9 @@ export default function RoomBookingWidget({ room }: Props) {
                       onChange={(e) => setLoginForm((p) => ({ ...p, password: e.target.value }))}
                       required
                     />
+                    {loginError && (
+                      <p className="text-xs text-destructive mt-1">{loginError}</p>
+                    )}
                   </div>
                   <Button
                     type="submit"
@@ -316,6 +340,20 @@ export default function RoomBookingWidget({ room }: Props) {
                       minLength={8}
                       required
                     />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="modal-confirm-password">Confirm password</Label>
+                    <Input
+                      id="modal-confirm-password"
+                      type="password"
+                      value={registerForm.confirmPassword}
+                      onChange={(e) => setRegisterForm((p) => ({ ...p, confirmPassword: e.target.value }))}
+                      minLength={8}
+                      required
+                    />
+                    {registerError && (
+                      <p className="text-xs text-destructive mt-1">{registerError}</p>
+                    )}
                   </div>
                   <Button
                     type="submit"

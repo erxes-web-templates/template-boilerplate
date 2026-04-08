@@ -186,9 +186,16 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
         setShowSearchResults(false);
         return;
       }
+
       const base = templateUrl("/products");
-      const separator = base.includes("?") ? "&" : "?";
-      router.push(`${base}${separator}searchValue=${encodeURIComponent(term)}`);
+      const [pathname, existingQuery = ""] = base.split("?");
+      const nextSearchParams = new URLSearchParams(existingQuery);
+
+      nextSearchParams.set("searchValue", term);
+
+      const nextQuery = nextSearchParams.toString();
+
+      router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname);
       setShowSearchResults(false);
     },
     [handleNavigate, router, searchTerm],

@@ -88,7 +88,9 @@ const usePage = (slug: string | null) => {
     if (
       !sections ||
       (sections.length === 0 && slug === "home") ||
-      (sections.length === 0 && slug === "about")
+      (sections.length === 0 && slug === "about") ||
+      (sections.length === 0 && slug === "contact") ||
+      (sections.length === 0 && slug === "confirmation")
     ) {
       return <EmptyState title="No contents available" />;
     }
