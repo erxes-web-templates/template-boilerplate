@@ -26,8 +26,12 @@ const FormSection = ({ section }: { section: Section }) => {
     <section id="contact" className="py-16 bg-gray-100">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold mb-8 text-center">
-          {section.content}
+          {section.config?.title || "Contact Us"}
         </h2>
+        <p className="text-center mb-12 text-gray-600">
+          {section.config?.description ||
+            "Feel free to reach out to us by filling the form below."}
+        </p>
         <div className=" max-w-[600px] mx-auto">
           <DynamicForm
             formData={formData}

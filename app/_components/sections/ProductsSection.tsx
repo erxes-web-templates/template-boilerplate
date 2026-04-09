@@ -1,50 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import {
-  useProductsQuery,
-  type ProductSummary,
-} from "../../../graphql/products";
+import { useMemo } from "react";
+import { useProductsQuery, type ProductSummary } from "../../../graphql/products";
 import { Section } from "../../../types/sections";
-import { toHtml } from "../../../lib/html";
 import { templateUrl } from "@/lib/utils";
 import { isBuildMode } from "../../../lib/buildMode";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import EmptyState from "@/components/common/EmptyState";
-import { useCart } from "../../../lib/CartContext";
-
-const toCurrency = (value?: number | null) => {
-  if (typeof value !== "number" || Number.isNaN(value)) return "—";
-  return `₮${Math.round(value).toLocaleString()}`;
-};
-
-type ButtonState = "idle" | "adding" | "added";
+import ProductCard from "../../../components/common/ProductCard";
 
 const ProductsSection = ({ section }: { section: Section }) => {
   const limit = Number(section.config?.limit ?? 6);
   const categoryId = section.config?.categoryId || null;
   const tag = section.config?.tag || null;
-  const { addToCart } = useCart();
-  const [buttonStates, setButtonStates] = useState<Record<string, ButtonState>>({});
   const isBuilder = isBuildMode();
-  const buttonTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
-
-  useEffect(() => {
-    return () => {
-      Object.values(buttonTimers.current).forEach(clearTimeout);
-    };
-  }, []);
 
   const { data, loading, error } = useProductsQuery({
     variables: {
@@ -111,126 +81,40 @@ const ProductsSection = ({ section }: { section: Section }) => {
             (product: ProductSummary, index: number) => {
               if (loading) {
                 return (
-                  <Card key={`placeholder-${index}`} className="animate-pulse overflow-hidden">
-                    <CardHeader className="h-48 bg-muted p-0" />
-                    <CardContent className="space-y-2 p-4">
+                  <div
+                    key={`placeholder-${index}`}
+                    className="animate-pulse overflow-hidden rounded-lg border bg-card"
+                  >
+                    <div className="h-48 bg-muted" />
+                    <div className="space-y-2 p-4">
                       <div className="h-4 w-2/3 rounded bg-muted" />
                       <div className="h-3 w-1/2 rounded bg-muted" />
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 );
               }
 
-              const imageUrl = product?.attachment?.url;
-              const price = toCurrency(product?.unitPrice);
-              const inStock = true;
-              const unitPrice =
-                typeof product?.unitPrice === "number" && Number.isFinite(product.unitPrice)
-                  ? product.unitPrice
-                  : 0;
-              const cartProductId = product?._id ?? "";
-              const state = cartProductId ? buttonStates[cartProductId] : undefined;
-              const isAdding = state === "adding";
-              const isAdded = state === "added";
-
-              const handleAddToCart = async () => {
-                if (!cartProductId) return;
-                setButtonStates((prev) => ({ ...prev, [cartProductId]: "adding" }));
-                try {
-                  await Promise.all([
-                    Promise.resolve(
-                      addToCart(
-                        {
-                          id: cartProductId,
-                          name: product?.name ?? "Untitled product",
-                          unitPrice,
-                          description: product?.description ?? "",
-                          imageUrl: imageUrl ?? null,
-                          categoryName: product?.category?.name ?? null,
-                        },
-                        1
-                      )
-                    ),
-                    new Promise((resolve) => setTimeout(resolve, 400)),
-                  ]);
-                  setButtonStates((prev) => ({ ...prev, [cartProductId]: "added" }));
-                  if (buttonTimers.current[cartProductId]) {
-                    clearTimeout(buttonTimers.current[cartProductId]);
-                  }
-                  buttonTimers.current[cartProductId] = setTimeout(() => {
-                    setButtonStates((prev) => {
-                      const next = { ...prev };
-                      delete next[cartProductId];
-                      return next;
-                    });
-                    delete buttonTimers.current[cartProductId];
-                  }, 1200);
-                } catch {
-                  setButtonStates((prev) => {
-                    const next = { ...prev };
-                    delete next[cartProductId];
-                    return next;
-                  });
-                }
-              };
-
               return (
-                <Card
+                <ProductCard
                   key={product?._id || index}
-                  className="group flex h-full flex-col overflow-hidden transition-shadow duration-200 hover:shadow-md"
-                >
-                  <CardHeader className="p-0">
-                    <div className="relative aspect-square w-full overflow-hidden bg-muted">
-                      {imageUrl ? (
-                        <Image
-                          src={imageUrl}
-                          alt={product?.name ?? ""}
-                          fill
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
-                          —
-                        </div>
-                      )}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex flex-1 flex-col gap-2 p-4">
-                    <CardTitle className="text-sm font-medium leading-snug line-clamp-2">
-                      {product?.name ?? "Untitled product"}
-                    </CardTitle>
-                    <CardDescription className="line-clamp-2 text-xs">
-                      <span dangerouslySetInnerHTML={toHtml(product?.description ?? "")} />
-                    </CardDescription>
-                    <div className="mt-auto flex items-center justify-between pt-1">
-                      <span className="text-sm font-semibold text-primary">{price}</span>
-                      <Badge variant={inStock ? "default" : "secondary"} className="text-xs">
-                        {inStock ? "In stock" : "Out of stock"}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex items-center gap-2 border-t border-border p-3">
-                    <Button asChild variant="outline" size="sm" className="flex-1 text-xs">
-                      <Link
-                        href={
-                          isBuilder
-                            ? templateUrl(`/product&productId=${product._id}`)
-                            : `/products/${product._id}`
-                        }
-                      >
-                        View
-                      </Link>
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="flex-1 text-xs"
-                      disabled={!inStock || !cartProductId || isAdding}
-                      onClick={handleAddToCart}
-                    >
-                      {isAdding ? "Adding…" : isAdded ? "Added" : "Add to cart"}
-                    </Button>
-                  </CardFooter>
-                </Card>
+                  product={{
+                    id: product?._id ?? "",
+                    name: product?.name ?? "Untitled product",
+                    price:
+                      typeof product?.unitPrice === "number" &&
+                      Number.isFinite(product.unitPrice)
+                        ? product.unitPrice
+                        : 0,
+                    categoryName: product?.category?.name ?? "Uncategorized",
+                    image: product?.attachment?.url ?? null,
+                    inStock:
+                      typeof product?.remainder === "number" &&
+                      Number.isFinite(product.remainder)
+                        ? product.remainder > 0
+                        : false,
+                    description: product?.description ?? "",
+                  }}
+                />
               );
             }
           )}

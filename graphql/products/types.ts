@@ -48,6 +48,7 @@ export interface ProductSummary {
 export interface ProductsVariables {
   searchValue?: string;
   tag?: string;
+  ids?: string[];
   type?: string;
   categoryId?: string;
   page?: number;

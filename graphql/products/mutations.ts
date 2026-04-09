@@ -19,8 +19,8 @@ const wishlistRemove = gql`
 `;
 
 const addToLastView = gql`
-  mutation LastViewedItemAdd($productId: String!, $customerId: String!) {
-    lastViewedItemAdd(productId: $productId, customerId: $customerId) {
+  mutation CpLastViewedItemAdd($productId: String!, $customerId: String!) {
+    cpLastViewedItemAdd(productId: $productId, customerId: $customerId) {
       _id
     }
   }

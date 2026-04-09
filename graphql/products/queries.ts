@@ -25,6 +25,7 @@ const products = gql`
   query cpPoscProducts(
     $searchValue: String,
     $tag: String
+    $ids: [String]
     $type: String,
     $categoryId: String,
     $page: Int,
@@ -37,6 +38,7 @@ const products = gql`
     cpPoscProducts(
       searchValue: $searchValue, 
       tag: $tag
+      ids: $ids
       categoryId: $categoryId, 
       type: $type, 
       page: $page, 

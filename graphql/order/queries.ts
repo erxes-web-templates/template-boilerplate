@@ -245,6 +245,25 @@ const getLastProductView = gql`
   }
 `;
 
+const cpLastViewedItems = gql`
+  query CpLastViewedItems($customerId: String!, $limit: Int) {
+    cpLastViewedItems(customerId: $customerId, limit: $limit) {
+      _id
+      productId
+      product {
+        _id
+        createdAt
+        attachment {
+          url
+        }
+        unitPrice
+        name
+        description
+      }
+    }
+  }
+`;
+
 const queries = {
   orderItemDetail,
   currentOrder,
@@ -254,6 +273,7 @@ const queries = {
   invoices,
   addresses,
   getLastProductView,
+  cpLastViewedItems,
 };
 
 export default queries;

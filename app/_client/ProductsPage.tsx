@@ -1,12 +1,8 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -25,28 +21,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  useProductCategoriesQuery,
-  useProductsQuery,
-  type ProductCategory,
-} from "../../graphql/products";
+import { useProductCategoriesQuery, useProductsQuery, type ProductCategory } from "../../graphql/products";
 import type { ProductSummary } from "../../graphql/products/types";
-import { useCart } from "../../lib/CartContext";
-import { templateUrl } from "../../lib/utils";
-import { isBuildMode } from "../../lib/buildMode";
+import ProductCard, {
+  type ProductCardProduct,
+} from "../../components/common/ProductCard";
 
 type SortOption = "featured" | "price-low" | "price-high" | "name-az";
 
-interface DisplayProduct {
-  id: string;
-  name: string;
-  price: number;
-  categoryId: string | null;
-  categoryName: string;
-  image?: string | null;
-  inStock: boolean;
-  description?: string | null;
-}
+type DisplayProduct = ProductCardProduct & { categoryId: string | null };
 
 interface SortOptionConfig {
   value: SortOption;
@@ -62,10 +45,7 @@ const SORT_OPTIONS: SortOptionConfig[] = [
 
 const DEFAULT_PRICE_RANGE: [number, number] = [0, 0];
 
-const formatCurrency = (value: number) =>
-  `₮${Math.round(value).toLocaleString()}`;
-
-type ButtonState = "idle" | "adding" | "added";
+const formatCurrency = (value: number) => `₮${Math.round(value).toLocaleString()}`;
 
 type ProductsPageProps = {
   initialCategories?: ProductCategory[];
@@ -83,30 +63,6 @@ export default function ProductsPage({
   const [priceRange, setPriceRange] =
     useState<[number, number]>(DEFAULT_PRICE_RANGE);
   const [priceInitialized, setPriceInitialized] = useState(false);
-  const [buttonStates, setButtonStates] = useState<Record<string, ButtonState>>(
-    {}
-  );
-  const buttonTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>(
-    {}
-  );
-
-  useEffect(() => {
-    return () => {
-      Object.values(buttonTimers.current).forEach((timer) => {
-        clearTimeout(timer);
-      });
-    };
-  }, []);
-
-  const notifyCartOpen = () => {
-    if (typeof window === "undefined") {
-      return;
-    }
-    window.dispatchEvent(new Event("cart:open"));
-  };
-  const isBuilder = isBuildMode();
-
-  const { addToCart } = useCart();
 
   const {
     data: categoriesData,
@@ -154,7 +110,7 @@ export default function ProductsPage({
           : false,
       description: product.description,
     }));
-  }, [productsData]);
+  }, [initialProducts, productsData]);
 
   const priceBounds = useMemo<[number, number]>(() => {
     if (!products.length) {
@@ -255,7 +211,7 @@ export default function ProductsPage({
         <Slider
           step={1}
           value={priceRange}
-          onValueChange={(value: any) => setPriceRange([value[0], value[1]])}
+          onValueChange={(value: number[]) => setPriceRange([value[0], value[1]])}
           className="mt-4"
           min={priceBounds[0]}
           max={hasPriceRange ? priceBounds[1] : priceBounds[0] + 1}
@@ -343,161 +299,9 @@ export default function ProductsPage({
               ))}
 
             {!isLoading &&
-              filteredProducts.map((product) => {
-                const imageUrl = product.image ?? undefined;
-                const inStock = true;
-                // const inStock = product.inStock;
-                const unitPrice = Number.isFinite(product.price)
-                  ? product.price
-                  : 0;
-                const cartProductId = product.id;
-                const buttonState = buttonStates[cartProductId];
-                const isAdding = buttonState === "adding";
-                const isAdded = buttonState === "added";
-
-                const handleAddToCart = async () => {
-                  if (!cartProductId || isAdding) {
-                    return;
-                  }
-
-                  setButtonStates((prev) => ({
-                    ...prev,
-                    [cartProductId]: "adding",
-                  }));
-
-                  try {
-                    await Promise.all([
-                      Promise.resolve(
-                        addToCart(
-                          {
-                            id: cartProductId,
-                            name: product.name ?? "Untitled product",
-                            unitPrice,
-                            description: product.description ?? "",
-                            imageUrl: imageUrl ?? null,
-                            categoryName: product.categoryName ?? null,
-                          },
-                          1
-                        )
-                      ),
-                      new Promise((resolve) => setTimeout(resolve, 400)),
-                    ]);
-
-                    setButtonStates((prev) => ({
-                      ...prev,
-                      [cartProductId]: "added",
-                    }));
-
-                    notifyCartOpen();
-
-                    if (buttonTimers.current[cartProductId]) {
-                      clearTimeout(buttonTimers.current[cartProductId]);
-                    }
-                    buttonTimers.current[cartProductId] = setTimeout(() => {
-                      setButtonStates((prev) => {
-                        const next = { ...prev };
-                        delete next[cartProductId];
-                        return next;
-                      });
-                      delete buttonTimers.current[cartProductId];
-                    }, 1200);
-                  } catch (error) {
-                    console.error("Failed to add product to cart", error);
-                    setButtonStates((prev) => {
-                      const next = { ...prev };
-                      delete next[cartProductId];
-                      return next;
-                    });
-                  }
-                };
-
-                return (
-                  <Card
-                    key={product.id}
-                    className="overflow-hidden border border-border transition-shadow hover:shadow-lg"
-                  >
-                    <div className="relative aspect-square w-full  overflow-hidden bg-muted">
-                      {product.image ? (
-                        <Image
-                          src={product.image}
-                          alt={product.name}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
-                      ) : (
-                        <div className="flex aspect-square w-full  items-center justify-center text-sm text-muted-foreground">
-                          Image coming soon
-                        </div>
-                      )}
-                      <Badge className="absolute left-4 top-4">
-                        {product.categoryName}
-                      </Badge>
-                    </div>
-                    <CardContent className="space-y-4 p-6">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="text-lg font-semibold text-foreground">
-                            {product.name}
-                          </h3>
-                          {product.description && (
-                            <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-                              <span
-                                dangerouslySetInnerHTML={{
-                                  __html: product.description,
-                                }}
-                              />
-                            </p>
-                          )}
-                        </div>
-                        <p className="text-lg font-semibold text-foreground">
-                          {formatCurrency(product.price)}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-                          <span>Rating unavailable</span>
-                        </div>
-                        <Badge
-                          variant={product.inStock ? "default" : "secondary"}
-                        >
-                          {product.inStock ? "In Stock" : "Out of Stock"}
-                        </Badge>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <Button asChild className="w-full">
-                          <Link
-                            href={
-                              isBuilder
-                                ? templateUrl(
-                                    `/product&productId=${product.id}`
-                                  )
-                                : `/products/${product.id}`
-                            }
-                          >
-                            View Details
-                          </Link>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="w-full"
-                          disabled={!inStock || !cartProductId || isAdding}
-                          onClick={handleAddToCart}
-                        >
-                          {isAdding
-                            ? "Adding..."
-                            : isAdded
-                            ? "Added to cart"
-                            : "Add to Cart"}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+              filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
           </div>
         )}
 

@@ -147,17 +147,18 @@ const buildFieldSchema = (field: ErxesField) => {
   }
 
   if (type === "number") {
-    const schema = z.preprocess((value) => {
-      if (value === "" || value === null || value === undefined) {
-        return undefined;
-      }
+    const schema = z.preprocess(
+      (value) => {
+        if (value === "" || value === null || value === undefined) {
+          return undefined;
+        }
 
-      return Number(value);
-    }, z.number({ invalid_type_error: `${label} must be a number` }));
+        return Number(value);
+      },
+      z.number({ invalid_type_error: `${label} must be a number` }),
+    );
 
-    return field.isRequired
-      ? schema
-      : schema.optional();
+    return field.isRequired ? schema : schema.optional();
   }
 
   if (type === "date") {
@@ -230,7 +231,9 @@ export default function DynamicForm({
     () =>
       steps.map((step) => ({
         ...step,
-        fields: fields.filter((field) => (field.pageNumber ?? 1) === step.order),
+        fields: fields.filter(
+          (field) => (field.pageNumber ?? 1) === step.order,
+        ),
       })),
     [fields, steps],
   );
@@ -348,12 +351,12 @@ export default function DynamicForm({
       <form onSubmit={form.handleSubmit(handleFormSubmit)}>
         <Card className="rounded-md shadow-lg">
           <CardHeader>
-            <CardTitle>{formData.title || "Contact Form"}</CardTitle>
+            {/* <CardTitle>{formData.title || "Contact Form"}</CardTitle>
             {formData.description ? (
               <p className="text-sm text-muted-foreground">
                 {formData.description}
               </p>
-            ) : null}
+            ) : null} */}
           </CardHeader>
           <CardContent className="space-y-6">
             {fieldsByStep.length > 1 && currentStep ? (
@@ -387,7 +390,9 @@ export default function DynamicForm({
                         ) : null}
                       </FormLabel>
                       {schemaField.description ? (
-                        <FormDescription>{schemaField.description}</FormDescription>
+                        <FormDescription>
+                          {schemaField.description}
+                        </FormDescription>
                       ) : null}
                       <FormControl>
                         <DynamicFormControl
@@ -422,7 +427,11 @@ export default function DynamicForm({
                     : formData.buttonText || "Submit"}
                 </Button>
               ) : (
-                <Button type="button" onClick={handleNext} disabled={submitting}>
+                <Button
+                  type="button"
+                  onClick={handleNext}
+                  disabled={submitting}
+                >
                   Next
                 </Button>
               )}
@@ -446,7 +455,13 @@ function DynamicFormControl({
   const type = getFieldType(field);
 
   if (type === "textarea") {
-    return <Textarea value={(value as string) || ""} onChange={(e) => onChange(e.target.value)} placeholder={field.text} />;
+    return (
+      <Textarea
+        value={(value as string) || ""}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={field.text}
+      />
+    );
   }
 
   if (type === "number") {

@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@apollo/client";
 import Link from "next/link";
 import { Section } from "../../../types/sections";
 import authQueries from "../../../graphql/auth/queries";
 import orderQueries from "../../../graphql/order/queries";
+import { useProductsQuery } from "../../../graphql/products";
 import { getFileUrl, templateUrl } from "@/lib/utils";
 import { isBuildMode } from "../../../lib/buildMode";
 import EmptyState from "@/components/common/EmptyState";
@@ -18,6 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { getLocalLastViewedProducts } from "../../../lib/lastViewedProducts";
 
 type ViewedProduct = {
   _id: string;
@@ -34,6 +36,8 @@ type ViewedProduct = {
   } | null;
 };
 
+const CP_LAST_VIEWED_ITEMS = orderQueries.cpLastViewedItems;
+
 const formatNumber = (value?: number | null) => {
   if (typeof value !== "number" || Number.isNaN(value)) {
     return "₮0";
@@ -47,6 +51,7 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
   const limit = Math.max(1, Number(section.config?.limit ?? 6));
   const fallbackCustomerId: string | null = section.config?.customerId ?? null;
   const isBuilder = isBuildMode();
+  const [localProductIds, setLocalProductIds] = useState<string[]>([]);
 
   const { data: userData } = useQuery(authQueries.currentUser);
   const resolvedCustomerId =
@@ -56,7 +61,7 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
     data: viewedData,
     loading,
     error,
-  } = useQuery(orderQueries.getLastProductView, {
+  } = useQuery(CP_LAST_VIEWED_ITEMS, {
     variables: {
       customerId: resolvedCustomerId ?? "",
       limit,
@@ -65,10 +70,70 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
     fetchPolicy: "cache-and-network",
   });
 
+  const {
+    data: guestProductsData,
+    loading: guestProductsLoading,
+    error: guestProductsError,
+  } = useProductsQuery({
+    variables: {
+      ids: localProductIds,
+      perPage: limit,
+    },
+    skip: resolvedCustomerId !== null || localProductIds.length === 0,
+    fetchPolicy: "cache-and-network",
+  });
+
+  useEffect(() => {
+    if (resolvedCustomerId) {
+      setLocalProductIds([]);
+      return;
+    }
+
+    setLocalProductIds(getLocalLastViewedProducts().slice(-limit).reverse());
+  }, [limit, resolvedCustomerId]);
+
   const viewedItems: ViewedProduct[] = useMemo(
-    () => viewedData?.lastViewedItems ?? [],
+    () => viewedData?.cpLastViewedItems ?? [],
     [viewedData]
   );
+
+  const guestViewedItems: ViewedProduct[] = useMemo(() => {
+    const products = guestProductsData?.cpPoscProducts ?? [];
+    const productMap = new Map(products.map((product) => [product._id, product]));
+
+    return localProductIds
+      .map((productId) => {
+        const product = productMap.get(productId);
+
+        if (!product) {
+          return null;
+        }
+
+        return {
+          _id: productId,
+          productId,
+          product: {
+            _id: product._id,
+            createdAt: null,
+            attachment: product.attachment ?? null,
+            unitPrice: product.unitPrice ?? null,
+            name: product.name ?? null,
+            description: product.description ?? null,
+          },
+        } satisfies ViewedProduct;
+      })
+      .filter((item): item is ViewedProduct => item !== null);
+  }, [guestProductsData, localProductIds]);
+
+  const activeItems = resolvedCustomerId ? viewedItems : guestViewedItems;
+  const activeLoading = resolvedCustomerId ? loading : guestProductsLoading;
+  const activeError = resolvedCustomerId ? error : guestProductsError;
+  const emptyTitle = resolvedCustomerId
+    ? "No viewed products yet"
+    : "No locally viewed products yet";
+  const emptyDescription = resolvedCustomerId
+    ? "Start browsing products to see them appear here."
+    : "Open a product page and it will appear here on this browser.";
 
   return (
     <section className="bg-background py-16">
@@ -82,37 +147,31 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
           )}
         </div>
 
-        {!resolvedCustomerId ? (
-          <EmptyState
-            title="Sign in to see recently viewed products"
-            description="Log in to keep track of the items you've explored."
-          />
-        ) : error ? (
+        {activeError ? (
           <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
             Unable to load recently viewed products right now. Please try again
             later.
           </div>
-        ) : !loading && viewedItems.length === 0 ? (
+        ) : !activeLoading && activeItems.length === 0 ? (
           <EmptyState
-            title="No viewed products yet"
-            description="Start browsing products to see them appear here."
+            title={emptyTitle}
+            description={emptyDescription}
           />
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {(loading
+          <div className="grid grid-cols-3 gap-3 xl:grid-cols-6">
+            {(activeLoading
               ? Array.from({ length: Math.min(limit, 6) })
-              : viewedItems
+              : activeItems
             ).map((entry: any, index) => {
-              if (loading) {
+              if (activeLoading) {
                 return (
                   <Card key={`placeholder-${index}`} className="animate-pulse">
-                    <CardHeader className="h-40 bg-muted/60" />
-                    <CardContent className="space-y-3">
-                      <div className="h-4 w-3/4 rounded bg-muted/80" />
+                    <CardHeader className="h-28 bg-muted/60" />
+                    <CardContent className="space-y-2 p-3">
+                      <div className="h-3 w-3/4 rounded bg-muted/80" />
                       <div className="h-3 w-1/2 rounded bg-muted/60" />
-                      <div className="h-3 w-1/3 rounded bg-muted/50" />
                     </CardContent>
-                    <CardFooter className="h-10 bg-muted/40" />
+                    <CardFooter className="h-8 bg-muted/40" />
                   </Card>
                 );
               }
@@ -127,7 +186,7 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
                   key={entry?._id ?? `viewed-${index}`}
                   className="flex h-full flex-col overflow-hidden border border-muted/60"
                 >
-                  <div className="relative h-48 w-full bg-muted">
+                  <div className="relative h-28 w-full bg-muted">
                     {imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -141,40 +200,37 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
                       </div>
                     )}
                   </div>
-                  <CardHeader className="space-y-2">
-                    <CardTitle className="text-base font-semibold">
+                  <CardHeader className="space-y-1 p-3">
+                    <CardTitle className="line-clamp-2 text-sm font-semibold">
                       {product?.name ?? "Untitled product"}
                     </CardTitle>
-                    <CardDescription className="line-clamp-2 text-sm">
+                    <CardDescription className="line-clamp-2 text-xs">
                       {product?.description ?? "No description provided."}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-3 text-sm">
+                  <CardContent className="space-y-2 p-3 pt-0 text-xs">
                     <p className="font-medium text-foreground">
-                      Price: {formatNumber(product?.unitPrice)}
+                      {formatNumber(product?.unitPrice)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Last viewed:{" "}
                       {viewedAt
                         ? new Date(viewedAt).toLocaleString()
                         : "Unknown"}
                     </p>
                   </CardContent>
-                  <CardFooter className="mt-auto justify-end gap-2 border-t bg-muted/40 p-4">
-                    <Button asChild variant="outline" size="sm">
+                  <CardFooter className="mt-auto border-t bg-muted/40 p-3">
+                    <Button asChild variant="outline" size="sm" className="w-full text-xs">
                       <Link
                         href={
                           isBuilder
                             ? templateUrl(
-                                `/products${
-                                  product?._id
-                                    ? `?highlight=${product._id}`
-                                    : ""
-                                }`
+                                product?._id
+                                  ? `/product&productId=${product._id}`
+                                  : "/products"
                               )
                             : product?._id
-                            ? `/products?highlight=${product._id}`
-                            : "/products"
+                              ? `/products/${product._id}`
+                              : "/products"
                         }
                       >
                         View product

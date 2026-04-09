@@ -34,6 +34,11 @@ import ecommerceMutations from "../../graphql/ecommerce/mutations";
 import { templateUrl } from "@/lib/utils";
 import { isBuildMode } from "../../lib/buildMode";
 import {
+  clearLocalLastViewedProducts,
+  getLocalLastViewedProducts,
+  rememberLastViewedProduct,
+} from "../../lib/lastViewedProducts";
+import {
   ProductReviews,
   type ProductReview,
 } from "../products/[id]/ProductReviews";
@@ -65,8 +70,6 @@ const SummaryItem = ({ label, value }: { label: string; value: string }) => (
   </Card>
 );
 
-const LAST_VIEWED_STORAGE_KEY = "wb:lastViewedProducts";
-const MAX_LOCAL_LAST_VIEWED = 20;
 type ButtonState = "idle" | "adding" | "added";
 
 type ProductDetailPageProps = {
@@ -250,9 +253,13 @@ export default function ProductDetailPage({
     string,
     unknown
   >;
-  const colorOptions = Array.isArray(customFields.colors)
-    ? (customFields.colors as string[])
-    : [];
+  const colorOptions = useMemo(
+    () =>
+      Array.isArray(customFields.colors)
+        ? (customFields.colors as string[])
+        : [],
+    [customFields.colors]
+  );
   const [activeColor, setActiveColor] = useState<string | null>(
     colorOptions[0] ?? null
   );
@@ -349,50 +356,11 @@ export default function ProductDetailPage({
   const reviewTotal = productReviews.length || reviewsCount;
   const ratingDisplay = reviewsAverage ?? averageRating;
 
-  const getLocalLastViewed = useCallback((): string[] => {
-    if (typeof window === "undefined") {
-      return [];
-    }
-    try {
-      const raw = window.localStorage.getItem(LAST_VIEWED_STORAGE_KEY);
-      if (!raw) {
-        return [];
-      }
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        return parsed.filter(
-          (value): value is string =>
-            typeof value === "string" && value.trim().length > 0
-        );
-      }
-    } catch (error) {
-      console.warn("Failed to read last viewed products from storage", error);
-    }
-    return [];
-  }, []);
-
-  const saveLocalLastViewed = useCallback((items: string[]) => {
-    if (typeof window === "undefined") {
-      return;
-    }
-    if (!items.length) {
-      window.localStorage.removeItem(LAST_VIEWED_STORAGE_KEY);
-      return;
-    }
-    window.localStorage.setItem(LAST_VIEWED_STORAGE_KEY, JSON.stringify(items));
-  }, []);
-
   const rememberLocally = useCallback(
     (productId: string) => {
-      if (!productId) {
-        return;
-      }
-      const current = getLocalLastViewed().filter((id) => id !== productId);
-      current.push(productId);
-      const trimmed = current.slice(-MAX_LOCAL_LAST_VIEWED);
-      saveLocalLastViewed(trimmed);
+      rememberLastViewedProduct(productId);
     },
-    [getLocalLastViewed, saveLocalLastViewed]
+    []
   );
 
   const flushLocalLastViewed = useCallback(
@@ -400,7 +368,7 @@ export default function ProductDetailPage({
       if (!customer) {
         return;
       }
-      const pending = getLocalLastViewed();
+      const pending = getLocalLastViewedProducts();
       if (pending.length === 0) {
         return;
       }
@@ -417,10 +385,10 @@ export default function ProductDetailPage({
 
       const hasFailure = results.some((result) => result.status === "rejected");
       if (!hasFailure) {
-        saveLocalLastViewed([]);
+        clearLocalLastViewedProducts();
       }
     },
-    [addToLastView, getLocalLastViewed, saveLocalLastViewed]
+    [addToLastView]
   );
 
   const lastViewedKeyRef = useRef<string | null>(null);
@@ -436,7 +404,7 @@ export default function ProductDetailPage({
   }, []);
 
   const handleAddToCart = useCallback(async () => {
-    if (!product?._id || buttonState === "adding") {
+    if (!product?._id || !inStock || buttonState === "adding") {
       return;
     }
 
@@ -478,7 +446,7 @@ export default function ProductDetailPage({
       console.error("Failed to add item to cart", error);
       setButtonState("idle");
     }
-  }, [addToCart, buttonState, product]);
+  }, [addToCart, buttonState, inStock, product]);
 
   useEffect(() => {
     if (!product?._id) {
@@ -775,10 +743,12 @@ export default function ProductDetailPage({
                   <Button
                     size="lg"
                     className="flex-1"
-                    disabled={!product?._id || buttonState === "adding"}
+                    disabled={!product?._id || !inStock || buttonState === "adding"}
                     onClick={handleAddToCart}
                   >
-                    {buttonState === "adding"
+                    {!inStock
+                      ? "Out of stock"
+                      : buttonState === "adding"
                       ? "Adding..."
                       : buttonState === "added"
                       ? "Added to cart"
