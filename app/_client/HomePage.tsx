@@ -8,6 +8,7 @@ import RoomDetailPage from "./RoomDetailPage";
 export default function TourBoilerPlateHome() {
   const searchParams = useSearchParams();
   const pageName = searchParams.get("pageName");
+  const PageContent = usePage(pageName);
 
   if (pageName === "rooms") {
     return <RoomsPage />;
@@ -16,8 +17,6 @@ export default function TourBoilerPlateHome() {
   if (pageName === "room") {
     return <RoomDetailPage />;
   }
-
-  const PageContent = usePage(pageName);
 
   return (
     <div>
