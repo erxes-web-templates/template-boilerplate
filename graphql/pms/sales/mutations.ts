@@ -162,6 +162,7 @@ const mutations = {
   addPayment,
   changeDeal,
   addLabel,
+  addTag: tagsAdd,
   tagsAdd,
 };
 export default mutations;
