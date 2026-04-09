@@ -23,6 +23,7 @@ import { getLocalLastViewedProducts } from "../../../lib/lastViewedProducts";
 
 type ViewedProduct = {
   _id: string;
+  productId?: string | null;
   updatedAt?: string | null;
   product?: {
     _id?: string | null;
