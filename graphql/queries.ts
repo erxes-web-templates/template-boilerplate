@@ -385,6 +385,9 @@ export const GET_FORM_DETAIL = gql`
       _id
       title
       description
+      buttonText
+      numberOfPages
+      leadData
       fields {
         _id
         code
@@ -399,7 +402,10 @@ export const GET_FORM_DETAIL = gql`
         order
         options
         optionsValues
+        description
         type
+        isRequired
+        pageNumber
       }
     }
   }

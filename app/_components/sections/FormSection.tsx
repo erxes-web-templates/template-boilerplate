@@ -1,11 +1,12 @@
 import { GET_FORM_DETAIL } from "../../../graphql/queries";
 import { Section } from "../../../types/sections";
-import React from "react";
+import React, { useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import DynamicForm from "../../../components/common/DynamicForm";
 import { FORM_SUBMISSION } from "../../../graphql/mutations";
 
 const FormSection = ({ section }: { section: Section }) => {
+  const [submitted, setSubmitted] = useState(false);
   const { data } = useQuery(GET_FORM_DETAIL, {
     variables: {
       id: section.contentTypeId,
@@ -17,6 +18,7 @@ const FormSection = ({ section }: { section: Section }) => {
   const [submitForm] = useMutation(FORM_SUBMISSION, {
     onCompleted: (data) => {
       console.log(data);
+      setSubmitted(true);
     },
   });
 
@@ -27,7 +29,12 @@ const FormSection = ({ section }: { section: Section }) => {
           {section.content}
         </h2>
         <div className=" max-w-[600px] mx-auto">
-          <DynamicForm formData={formData} submitForm={submitForm} />
+          <DynamicForm
+            formData={formData}
+            submitForm={submitForm}
+            submitted={submitted}
+            successMessage={section.config?.successMessage}
+          />
         </div>
       </div>
     </section>
