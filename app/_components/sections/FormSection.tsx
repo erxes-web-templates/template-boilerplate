@@ -1,3 +1,5 @@
+"use client";
+
 import { GET_FORM_DETAIL } from "../../../graphql/queries";
 import { Section } from "../../../types/sections";
 import React, { useState } from "react";
