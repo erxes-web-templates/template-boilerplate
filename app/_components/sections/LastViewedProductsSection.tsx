@@ -101,15 +101,14 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
     const products = guestProductsData?.cpPoscProducts ?? [];
     const productMap = new Map(products.map((product) => [product._id, product]));
 
-    return localProductIds
-      .map((productId) => {
+    return localProductIds.reduce<ViewedProduct[]>((acc, productId) => {
         const product = productMap.get(productId);
 
         if (!product) {
-          return null;
+          return acc;
         }
 
-        return {
+        acc.push({
           _id: productId,
           productId,
           product: {
@@ -120,9 +119,10 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
             name: product.name ?? null,
             description: product.description ?? null,
           },
-        } satisfies ViewedProduct;
-      })
-      .filter((item): item is ViewedProduct => item !== null);
+        });
+
+        return acc;
+      }, []);
   }, [guestProductsData, localProductIds]);
 
   const activeItems = resolvedCustomerId ? viewedItems : guestViewedItems;
