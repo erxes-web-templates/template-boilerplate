@@ -1,18 +1,11 @@
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { Section } from "../../../types/sections";
-import { templateUrl } from "@/lib/utils";
 import { toHtml } from "../../../lib/html";
-import { isBuildMode } from "../../../lib/buildMode";
 import Link from "next/link";
 
 const TextSection = ({ section }: { section: Section }) => {
-  const isBuilder = isBuildMode();
-  const ctaHref = section.config.primaryCtaUrl
-    ? isBuilder
-      ? templateUrl(section.config.primaryCtaUrl)
-      : section.config.primaryCtaUrl
-    : "#";
+  const ctaHref = section.config.primaryCtaUrl ?? "#";
   return (
     <section className="py-16">
       <div className="container mx-auto max-w-6xl px-4">

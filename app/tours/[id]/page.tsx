@@ -1,7 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { isBuildMode } from "../../../lib/buildMode";
-import TourDetailPageClient from "../../_client/TourDetailPage";
 import { fetchBmTourDetail } from "../../../lib/fetchTours";
 import { getFileUrl } from "../../../lib/utils";
 import {
@@ -19,10 +17,6 @@ type PageProps = {
 
 export default async function TourDetailPage({ params }: PageProps) {
   const { id } = await params;
-  if (isBuildMode()) {
-    return <TourDetailPageClient initialTourId={id} />;
-  }
-
   const tourDetail = await fetchBmTourDetail(id);
 
   if (!tourDetail) {

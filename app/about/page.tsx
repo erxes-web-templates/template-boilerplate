@@ -1,8 +1,6 @@
 import pageData from "../../data/pages/about.json";
 import { renderSections } from "../../lib/renderSections";
 import { Section } from "../../types/sections";
-import { isBuildMode } from "../../lib/buildMode";
-import AboutPageClient from "../_client/AboutPage";
 import HeroSection from "../_components/sections/HeroSection";
 import AboutSection from "../_components/sections/AboutSection";
 import FormSection from "../_components/sections/FormSection";
@@ -25,10 +23,6 @@ export const metadata = {
 };
 
 export default function AboutPage() {
-  if (isBuildMode()) {
-    return <AboutPageClient />;
-  }
-
   const sectionComponents = {
     hero: HeroSection,
     imageText: AboutSection,

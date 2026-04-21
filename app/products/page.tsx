@@ -1,15 +1,9 @@
-import { isBuildMode } from "../../lib/buildMode";
-import ProductsPageClient from "../_client/ProductsPage";
 import {
   fetchProductCategories,
   fetchProducts,
 } from "../../graphql/products/server";
 
 export default async function ProductsPage() {
-  if (isBuildMode()) {
-    return <ProductsPageClient />;
-  }
-
   const [categoriesResult, productsResult] = await Promise.all([
     fetchProductCategories({
       variables: { perPage: 100, excludeEmpty: false },

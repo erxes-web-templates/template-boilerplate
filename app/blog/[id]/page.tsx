@@ -1,6 +1,4 @@
 import Image from "next/image";
-import { isBuildMode } from "../../../lib/buildMode";
-import BlogPostPageClient from "../../_client/BlogPostPage";
 import { fetchCmsPost } from "../../../lib/fetchCms";
 import { getFileUrl } from "../../../lib/utils";
 
@@ -10,10 +8,6 @@ type PageProps = {
 
 export default async function PostDetailPage({ params }: PageProps) {
   const { id } = await params;
-  if (isBuildMode()) {
-    return <BlogPostPageClient initialPostId={id} />;
-  }
-
   const post = await fetchCmsPost({ id });
 
   if (!post) {

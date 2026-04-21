@@ -4,34 +4,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { Section } from "../../../types/sections";
 import { getFileUrl } from "@/lib/utils";
-import { templateUrl } from "@/lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
 import { Card, CardFooter } from "@/components/ui/card";
 
 type LinkType = "product" | "productCategory" | "productTag" | "external";
 
 const getHrefForLink = (link?: { type?: LinkType; value?: string }) => {
-  if (!link?.type || !link.value) {
-    return null;
-  }
-  const isBuilder = isBuildMode();
-
+  if (!link?.type || !link.value) return null;
   switch (link.type) {
-    case "product":
-      return isBuilder
-        ? templateUrl(`/product&productId=${link.value}`)
-        : `/products/${link.value}`;
-    case "productCategory":
-      return isBuilder
-        ? `${templateUrl("/products")}&categoryId=${link.value}`
-        : `/products?categoryId=${link.value}`;
-    case "productTag":
-      return isBuilder
-        ? `${templateUrl("/products")}&tag=${link.value}`
-        : `/products?tag=${link.value}`;
+    case "product": return `/products/${link.value}`;
+    case "productCategory": return `/products?categoryId=${link.value}`;
+    case "productTag": return `/products?tag=${link.value}`;
     case "external":
-    default:
-      return link.value;
+    default: return link.value;
   }
 };
 

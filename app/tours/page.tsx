@@ -1,7 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { isBuildMode } from "../../lib/buildMode";
-import ToursPageClient from "../_client/ToursPage";
 import { fetchBmTours } from "../../lib/fetchTours";
 import {
   Card,
@@ -16,10 +14,6 @@ import { getFileUrl } from "../../lib/utils";
 import type { BmTour } from "../../types/tours";
 
 export default async function ToursPage() {
-  if (isBuildMode()) {
-    return <ToursPageClient />;
-  }
-
   const data = (await fetchBmTours(100, { status: "published" })) as any;
   const tours = (data?.list || [])
     .map((group: any) => group.items?.[0])

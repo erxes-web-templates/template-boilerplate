@@ -20,8 +20,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Section } from "../../../types/sections";
 import { getFileUrl } from "@/lib/utils";
-import { templateUrl } from "@/lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
 
 type CarouselLinkType = "product" | "productCategory" | "external";
 
@@ -66,23 +64,11 @@ const resolveLink = (
   }
 
   if (linkType === "product") {
-    const isBuilder = isBuildMode();
-    return {
-      href: isBuilder
-        ? templateUrl(`/product&productId=${value}`)
-        : `/products/${value}`,
-      isExternal: false,
-    };
+    return { href: `/products/${value}`, isExternal: false };
   }
 
   if (linkType === "productCategory") {
-    const isBuilder = isBuildMode();
-    return {
-      href: isBuilder
-        ? `${templateUrl("/products")}&categoryId=${value}`
-        : `/products?categoryId=${value}`,
-      isExternal: false,
-    };
+    return { href: `/products?categoryId=${value}`, isExternal: false };
   }
 
   return null;

@@ -7,8 +7,7 @@ import { Section } from "../../../types/sections";
 import authQueries from "../../../graphql/auth/queries";
 import orderQueries from "../../../graphql/order/queries";
 import { useProductsQuery } from "../../../graphql/products";
-import { getFileUrl, templateUrl } from "@/lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
+import { getFileUrl } from "@/lib/utils";
 import EmptyState from "@/components/common/EmptyState";
 import {
   Card,
@@ -51,7 +50,6 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
   const description = section.config?.description ?? "";
   const limit = Math.max(1, Number(section.config?.limit ?? 6));
   const fallbackCustomerId: string | null = section.config?.customerId ?? null;
-  const isBuilder = isBuildMode();
   const [localProductIds, setLocalProductIds] = useState<string[]>([]);
 
   const { data: userData } = useQuery(authQueries.currentUser);
@@ -221,19 +219,7 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
                   </CardContent>
                   <CardFooter className="mt-auto border-t bg-muted/40 p-3">
                     <Button asChild variant="outline" size="sm" className="w-full text-xs">
-                      <Link
-                        href={
-                          isBuilder
-                            ? templateUrl(
-                                product?._id
-                                  ? `/product&productId=${product._id}`
-                                  : "/products"
-                              )
-                            : product?._id
-                              ? `/products/${product._id}`
-                              : "/products"
-                        }
-                      >
+                      <Link href={product?._id ? `/products/${product._id}` : "/products"}>
                         View product
                       </Link>
                     </Button>

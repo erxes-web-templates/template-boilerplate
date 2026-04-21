@@ -1,5 +1,3 @@
-import { isBuildMode } from "../../../lib/buildMode";
-import ProductDetailPageClient from "../../_client/ProductDetailPage";
 import {
   fetchProductAverageReview,
   fetchProductDetail,
@@ -13,10 +11,6 @@ type PageProps = {
 
 export default async function ProductDetailPage({ params }: PageProps) {
   const { id } = await params;
-  if (isBuildMode()) {
-    return <ProductDetailPageClient initialProductId={id} />;
-  }
-
   const productId = id;
 
   const [detailResult, similaritiesResult, averageResult, reviewsResult] =

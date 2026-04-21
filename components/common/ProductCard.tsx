@@ -8,8 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "../../lib/CartContext";
-import { templateUrl } from "../../lib/utils";
-import { isBuildMode } from "../../lib/buildMode";
 import { toHtml, type HtmlValue } from "../../lib/html";
 
 type ButtonState = "idle" | "adding" | "added";
@@ -33,7 +31,6 @@ const formatCurrency = (value: number) =>
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
-  const isBuilder = isBuildMode();
   const [buttonState, setButtonState] = useState<ButtonState>("idle");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -146,13 +143,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         <div className="flex gap-3">
           <Button asChild className="w-full">
-            <Link
-              href={
-                isBuilder
-                  ? templateUrl(`/product&productId=${product.id}`)
-                  : `/products/${product.id}`
-              }
-            >
+            <Link href={`/products/${product.id}`}>
               View Details
             </Link>
           </Button>

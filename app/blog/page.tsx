@@ -1,7 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { isBuildMode } from "../../lib/buildMode";
-import BlogPageClient from "../_client/BlogPage";
 import { fetchCmsPosts } from "../../lib/fetchCms";
 import data from "../../data/configs.json";
 import {
@@ -17,10 +15,6 @@ import { getFileUrl } from "../../lib/utils";
 import type { CmsPost } from "../../types/cms";
 
 export default async function BlogsPage() {
-  if (isBuildMode()) {
-    return <BlogPageClient />;
-  }
-
   const posts = await fetchCmsPosts({
     limit: 10,
     webId: data.cpId,

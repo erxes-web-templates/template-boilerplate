@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useProductsQuery, type ProductSummary } from "../../../graphql/products";
 import { Section } from "../../../types/sections";
-import { templateUrl } from "@/lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
 import { Button } from "@/components/ui/button";
 import EmptyState from "@/components/common/EmptyState";
 import ProductCard from "../../../components/common/ProductCard";
@@ -14,7 +12,6 @@ const ProductsSection = ({ section }: { section: Section }) => {
   const limit = Number(section.config?.limit ?? 6);
   const categoryId = section.config?.categoryId || null;
   const tag = section.config?.tag || null;
-  const isBuilder = isBuildMode();
 
   const { data, loading, error } = useProductsQuery({
     variables: {
@@ -123,13 +120,7 @@ const ProductsSection = ({ section }: { section: Section }) => {
         {section.config?.primaryCtaUrl && (
           <div className="mt-10 text-center">
             <Button asChild variant="outline">
-              <Link
-                href={
-                  isBuilder
-                    ? templateUrl(section.config.primaryCtaUrl)
-                    : section.config.primaryCtaUrl
-                }
-              >
+              <Link href={section.config.primaryCtaUrl}>
                 {section.config.primaryCta || "View all"}
               </Link>
             </Button>

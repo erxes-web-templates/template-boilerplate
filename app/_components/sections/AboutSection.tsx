@@ -2,19 +2,13 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import Image from "next/image";
 import { Section } from "../../../types/sections";
-import { getFileUrl, templateUrl } from "@/lib/utils";
+import { getFileUrl } from "@/lib/utils";
 import { toHtml } from "../../../lib/html";
-import { isBuildMode } from "../../../lib/buildMode";
 import Link from "next/link";
 
 const AboutSection = ({ section }: { section: Section }) => {
   const isImageLeft = section.config.imagePosition === "left";
-  const isBuilder = isBuildMode();
-  const ctaHref = section.config.primaryCtaUrl
-    ? isBuilder
-      ? templateUrl(section.config.primaryCtaUrl)
-      : section.config.primaryCtaUrl
-    : "#";
+  const ctaHref = section.config.primaryCtaUrl ?? "#";
 
   const imageEl = section.config.image ? (
     <div className="w-full md:w-1/2">

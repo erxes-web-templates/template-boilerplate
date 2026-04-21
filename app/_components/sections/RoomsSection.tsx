@@ -10,8 +10,6 @@ import {
 } from "../../../graphql/pms/rooms";
 import { Section } from "../../../types/sections";
 import { toHtml } from "../../../lib/html";
-import { templateUrl } from "@/lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
 import {
   Card,
   CardContent,
@@ -32,7 +30,6 @@ const RoomsSection = ({ section }: { section: Section }) => {
   const limit = Number(section.config?.limit ?? 6);
   const categoryId = section.config?.categoryId || null;
   const tag = section.config?.tag || null;
-  const isBuilder = isBuildMode();
 
   const { data: tagsData } = useTagsQuery({
     variables: { searchValue: "accommodation", type: "core:product" },
@@ -165,24 +162,12 @@ const RoomsSection = ({ section }: { section: Section }) => {
                       size="sm"
                       className="flex-1 text-xs"
                     >
-                      <Link
-                        href={
-                          isBuilder
-                            ? templateUrl(`/room&roomId=${room._id}`)
-                            : `/rooms/${room._id}`
-                        }
-                      >
+                      <Link href={`/rooms/${room._id}`}>
                         View
                       </Link>
                     </Button>
                     <Button asChild size="sm" className="flex-1 text-xs">
-                      <Link
-                        href={
-                          isBuilder
-                            ? templateUrl(`/room&roomId=${room._id}&book=true`)
-                            : `/rooms/${room._id}?book=true`
-                        }
-                      >
+                      <Link href={`/rooms/${room._id}?book=true`}>
                         Book now
                       </Link>
                     </Button>
@@ -196,13 +181,7 @@ const RoomsSection = ({ section }: { section: Section }) => {
         {section.config?.primaryCtaUrl && (
           <div className="mt-10 text-center">
             <Button asChild variant="outline">
-              <Link
-                href={
-                  isBuilder
-                    ? templateUrl(section.config.primaryCtaUrl)
-                    : section.config.primaryCtaUrl
-                }
-              >
+              <Link href={section.config.primaryCtaUrl}>
                 {section.config.primaryCta || "View all rooms"}
               </Link>
             </Button>

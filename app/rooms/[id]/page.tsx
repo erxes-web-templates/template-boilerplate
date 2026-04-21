@@ -1,7 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { isBuildMode } from "../../../lib/buildMode";
-import RoomDetailPageClient from "../../_client/RoomDetailPage";
 import { fetchRoomDetail } from "../../../lib/fetchRooms";
 import { ArrowLeft } from "lucide-react";
 import RoomBookingWidget from "../_components/RoomBookingWidget";
@@ -12,11 +10,6 @@ type PageProps = {
 
 export default async function RoomDetailPage({ params }: PageProps) {
   const { id } = await params;
-
-  if (isBuildMode()) {
-    return <RoomDetailPageClient initialRoomId={id} />;
-  }
-
   const room = await fetchRoomDetail(id);
 
   if (!room) {

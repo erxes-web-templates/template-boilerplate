@@ -1,8 +1,6 @@
 import { renderSections } from "../lib/renderSections";
 import { fetchWebPage } from "../lib/fetchWebPage";
 import { Section } from "../types/sections";
-import { isBuildMode } from "../lib/buildMode";
-import HomePageClient from "./_client/HomePage";
 import HeroSection from "./_components/sections/HeroSection";
 import AboutSection from "./_components/sections/AboutSection";
 import FormSection from "./_components/sections/FormSection";
@@ -43,11 +41,6 @@ const sectionComponents = {
 // In production this is a Server Component — Next.js ISR re-generates it
 // automatically based on the revalidate interval set in lib/client.ts.
 export default async function HomePage() {
-  if (isBuildMode()) {
-    return <HomePageClient />;
-  }
-
-  // Production: fetch page data server-side (SSR/ISR)
   const webId = process.env.ERXES_WEB_ID || "";
   const page = await fetchWebPage(webId, "home");
   const pageItems: Section[] = page?.pageItems ?? [];

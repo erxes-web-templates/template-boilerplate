@@ -1,7 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { isBuildMode } from "../../lib/buildMode";
-import RoomsPageClient from "../_client/RoomsPage";
 import { fetchRooms } from "../../lib/fetchRooms";
 import { getFileUrl } from "../../lib/utils";
 import { Button } from "../../components/ui/button";
@@ -14,10 +12,6 @@ type PageProps = {
 };
 
 export default async function RoomsPage({ searchParams }: PageProps) {
-  if (isBuildMode()) {
-    return <RoomsPageClient />;
-  }
-
   const { page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam ?? 1));
 

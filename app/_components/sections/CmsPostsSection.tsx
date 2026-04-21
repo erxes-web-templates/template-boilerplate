@@ -14,8 +14,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useQuery } from "@apollo/client";
 import { GET_CMS_POSTS } from "../../../graphql/queries";
-import { getFileUrl, templateUrl } from "@/lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
+import { getFileUrl } from "@/lib/utils";
 import { toHtml } from "../../../lib/html";
 import { Section } from "../../../types/sections";
 import { CmsPost } from "../../../types/cms";
@@ -30,7 +29,6 @@ const CmsPostsSection = ({ section }: { section: Section }) => {
   });
 
   const posts = data?.cpPosts || [];
-  const isBuilder = isBuildMode();
 
   return (
     <section className="py-16">
@@ -66,13 +64,7 @@ const CmsPostsSection = ({ section }: { section: Section }) => {
                 </CardDescription>
               </CardContent>
               <CardFooter className="border-t border-border p-4">
-                <Link
-                  href={
-                    isBuilder
-                      ? templateUrl(`/post&postId=${post._id}&slug=${post.slug}`)
-                      : `/blog/${post._id}`
-                  }
-                >
+                <Link href={`/blog/${post._id}`}>
                   <Button variant="outline" size="sm">
                     {section.config.primaryCta || "Read more"}
                   </Button>
@@ -84,7 +76,7 @@ const CmsPostsSection = ({ section }: { section: Section }) => {
         {section.config?.primaryCtaUrl && (
           <div className="mt-10 text-center">
             <Link
-              href={isBuilder ? templateUrl(section.config.primaryCtaUrl) : section.config.primaryCtaUrl}
+              href={section.config.primaryCtaUrl}
               className="text-sm font-medium text-primary hover:underline"
             >
               {section.config.primaryCta || "View all"}

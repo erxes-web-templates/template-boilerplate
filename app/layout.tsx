@@ -3,7 +3,6 @@ import "./globals.css";
 import data from "../data/configs.json";
 import ClientShell from "./_components/ClientShell";
 import { fetchCpConfig } from "../lib/fetchCpConfig";
-import { isBuildMode } from "../lib/buildMode";
 import type { CPDetail } from "../types/cms";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -50,9 +49,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cpDetail = isBuildMode()
-    ? fallbackCpDetail()
-    : (await fetchCpConfig()) || fallbackCpDetail();
+  const cpDetail = (await fetchCpConfig()) || fallbackCpDetail();
 
   return (
     <html lang="en">

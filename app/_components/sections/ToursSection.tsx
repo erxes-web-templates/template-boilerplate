@@ -13,8 +13,7 @@ import React from "react";
 import Link from "next/link";
 import { useQuery } from "@apollo/client";
 import { TOURS_GROUP_QUERY } from "../../../graphql/queries";
-import { getFileUrl, templateUrl } from "../../../lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
+import { getFileUrl } from "../../../lib/utils";
 import { toHtml } from "../../../lib/html";
 import { Section } from "../../../types/sections";
 import Image from "next/image";
@@ -29,7 +28,6 @@ const ToursSection = ({ section }: { section: Section }) => {
   });
 
   const tours = data?.cpBmToursGroup?.list || [];
-  const isBuilder = isBuildMode();
 
   return (
     <section className="py-16">
@@ -88,13 +86,7 @@ const ToursSection = ({ section }: { section: Section }) => {
                     </span>
                   )}
                 </div>
-                <Link
-                  href={
-                    isBuilder
-                      ? templateUrl(`/tour&tourId=${tour.items[0].groupCode}`)
-                      : `/tours/${tour.items[0].groupCode}`
-                  }
-                >
+                <Link href={`/tours/${tour.items[0].groupCode}`}>
                   <Button size="sm">
                     {section.config?.primaryCta || "Book now"}
                   </Button>
@@ -107,11 +99,7 @@ const ToursSection = ({ section }: { section: Section }) => {
         {section.config?.primaryCtaUrl && (
           <div className="mt-10 text-center">
             <Link
-              href={
-                isBuilder
-                  ? templateUrl(section.config.primaryCtaUrl)
-                  : section.config.primaryCtaUrl
-              }
+              href={section.config.primaryCtaUrl}
               className="text-sm font-medium text-primary hover:underline"
             >
               {section.config.primaryCta || "View all"}

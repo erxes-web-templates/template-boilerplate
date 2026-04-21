@@ -15,7 +15,6 @@ import { useQuery } from "@apollo/client";
 import { GET_CMS_MENU_LIST } from "../../graphql/queries";
 import Image from "next/image";
 import { getFileUrl, templateUrl } from "@/lib/utils";
-import { isBuildMode } from "../../lib/buildMode";
 import {
   ShoppingCart,
   Search,
@@ -201,17 +200,12 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
     [handleNavigate, router, searchTerm],
   );
 
-  const isBuilder = isBuildMode();
-
   const handleProductSelect = useCallback(
     (productId: string) => {
-      const url = isBuilder
-        ? templateUrl(`/product&productId=${productId}`)
-        : `/products/${productId}`;
-      router.push(url);
+      router.push(`/products/${productId}`);
       setShowSearchResults(false);
     },
-    [router, isBuilder],
+    [router],
   );
 
   const handleFocus = () => {

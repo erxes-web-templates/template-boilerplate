@@ -7,8 +7,7 @@ import { useQuery } from "@apollo/client";
 import ecommerceQueries from "../../../graphql/products/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Section } from "../../../types/sections";
-import { getFileUrl, templateUrl } from "@/lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
+import { getFileUrl } from "@/lib/utils";
 import EmptyState from "@/components/common/EmptyState";
 
 type ProductCategory = {
@@ -25,7 +24,6 @@ const ProductCategoriesSection = ({ section }: { section: Section }) => {
   const selectedCategories: string[] = section.config?.categories ?? [];
   const title = section.config?.title ?? "Featured categories";
   const description = section.config?.description ?? "";
-  const isBuilder = isBuildMode();
 
   const { data, loading, error } = useQuery(
     ecommerceQueries.productCategories,
@@ -130,17 +128,7 @@ const ProductCategoriesSection = ({ section }: { section: Section }) => {
                     )}
                     <div className="pt-3">
                       <Link
-                        href={
-                          isBuilder
-                            ? `${templateUrl("/products")}${
-                                category._id
-                                  ? `&categoryId=${category._id}`
-                                  : ""
-                              }`
-                            : category._id
-                            ? `/products?categoryId=${category._id}`
-                            : "/products"
-                        }
+                        href={category._id ? `/products?categoryId=${category._id}` : "/products"}
                         className="text-sm font-medium text-primary underline-offset-4 hover:underline"
                       >
                         View products

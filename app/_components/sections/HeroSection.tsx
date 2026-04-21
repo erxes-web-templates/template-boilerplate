@@ -3,17 +3,11 @@ import { Section } from "../../../types/sections";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { getFileUrl, templateUrl } from "@/lib/utils";
+import { getFileUrl } from "@/lib/utils";
 import { toHtml } from "../../../lib/html";
-import { isBuildMode } from "../../../lib/buildMode";
 
 const HeroSection = ({ section }: { section: Section }) => {
-  const isBuilder = isBuildMode();
-  const ctaHref = section.config.primaryCtaUrl
-    ? isBuilder
-      ? templateUrl(section.config.primaryCtaUrl)
-      : section.config.primaryCtaUrl
-    : "#";
+  const ctaHref = section.config.primaryCtaUrl ?? "#";
 
   return (
     <section className="relative h-[560px] overflow-hidden bg-muted">
