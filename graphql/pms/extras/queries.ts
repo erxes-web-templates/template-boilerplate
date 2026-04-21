@@ -36,7 +36,7 @@ const extras = gql`
 
 const categories = gql`
   query ProductCategories($parentId: String, $withChild: Boolean) {
-    productCategories(parentId: $parentId, withChild: $withChild) {
+    cpProductCategories(parentId: $parentId, withChild: $withChild) {
       _id
       code
       name
