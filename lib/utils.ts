@@ -9,10 +9,30 @@ export const uncapitalize = (str: string) => {
   return str.charAt(0).toLowerCase() + str.slice(1);
 };
 
+export const getEnv = (): Record<string, string> => {
+  if (typeof window === "undefined") return {};
+
+  const envMaps: { name: string }[] = (window as any).envMaps || [];
+  if (!envMaps.length) return {};
+
+  const subdomain = window.location.hostname.split(".")[0];
+  const envs: Record<string, string> = {};
+
+  for (const envMap of envMaps) {
+    const value = localStorage.getItem(`builder_env_${envMap.name}`) ?? "";
+    envs[envMap.name] = value.replace("<subdomain>", subdomain);
+  }
+
+  return envs;
+};
+
 export const getFileUrl = (url: string) => {
   if (!url) return "";
   if (url.startsWith("http")) return url;
-  return `${process.env.ERXES_FILE_URL}${url}`;
+  if (process.env.ERXES_FILE_URL) return `${process.env.ERXES_FILE_URL}${url}`;
+  const env = getEnv();
+  const apiDomain = env.NEXT_PUBLIC_API_DOMAIN || process.env.NEXT_PUBLIC_API_DOMAIN || "";
+  return apiDomain ? `${apiDomain}/read-file?key=${url}` : url;
 };
 
 export const templateUrl = (slug: string) => {
