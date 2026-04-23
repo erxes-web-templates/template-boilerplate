@@ -8,6 +8,7 @@ import pmsConfigQueries from "../../graphql/pms/config/queries";
 import pmsExtraQueries from "../../graphql/pms/extras/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import usePage from "../../lib/usePage";
+import { sectionComponents } from "../_components/sections";
 import Image from "next/image";
 import { getFileUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -55,7 +56,7 @@ const HotelBookingPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pageName = searchParams.get("pageName");
-  const PageContent = usePage(pageName);
+  const PageContent = usePage(pageName, sectionComponents);
   const client = useApolloClient();
   const { addToCart } = useCart();
 

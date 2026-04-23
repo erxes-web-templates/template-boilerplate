@@ -1,29 +1,17 @@
-import path from "path";
-import type { NextConfig } from "next";
+import { createNextConfig } from "./lib/next.config.base";
 
-const nextConfig: NextConfig = {
-  env: {
-    ERXES_API_URL: "http://localhost:4000/graphql",
-    ERXES_URL: "http://localhost:4000",
-    ERXES_FILE_URL: "http://localhost:4000/read-file?key=",
-    ERXES_CP_ID: "UUuZ5v2YQnwjEj5r_iVQz",
-    NEXT_PUBLIC_PMS_TOKEN: "",
-    TEMPLATE_TYPE: "tour",
-    NEXT_PUBLIC_POS_TOKEN: "o16LbW3jTsTspBuECzqY1nCPrFvvD858",
-    ERXES_WEB_ID: "RiW86babHSW2AyuBRJA6l",
-    ERXES_APP_TOKEN:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRQb3J0YWxJZCI6ImtxdjlPWE1yYmFJWV9mM05zOWZ5ayIsImlhdCI6MTc3NDU4OTU3M30.Ck4ZhMyi86axeie9d56Yc3rnbCUqosjP_x97fyoSSXM",
-  },
-  images: {
-    unoptimized: true,
-  },
-  webpack: (config) => {
-    config.resolve.alias["@"] = path.resolve(__dirname);
-    return config;
-  },
-};
-
-export default nextConfig;
+export default createNextConfig({
+  ERXES_API_URL: "http://localhost:4000/graphql",
+  ERXES_URL: "http://localhost:4000",
+  ERXES_FILE_URL: "http://localhost:4000/read-file?key=",
+  ERXES_CP_ID: "UUuZ5v2YQnwjEj5r_iVQz",
+  NEXT_PUBLIC_PMS_TOKEN: "",
+  TEMPLATE_TYPE: "tour",
+  NEXT_PUBLIC_POS_TOKEN: "o16LbW3jTsTspBuECzqY1nCPrFvvD858",
+  ERXES_WEB_ID: "RiW86babHSW2AyuBRJA6l",
+  ERXES_APP_TOKEN:
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRQb3J0YWxJZCI6ImtxdjlPWE1yYmFJWV9mM05zOWZ5ayIsImlhdCI6MTc3NDU4OTU3M30.Ck4ZhMyi86axeie9d56Yc3rnbCUqosjP_x97fyoSSXM",
+});
 // export default {
 //   env: {
 //     ERXES_API_URL: "https://tegrigobi.app.erxes.io/gateway/graphql",

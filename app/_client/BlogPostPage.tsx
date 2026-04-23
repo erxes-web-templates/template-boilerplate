@@ -2,6 +2,7 @@
 
 import { GET_CMS_POST } from "../../graphql/queries";
 import usePage from "../../lib/usePage";
+import { sectionComponents } from "../_components/sections";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 import { useQuery } from "@apollo/client";
@@ -10,25 +11,22 @@ import { getFileUrl } from "@/lib/utils";
 
 type PostDetailPageProps = {
   initialPostId?: string;
+  initialPost?: any;
 };
 
-const PostDetailPage = ({ initialPostId }: PostDetailPageProps) => {
+const PostDetailPage = ({ initialPostId, initialPost }: PostDetailPageProps) => {
   const searchParams = useSearchParams();
+  const pageName = searchParams.get("pageName");
+  const PageContent = usePage(pageName, sectionComponents);
 
-  const pageName = searchParams.get("pageName"); //pageName = about, tours, contact etc
-
-  const PageContent = usePage(pageName);
-
-  //   const slug = searchParams.get("slug");
   const postId = searchParams.get("postId") ?? initialPostId;
 
   const { data } = useQuery(GET_CMS_POST, {
-    variables: {
-      id: postId,
-    },
+    variables: { id: postId },
+    skip: !!initialPost,
   });
 
-  const post = data?.cmsPost || {};
+  const post = initialPost ?? data?.cmsPost ?? {};
 
   return (
     <div className="container mx-auto p-4">

@@ -17,23 +17,27 @@ import { Button } from "@/components/ui/button";
 import { getFileUrl, templateUrl } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import usePage from "../../lib/usePage";
+import { sectionComponents } from "../_components/sections";
 import { BmTour } from "../../types/tours";
-const ToursPage = () => {
+
+type Props = {
+  initialData?: any;
+};
+
+const ToursPage = ({ initialData }: Props) => {
   const searchParams = useSearchParams();
-
-  const pageName = searchParams.get("pageName"); //pageName = about, tours, contact etc
-
-  const PageContent = usePage(pageName);
+  const pageName = searchParams.get("pageName");
+  const PageContent = usePage(pageName, sectionComponents);
 
   const { data, loading } = useQuery(TOURS_GROUP_QUERY, {
     variables: { limit: 100, status: "published" },
+    skip: !!initialData,
   });
 
-  const tours = (data?.cpBmToursGroup?.list || []).map(
-    (group: any) => group.items?.[0],
-  ).filter(Boolean);
+  const groups = initialData?.list ?? data?.cpBmToursGroup?.list ?? [];
+  const tours = groups.map((group: any) => group.items?.[0]).filter(Boolean);
 
-  if (loading) {
+  if (!initialData && loading) {
     return "Loading ...";
   }
 
@@ -62,8 +66,7 @@ const ToursPage = () => {
             </CardContent>
             <CardFooter className="flex justify-between items-center">
               <span className="text-lg font-bold">{tour.cost}</span>
-              <Link href={templateUrl(`/tour&tourId=${tour.groupCode}`)}>
-                {" "}
+              <Link href={templateUrl(`/tours/${tour.groupCode || tour._id}`)}>
                 <Button>Read more</Button>
               </Link>
             </CardFooter>

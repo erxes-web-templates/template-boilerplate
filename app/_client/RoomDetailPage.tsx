@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { queries as roomQueries, useTagsQuery } from "../../graphql/pms/rooms";
 import type { RoomSummary } from "../../graphql/pms/rooms";
 import usePage from "../../lib/usePage";
+import { sectionComponents } from "../_components/sections";
 import Image from "next/image";
 import Link from "next/link";
 import { templateUrl } from "../../lib/utils";
@@ -15,17 +16,20 @@ import { ArrowLeft } from "lucide-react";
 
 type Props = {
   initialRoomId?: string;
+  initialRoom?: any;
 };
 
-export default function RoomDetailPage({ initialRoomId }: Props) {
+export default function RoomDetailPage({ initialRoomId, initialRoom }: Props) {
   const searchParams = useSearchParams();
   const pageName = searchParams.get("pageName");
-  const PageContent = usePage(pageName);
+  const PageContent = usePage(pageName, sectionComponents);
 
   const roomId = searchParams.get("roomId") ?? initialRoomId;
+  const skip = !!initialRoom;
 
   const { data: tagsData } = useTagsQuery({
     variables: { searchValue: "accommodation", type: "core:product" },
+    skip,
   });
   const accommodationTagId = tagsData?.cpTags?.[0]?._id;
 
@@ -38,17 +42,18 @@ export default function RoomDetailPage({ initialRoomId }: Props) {
         page: 1,
         ...(accommodationTagId ? { tagIds: [accommodationTagId] } : {}),
       },
-      skip: !roomId,
+      skip: skip || !roomId,
     },
   );
 
   const room = useMemo(() => {
+    if (initialRoom) return initialRoom as RoomSummary;
     const list = data?.cpProducts;
     if (!Array.isArray(list)) return null;
     return list[0] ?? null;
-  }, [data]);
+  }, [initialRoom, data]);
 
-  if (loading) {
+  if (!skip && loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">

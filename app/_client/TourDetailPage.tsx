@@ -11,6 +11,7 @@ import {
   AccordionTrigger,
 } from "../../components/ui/accordion";
 import usePage from "../../lib/usePage";
+import { sectionComponents } from "../_components/sections";
 import Image from "next/image";
 import Link from "next/link";
 import { getFileUrl, templateUrl } from "../../lib/utils";
@@ -20,19 +21,21 @@ import { ArrowLeft, Calendar, Clock, DollarSign, Hash } from "lucide-react";
 
 type TourDetailPageProps = {
   initialTourId?: string;
+  initialTourDetail?: any;
 };
 
-export default function TourDetailPage({ initialTourId }: TourDetailPageProps) {
+export default function TourDetailPage({ initialTourId, initialTourDetail }: TourDetailPageProps) {
   const searchParams = useSearchParams();
 
   const pageName = searchParams.get("pageName");
-  const PageContent = usePage(pageName);
+  const PageContent = usePage(pageName, sectionComponents);
 
   const tourId = searchParams.get("tourId") ?? initialTourId;
+  const skip = !!initialTourDetail;
 
   const { data: groupsData, loading: groupsLoading } = useQuery(TOURS_GROUP_QUERY, {
     variables: { status: "published" },
-    skip: !tourId,
+    skip: skip || !tourId,
   });
 
   const groups = groupsData?.cpBmToursGroup?.list || [];
@@ -45,12 +48,12 @@ export default function TourDetailPage({ initialTourId }: TourDetailPageProps) {
     tmsQueries.TOUR_GROUP_DETAIL_QUERY,
     {
       variables: { groupCode, status: "published" },
-      skip: !groupCode,
+      skip: skip || !groupCode,
     },
   );
 
-  const loading = groupsLoading || detailLoading;
-  const groupTourItems = groupDetailData?.cpBmToursGroupDetail?.items || [];
+  const loading = !skip && (groupsLoading || detailLoading);
+  const groupTourItems = initialTourDetail?.items ?? groupDetailData?.cpBmToursGroupDetail?.items ?? [];
   const tour = groupTourItems[0] || null;
 
   if (loading) {
