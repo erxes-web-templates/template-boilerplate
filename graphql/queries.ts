@@ -69,6 +69,15 @@ export const CP_GET_CONFIG = gql`
       templateId
       templateType
       erxesAppToken
+      messengerBrandCode
+      appearances {
+        backgroundColor
+        primaryColor
+        secondaryColor
+        accentColor
+        fontSans
+        fontHeading
+      }
     }
   }
 `;
