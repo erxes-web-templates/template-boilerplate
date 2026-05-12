@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import data from "../data/configs.json";
 import ClientShell from "./_components/ClientShell";
@@ -59,6 +60,18 @@ export default async function RootLayout({
       <body>
         <ClientShell cpDetail={cpDetail}>{children}</ClientShell>
         <Toaster />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-9VN5W5KKWX"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-9VN5W5KKWX');
+          `}
+        </Script>
       </body>
     </html>
   );
