@@ -1,19 +1,21 @@
 import { gql } from "@apollo/client";
 
 const pmsRooms = gql`
-  query PmsRooms(
+  query CpPmsRooms(
     $pipelineId: String!
-    $endDate1: Date
-    $endDate2: Date
-    $startDate1: Date
-    $startDate2: Date
+    $startDate: Date
+    $endDate: Date
+    $skipStageIds: [String]
+    $page: Int
+    $perPage: Int
   ) {
-    pmsRooms(
+    cpPmsRooms(
       pipelineId: $pipelineId
-      endDate1: $endDate1
-      endDate2: $endDate2
-      startDate1: $startDate1
-      startDate2: $startDate2
+      startDate: $startDate
+      endDate: $endDate
+      skipStageIds: $skipStageIds
+      page: $page
+      perPage: $perPage
     ) {
       _id
       name
@@ -26,7 +28,7 @@ const pmsRooms = gql`
 `;
 
 const deals = gql`
-  query Deals(
+  query CpDeals(
     $initialStageId: String
     $stageId: String
     $limit: Int
@@ -43,7 +45,7 @@ const deals = gql`
     $sortField: String
     $sortDirection: Int
   ) {
-    deals(
+    cpDeals(
       initialStageId: $initialStageId
       stageId: $stageId
       limit: $limit
@@ -110,7 +112,7 @@ const deals = gql`
 
 const dealDetail = gql`
   query DealDetail($id: String!) {
-    dealDetail(_id: $id) {
+    cpDealDetail(_id: $id) {
       _id
       customers {
         _id
@@ -149,7 +151,7 @@ const dealDetail = gql`
 
 const dealPreview = gql`
   query DealPreview($id: String!) {
-    dealDetail(_id: $id) {
+    cpDealDetail(_id: $id) {
       customers {
         _id
         lastName
@@ -164,7 +166,7 @@ const dealPreview = gql`
 
 const dealFullDetail = gql`
   query DealFullDetail($id: String!) {
-    dealDetail(_id: $id) {
+    cpDealDetail(_id: $id) {
       _id
       stageId
       name

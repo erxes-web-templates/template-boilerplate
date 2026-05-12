@@ -3,13 +3,14 @@
 import type React from "react";
 import { useSearchParams } from "next/navigation";
 import usePage from "../../lib/usePage";
+import { sectionComponents } from "../_components/sections";
 
 export default function ContactPage() {
   const searchParams = useSearchParams();
 
   const pageName = searchParams.get("pageName"); //pageName = about, tours, contact etc
 
-  const PageContent = usePage(pageName);
+  const PageContent = usePage(pageName, sectionComponents);
 
   return (
     <div className="container mx-auto px-4 py-12">

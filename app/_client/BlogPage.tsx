@@ -2,6 +2,7 @@
 
 import { GET_CMS_POSTS } from "../../graphql/queries";
 import usePage from "../../lib/usePage";
+import { sectionComponents } from "../_components/sections";
 import { CmsPost } from "../../types/cms";
 import { useQuery } from "@apollo/client";
 import { useSearchParams } from "next/navigation";
@@ -12,21 +13,23 @@ import { getFileUrl, templateUrl } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-const BlogsPage = () => {
-  const searchParams = useSearchParams();
-  const pageName = searchParams.get("pageName"); //pageName = about, tours, contact etc
+type Props = {
+  initialPosts?: any[] | null;
+};
 
-  const PageContent = usePage(pageName);
+const BlogsPage = ({ initialPosts }: Props) => {
+  const searchParams = useSearchParams();
+  const pageName = searchParams.get("pageName");
+  const PageContent = usePage(pageName, sectionComponents);
 
   const { data, loading } = useQuery(GET_CMS_POSTS, {
-    variables: {
-      limit: 10,
-    },
+    variables: { limit: 10 },
+    skip: !!initialPosts,
   });
 
-  const posts = data?.cpPosts || [];
+  const posts = initialPosts ?? data?.cpPosts ?? [];
 
-  if (loading) {
+  if (!initialPosts && loading) {
     return "Loading ...";
   }
   return (

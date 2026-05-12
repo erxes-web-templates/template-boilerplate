@@ -8,6 +8,7 @@ import pmsConfigQueries from "../../graphql/pms/config/queries";
 import pmsExtraQueries from "../../graphql/pms/extras/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import usePage from "../../lib/usePage";
+import { sectionComponents } from "../_components/sections";
 import Image from "next/image";
 import { getFileUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -55,7 +56,7 @@ const HotelBookingPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pageName = searchParams.get("pageName");
-  const PageContent = usePage(pageName);
+  const PageContent = usePage(pageName, sectionComponents);
   const client = useApolloClient();
   const { addToCart } = useCart();
 
@@ -67,7 +68,7 @@ const HotelBookingPage = () => {
 
   const startDate = toIsoDate(startDateRaw);
   const endDate = toIsoDate(endDateRaw);
-  const categoryId = "jZlfm7JrqZgYITwSiSs-B";
+  const categoryId = "YgqlCf1xH-aBaP_Vhrwvk";
   const [productIds, setProductIds] = useState<string[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<any | null>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -111,7 +112,7 @@ const HotelBookingPage = () => {
     let active = true;
 
     const loadProducts = async () => {
-      const categories = categoryData?.productCategories ?? [];
+      const categories = categoryData?.cpProductCategories ?? [];
       const categoryIds = categories.length
         ? categories.map((item: { _id: string }) => item._id)
         : [categoryId];

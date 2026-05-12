@@ -7,6 +7,7 @@ import { useRoomsQuery, useTagsQuery, type RoomSummary } from "../../graphql/pms
 import { templateUrl, getFileUrl } from "../../lib/utils";
 import { useSearchParams } from "next/navigation";
 import usePage from "../../lib/usePage";
+import { sectionComponents } from "../_components/sections";
 import { Button } from "../../components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -17,14 +18,21 @@ const toCurrency = (value?: number | null) => {
 
 const PER_PAGE = 12;
 
-const RoomsPage = () => {
+type Props = {
+  initialRooms?: any[] | null;
+  initialPage?: number;
+};
+
+const RoomsPage = ({ initialRooms, initialPage }: Props) => {
   const searchParams = useSearchParams();
   const pageName = searchParams.get("pageName");
-  const PageContent = usePage(pageName);
-  const [page, setPage] = useState(1);
+  const PageContent = usePage(pageName, sectionComponents);
+  const [page, setPage] = useState(initialPage ?? 1);
+  const [useServerData, setUseServerData] = useState(!!initialRooms);
 
   const { data: tagsData } = useTagsQuery({
     variables: { searchValue: "accommodation", type: "core:product" },
+    skip: useServerData,
   });
   const accommodationTagId = tagsData?.cpTags?.[0]?._id;
 
@@ -36,19 +44,26 @@ const RoomsPage = () => {
       sortDirection: -1,
       ...(accommodationTagId ? { tagIds: [accommodationTagId] } : {}),
     },
+    skip: useServerData,
   });
 
   const rooms = useMemo(() => {
+    if (useServerData && initialRooms) return initialRooms as RoomSummary[];
     const payload = data?.cpProducts as unknown;
     if (!payload) return [];
     if (Array.isArray(payload)) return payload as RoomSummary[];
     return [];
-  }, [data]);
+  }, [useServerData, initialRooms, data]);
 
   const hasNext = rooms.length === PER_PAGE;
   const hasPrev = page > 1;
 
-  if (loading) {
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    setUseServerData(false);
+  };
+
+  if (!useServerData && loading) {
     return (
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {Array.from({ length: PER_PAGE }).map((_, i) => (
@@ -117,7 +132,7 @@ const RoomsPage = () => {
             size="sm"
             disabled={!hasPrev}
             className="gap-1"
-            onClick={() => setPage((p) => p - 1)}
+            onClick={() => handlePageChange(page - 1)}
           >
             <ChevronLeft className="h-4 w-4" />
             Prev
@@ -128,7 +143,7 @@ const RoomsPage = () => {
             size="sm"
             disabled={!hasNext}
             className="gap-1"
-            onClick={() => setPage((p) => p + 1)}
+            onClick={() => handlePageChange(page + 1)}
           >
             Next
             <ChevronRight className="h-4 w-4" />

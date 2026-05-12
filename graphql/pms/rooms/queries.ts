@@ -72,13 +72,13 @@ const roomCategories = gql`
 `;
 
 const checkRooms = gql`
-  query PmsCheckRooms(
+  query CpPmsCheckRooms(
     $pipelineId: String!
     $endDate: Date
     $startDate: Date
     $ids: [String]
   ) {
-    pmsCheckRooms(
+    cpPmsCheckRooms(
       pipelineId: $pipelineId
       endDate: $endDate
       startDate: $startDate
