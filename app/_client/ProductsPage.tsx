@@ -26,6 +26,11 @@ import type { ProductSummary } from "../../graphql/products/types";
 import ProductCard, {
   type ProductCardProduct,
 } from "../../components/common/ProductCard";
+import { renderSections } from "../../lib/renderSections";
+import { sectionComponents } from "../_components/sections";
+import { isBuildMode } from "../../lib/buildMode";
+import { Section } from "../../types/sections";
+import ProductsPageSections from "./ProductsPageSections";
 
 type SortOption = "featured" | "price-low" | "price-high" | "name-az";
 
@@ -50,11 +55,13 @@ const formatCurrency = (value: number) => `₮${Math.round(value).toLocaleString
 type ProductsPageProps = {
   initialCategories?: ProductCategory[];
   initialProducts?: ProductSummary[];
+  initialSections?: Section[];
 };
 
 export default function ProductsPage({
   initialCategories,
   initialProducts,
+  initialSections,
 }: ProductsPageProps) {
   const searchParams = useSearchParams();
   const searchValue = searchParams.get("searchValue")?.trim() ?? "";
@@ -226,6 +233,7 @@ export default function ProductsPage({
   );
 
   return (
+    <div>
     <div className="mx-auto grid max-w-8xl gap-8 px-4 py-12 md:grid-cols-[280px_1fr]">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -316,6 +324,10 @@ export default function ProductsPage({
           </div>
         )}
       </div>
+    </div>
+    {isBuildMode()
+      ? <ProductsPageSections />
+      : renderSections({ sections: initialSections ?? [], components: sectionComponents })}
     </div>
   );
 }

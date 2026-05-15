@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter, useParams, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useMutation } from "@apollo/client";
 import { mutations } from "../../../graphql/auth";
 import {
@@ -19,30 +19,8 @@ import { Button } from "../../../components/ui/button";
 import { toast } from "sonner";
 import { templateUrl } from "../../../lib/utils";
 
-const resolveClientPortalId = (
-  paramsValue?: string | string[],
-  searchValue?: string | null
-) => {
-  if (searchValue) {
-    return searchValue;
-  }
-
-  if (Array.isArray(paramsValue)) {
-    return paramsValue[0] ?? "";
-  }
-
-  return paramsValue ?? "";
-};
-
 export default function RegisterPage() {
   const router = useRouter();
-  const params = useParams<{ id?: string }>();
-  const searchParams = useSearchParams();
-
-  const clientPortalId = resolveClientPortalId(
-    process.env.ERXES_CP_ID || params?.id,
-    searchParams?.get("clientPortalId")
-  );
 
   const [formState, setFormState] = useState({
     firstName: "",
@@ -70,17 +48,8 @@ export default function RegisterPage() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!clientPortalId) {
-      toast("Client portal not configured", {
-        description:
-          "Missing client portal identifier. Please contact support.",
-      });
-      return;
-    }
-
     await registerMutation({
       variables: {
-        clientPortalId,
         firstName: formState.firstName,
         lastName: formState.lastName,
         email: formState.email,

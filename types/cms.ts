@@ -25,7 +25,7 @@ type MenuItem = {
   icon?: string;
   kind: string;
   contentType?: string;
-  contentTypeID?: string;
+  contentTypeId?: string;
   order: number;
   clientPortalId: string;
 };
