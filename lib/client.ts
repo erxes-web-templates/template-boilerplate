@@ -17,9 +17,7 @@ const createClient = () =>
         "x-app-token": process.env.ERXES_APP_TOKEN || "",
       },
       fetchOptions: {
-        // Use Next.js caching with 1 hour revalidation instead of no-store
-        // This allows static rendering while keeping data reasonably fresh
-        next: { revalidate: 3600 },
+        cache: "no-store",
       },
     }),
   });
