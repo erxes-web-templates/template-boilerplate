@@ -12,7 +12,7 @@ import type { CPDetail } from "../../types/cms";
 
 type ClientShellProps = {
   children: React.ReactNode;
-  cpDetail?: (CPDetail & { messengerBrandCode?: string }) | null;
+  cpDetail?: (CPDetail & { integrations?: { messengerBrandCode?: string } }) | null;
 };
 
 export default function ClientShell({ children, cpDetail }: ClientShellProps) {
@@ -51,7 +51,7 @@ export default function ClientShell({ children, cpDetail }: ClientShellProps) {
   return (
     <ApolloWrapper>
       <SyncConfigOnLoad />
-      {cpDetail?.messengerBrandCode && baseUrl && (
+      {cpDetail?.integrations?.messengerBrandCode && baseUrl && (
         <Script
           id="erxes"
           strategy="afterInteractive"
@@ -59,7 +59,7 @@ export default function ClientShell({ children, cpDetail }: ClientShellProps) {
             __html: `
               window.erxesSettings = {
                 messenger: {
-                  brand_id: "${cpDetail.messengerBrandCode}",
+                  brand_id: "${cpDetail.integrations?.messengerBrandCode}",
                 },
               };
               

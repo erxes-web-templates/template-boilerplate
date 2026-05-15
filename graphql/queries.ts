@@ -69,7 +69,9 @@ export const CP_GET_CONFIG = gql`
       templateId
       templateType
       erxesAppToken
-      messengerBrandCode
+      integrations {
+        messengerBrandCode
+      }
       appearances {
         backgroundColor
         primaryColor
