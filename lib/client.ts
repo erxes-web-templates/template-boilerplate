@@ -17,7 +17,7 @@ const createClient = () =>
         "x-app-token": process.env.ERXES_APP_TOKEN || "",
       },
       fetchOptions: {
-        cache: "no-store",
+        next: { revalidate: 60 },
       },
     }),
   });
