@@ -8,10 +8,18 @@ import { isBuildMode } from "../lib/buildMode";
 import type { CPDetail } from "../types/cms";
 import { Toaster } from "@/components/ui/sonner";
 
-export const metadata: Metadata = {
-  title: data.meta.title,
-  description: data.meta.description,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const cpDetail = isBuildMode() ? null : await fetchCpConfig();
+  const faviconUrl = cpDetail?.favicon?.url;
+
+  return {
+    title: data.meta.title,
+    description: data.meta.description,
+    ...(faviconUrl && {
+      icons: { icon: faviconUrl },
+    }),
+  };
+}
 
 const fallbackCpDetail = (): CPDetail => {
   const socials: Array<{ name: string; url: string | string[] }> =

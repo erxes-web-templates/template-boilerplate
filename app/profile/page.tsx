@@ -543,7 +543,7 @@ export default function ProfilePage() {
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href={templateUrl("/register")}>Бүртгүүлэх</Link>
+              <Link href={templateUrl("/auth/register")}>Бүртгүүлэх</Link>
             </Button>
           </CardFooter>
         </Card>

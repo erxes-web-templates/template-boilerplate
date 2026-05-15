@@ -36,6 +36,7 @@ type CPDetail = {
   description: string;
   copyright: string;
   logo?: { url: string; name?: string } | string;
+  favicon?: { url: string; name?: string };
   styles: {
     baseColor: string;
     backgroundColor: string;

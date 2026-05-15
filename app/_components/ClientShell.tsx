@@ -1,6 +1,7 @@
 "use client";
 
 import Script from "next/script";
+import { useEffect } from "react";
 import { ApolloWrapper } from "../../lib/apollo-wrapper";
 import { CartProvider } from "../../lib/CartContext";
 import Header from "./Header";
@@ -15,6 +16,28 @@ type ClientShellProps = {
 };
 
 export default function ClientShell({ children, cpDetail }: ClientShellProps) {
+  useEffect(() => {
+    const appearances = cpDetail?.appearances;
+    const styles = cpDetail?.styles;
+    if (!appearances && !styles) return;
+
+    const root = document.documentElement;
+    const setVar = (variable: string, value?: string | null) => {
+      if (value) root.style.setProperty(variable, value);
+    };
+
+    setVar("--primary", appearances?.primaryColor || styles?.baseColor);
+    setVar("--background", appearances?.backgroundColor || styles?.backgroundColor);
+    setVar("--secondary-color", appearances?.secondaryColor);
+    setVar("--accent", appearances?.accentColor);
+
+    const bodyFont = appearances?.fontSans || styles?.baseFont;
+    const headingFont = appearances?.fontHeading || styles?.headingFont || bodyFont;
+
+    setVar("--font-body", bodyFont);
+    setVar("--font-heading", headingFont);
+    setVar("--font-mono", (appearances as any)?.fontMono);
+  }, [cpDetail]);
   const env = getEnv();
   const posToken =
     process.env.NEXT_PUBLIC_POS_TOKEN || env.NEXT_PUBLIC_POS_TOKEN || "";

@@ -16,7 +16,7 @@ const FormSection = ({ section }: { section: Section }) => {
   });
 
   console.log(data, "data");
-  const formData = data?.formDetail || {};
+  const formData = data?.cpFormDetail || {};
   const [submitForm] = useMutation(FORM_SUBMISSION, {
     onCompleted: (data) => {
       console.log(data);

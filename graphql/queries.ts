@@ -389,8 +389,8 @@ export const GET_CMS_POST_LIST = gql`
 `;
 
 export const GET_FORM_DETAIL = gql`
-  query FormDetail($id: String!) {
-    formDetail(_id: $id) {
+  query CpFormDetail($id: String!) {
+    cpFormDetail(_id: $id) {
       _id
       title
       description
