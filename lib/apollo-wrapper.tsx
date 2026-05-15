@@ -8,6 +8,7 @@ import {
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { ApolloProvider } from "@apollo/client";
+import { useRef } from "react";
 import { AuthProvider } from "./AuthContext";
 
 // Create the Apollo Client instance
@@ -49,10 +50,13 @@ function makeClient() {
 
 // ApolloWrapper component to provide the Apollo Client to the app
 export function ApolloWrapper({ children }: React.PropsWithChildren) {
-  const client = makeClient(); // Create the Apollo Client instance
+  const clientRef = useRef<ReturnType<typeof makeClient> | null>(null);
+  if (!clientRef.current) {
+    clientRef.current = makeClient();
+  }
 
   return (
-    <ApolloProvider client={client}>
+    <ApolloProvider client={clientRef.current}>
       <AuthProvider>{children}</AuthProvider>
     </ApolloProvider>
   );

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMutation } from "@apollo/client";
+import { useMutation, useApolloClient } from "@apollo/client";
 import { mutations } from "../../../graphql/auth";
 import {
   Card,
@@ -34,7 +34,10 @@ const storeTokens = (response: LoginResponse) => {
   }
 
   if (typeof response === "string") {
-    sessionStorage.setItem("token", response);
+    // Backend returns "Success" for cookie-based sessions; don't store that as a JWT
+    if (response !== "Success") {
+      sessionStorage.setItem("token", response);
+    }
     return;
   }
 
@@ -50,6 +53,7 @@ const storeTokens = (response: LoginResponse) => {
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const apolloClient = useApolloClient();
 
   const [credentials, setCredentials] = useState({
     login: "",
@@ -62,8 +66,11 @@ export default function LoginPage() {
         description: error.message,
       });
     },
-    onCompleted(data) {
+    async onCompleted(data) {
       storeTokens(data?.clientPortalUserLoginWithCredentials);
+      // Refetch clientPortalCurrentUser so AuthContext picks up the new session
+      // before navigating, ensuring the user is immediately available on the next page.
+      await apolloClient.refetchQueries({ include: ["clientPortalCurrentUser"] });
       toast("Login successful", {
         description: "You have been logged in successfully.",
       });
