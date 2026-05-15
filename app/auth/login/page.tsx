@@ -28,21 +28,6 @@ type LoginResponse =
   | null
   | undefined;
 
-const resolveClientPortalId = (
-  paramsValue?: string | string[],
-  searchValue?: string | null
-) => {
-  if (searchValue) {
-    return searchValue;
-  }
-
-  if (Array.isArray(paramsValue)) {
-    return paramsValue[0] ?? "";
-  }
-
-  return paramsValue ?? "";
-};
-
 const storeTokens = (response: LoginResponse) => {
   if (!response) {
     return;
@@ -129,7 +114,15 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  href={templateUrl("/auth/forgot-password")}
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <Input
                 id="password"
                 type="password"

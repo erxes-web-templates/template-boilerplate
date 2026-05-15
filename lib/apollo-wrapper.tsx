@@ -34,6 +34,9 @@ function makeClient() {
       headers: {
         ...headers,
         ...(token ? { "client-auth-token": token } : {}),
+        ...(process.env.NEXT_PUBLIC_ERXES_CP_ID
+          ? { "client-portal-id": process.env.NEXT_PUBLIC_ERXES_CP_ID }
+          : {}),
       },
     };
   });

@@ -125,7 +125,7 @@ export const GET_CMS_MENU = gql`
         url
         _id
         contentType
-        contentTypeID
+        contentTypeId
         icon
         kind
         label
