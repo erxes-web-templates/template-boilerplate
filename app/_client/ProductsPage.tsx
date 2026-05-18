@@ -113,8 +113,8 @@ export default function ProductsPage({
       inStock:
         typeof product.remainder === "number" &&
         Number.isFinite(product.remainder)
-          ? product.remainder > 0
-          : false,
+          ? (product.remainder || 999) > 0 // TODO: remove || 999 once API returns real remainder
+          : true,
       description: product.description,
     }));
   }, [initialProducts, productsData]);

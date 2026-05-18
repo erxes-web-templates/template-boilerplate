@@ -167,8 +167,8 @@ export default function ProductDetailPage({
   const reviewsCount = reviewSummary?.length ?? 0;
   const inStock =
     typeof product?.remainder === "number" && Number.isFinite(product.remainder)
-      ? product.remainder > 0
-      : false;
+      ? (product.remainder || 999) > 0 // TODO: remove || 999 once API returns real remainder
+      : true;
   const isBuilder = isBuildMode();
   const { addToCart } = useCart();
   const { data: userData } = useQuery(authQueries.currentUser);
