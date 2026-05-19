@@ -269,7 +269,7 @@ export default function ProfilePage() {
     [wishlistData],
   );
   const viewedItems = useMemo(
-    () => viewedData?.lastViewedItems ?? [],
+    () => viewedData?.cpLastViewedItems ?? [],
     [viewedData],
   );
 

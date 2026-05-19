@@ -227,7 +227,7 @@ const addresses = gql`
 
 const getLastProductView = gql`
   query LastViewedItems($customerId: String!, $limit: Int) {
-    lastViewedItems(customerId: $customerId, limit: $limit) {
+    cpLastViewedItems(customerId: $customerId, limit: $limit) {
       _id
       productId
 

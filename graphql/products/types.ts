@@ -177,7 +177,7 @@ export interface LastViewedProduct {
 }
 
 export interface LastProductViewData {
-  lastViewedItems: LastViewedProduct[];
+  cpLastViewedItems: LastViewedProduct[];
 }
 
 export interface LastProductViewVariables {
