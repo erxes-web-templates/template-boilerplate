@@ -19,6 +19,15 @@ import { GET_FORM_DETAIL } from "../../../graphql/queries";
 import { FORM_SUBMISSION } from "../../../graphql/mutations";
 import useClientPortal from "@/hooks/useClientPortal";
 import { useParams } from "next/navigation";
+const parseStringOrArray = (value: unknown): string[] => {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    try { return JSON.parse(value); } catch { return [value]; }
+  }
+  return [];
+};
+
 const ContactSection = ({ section }: { section: Section }) => {
   const params = useParams<{ id: string }>();
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -73,18 +82,17 @@ const ContactSection = ({ section }: { section: Section }) => {
                     <div>
                       <h3 className="font-medium">Phone Number</h3>
                       <p className="text-muted-foreground">
-                        {cpDetail?.externalLinks?.phones &&
-                          cpDetail?.externalLinks?.phones.map(
-                            (phone: string) => (
-                              <a
-                                href={`tel:${phone}`}
-                                className="hover:text-primary block"
-                                key={phone}
-                              >
-                                {phone}
-                              </a>
-                            )
-                          )}
+                        {parseStringOrArray(cpDetail?.externalLinks?.phones).map(
+                          (phone: string) => (
+                            <a
+                              href={`tel:${phone}`}
+                              className="hover:text-primary block"
+                              key={phone}
+                            >
+                              {phone}
+                            </a>
+                          )
+                        )}
                       </p>
                     </div>
                   </div>
@@ -94,19 +102,17 @@ const ContactSection = ({ section }: { section: Section }) => {
                     <div>
                       <h3 className="font-medium">Email Address</h3>
                       <p className="text-muted-foreground">
-                        {cpDetail?.externalLinks?.emails &&
-                          cpDetail?.externalLinks?.emails.map(
-                            (email: string) => (
-                              <a
-                                href={`
-                            mailto:${email}`}
-                                className="hover:text-primary block"
-                                key={email}
-                              >
-                                {email}
-                              </a>
-                            )
-                          )}
+                        {parseStringOrArray(cpDetail?.externalLinks?.emails).map(
+                          (email: string) => (
+                            <a
+                              href={`mailto:${email}`}
+                              className="hover:text-primary block"
+                              key={email}
+                            >
+                              {email}
+                            </a>
+                          )
+                        )}
                       </p>
                     </div>
                   </div>
