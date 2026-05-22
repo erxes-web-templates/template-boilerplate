@@ -151,6 +151,7 @@ export const GET_CMS_MENU_LIST = gql`
       icon
       url
       order
+      openInNewTab
       target
     }
   }

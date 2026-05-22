@@ -28,6 +28,8 @@ type MenuItem = {
   contentTypeId?: string;
   order: number;
   clientPortalId: string;
+  openInNewTab?: boolean;
+  target?: string;
 };
 
 type CPDetail = {

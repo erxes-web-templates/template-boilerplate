@@ -104,25 +104,48 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
 
   const nestedMenus = organizeMenus(menus);
 
+  const MenuLink = ({
+    href,
+    openInNewTab,
+    className,
+    children,
+  }: {
+    href: string;
+    openInNewTab?: boolean;
+    className?: string;
+    children: React.ReactNode;
+  }) =>
+    openInNewTab ? (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+        {children}
+      </a>
+    ) : (
+      <Link href={href} className={className}>
+        {children}
+      </Link>
+    );
+
   const renderMenu = (menu: MenuItem & { children: MenuItem[] }) => (
     <div key={menu._id} className="relative group">
-      <Link
+      <MenuLink
         href={templateUrl(menu.url || "")}
+        openInNewTab={menu.openInNewTab}
         className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors duration-200"
       >
         {menu.label}
-      </Link>
+      </MenuLink>
       {menu.children.length > 0 && (
         <div className="absolute top-full left-0 pt-2 hidden group-hover:block z-50 min-w-[180px]">
           <div className="bg-background border border-border rounded-lg shadow-lg overflow-hidden">
             {menu.children.map((child: any) => (
-              <Link
+              <MenuLink
                 key={child._id}
                 href={templateUrl(child.url || "")}
+                openInNewTab={child.openInNewTab}
                 className="block px-4 py-2.5 text-sm text-foreground/70 hover:text-foreground hover:bg-muted transition-colors duration-150"
               >
                 {child.label}
-              </Link>
+              </MenuLink>
             ))}
           </div>
         </div>
@@ -449,22 +472,24 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
               <nav className="flex flex-col gap-1">
                 {nestedMenus.map((menu) => (
                   <div key={menu._id}>
-                    <Link
+                    <MenuLink
                       href={templateUrl(menu.url || "")}
+                      openInNewTab={menu.openInNewTab}
                       className="block rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
                     >
                       {menu.label}
-                    </Link>
+                    </MenuLink>
                     {menu.children.length > 0 && (
                       <div className="ml-3 mt-1 flex flex-col gap-0.5 border-l border-border pl-3">
                         {menu.children.map((child) => (
-                          <Link
+                          <MenuLink
                             key={child._id}
                             href={templateUrl(child.url || "")}
+                            openInNewTab={(child as any).openInNewTab}
                             className="block rounded-md px-3 py-1.5 text-sm text-foreground/60 hover:bg-muted hover:text-foreground transition-colors"
                           >
                             {child.label}
-                          </Link>
+                          </MenuLink>
                         ))}
                       </div>
                     )}

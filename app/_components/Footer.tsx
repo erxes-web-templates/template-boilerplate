@@ -155,12 +155,23 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
               {menus.length > 0 ? (
                 menus.map((menu: MenuItem) => (
                   <li key={menu._id}>
-                    <Link
-                      href={templateUrl(menu.url || "/")}
-                      className="text-sm text-white/70 hover:text-white transition-colors"
-                    >
-                      {menu.label}
-                    </Link>
+                    {menu.openInNewTab ? (
+                      <a
+                        href={templateUrl(menu.url || "/")}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-white/70 hover:text-white transition-colors"
+                      >
+                        {menu.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={templateUrl(menu.url || "/")}
+                        className="text-sm text-white/70 hover:text-white transition-colors"
+                      >
+                        {menu.label}
+                      </Link>
+                    )}
                   </li>
                 ))
               ) : (
