@@ -129,7 +129,7 @@ const ProfileWishlistTab = ({
                 Үнэ: ₮{Number(product?.unitPrice || 0).toLocaleString()}
               </p>
               <p className="text-xs text-muted-foreground">
-                Үлдэгдэл: {product?.remainder || 999 /* TODO: remove || 999 once API returns real remainder */}
+                Үлдэгдэл: {product?.remainder ?? 0}
               </p>
             </CardContent>
             <CardFooter className="mt-auto flex justify-end gap-2 bg-muted/40 p-4">

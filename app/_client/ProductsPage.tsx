@@ -111,9 +111,8 @@ export default function ProductsPage({
       categoryName: product.category?.name ?? "Uncategorized",
       image: product.attachment?.url ?? null,
       inStock:
-        typeof product.remainder === "number" &&
-        Number.isFinite(product.remainder)
-          ? (product.remainder || 999) > 0 // TODO: remove || 999 once API returns real remainder
+        typeof product.remainder === "number" && Number.isFinite(product.remainder)
+          ? product.remainder > 0
           : true,
       description: product.description,
     }));
