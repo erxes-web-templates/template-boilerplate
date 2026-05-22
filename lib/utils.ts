@@ -59,6 +59,10 @@ export const templateUrl = (slug: string) => {
       return "#";
     }
 
+    if (/^https?:\/\//i.test(slug)) {
+      return slug;
+    }
+
     const normalized = slug.startsWith("/") ? slug : `/${slug}`;
     return normalized === "/home" ? "/" : normalized;
   }
@@ -66,6 +70,8 @@ export const templateUrl = (slug: string) => {
   if (typeof window !== "undefined") {
     if (slug === "#") {
       return "#";
+    } else if (/^https?:\/\//i.test(slug)) {
+      return slug;
     } else {
       const url = new URL(window.location.href);
       const id = url.pathname.split("/").pop();
