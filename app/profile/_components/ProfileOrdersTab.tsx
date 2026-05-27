@@ -242,7 +242,7 @@ function OrderDetailDialog({
                 </p>
                 {order.items.map((item, i) => {
                   const imageUrl = item.productImgUrl
-                    ? getFileUrl(item.productImgUrl)
+                    ? item.productImgUrl
                     : undefined;
                   const lineTotal = (item.count ?? 1) * (item.unitPrice ?? 0);
                   return (
@@ -902,7 +902,7 @@ const ProfileOrdersTab = ({ orders, loading }: ProfileOrdersTabProps) => {
               {!!order.items?.length &&
                 order.items.slice(0, 3).map((item, index) => {
                   const imageUrl = item?.productImgUrl
-                    ? getFileUrl(item.productImgUrl)
+                    ? item.productImgUrl
                     : undefined;
                   return (
                     <div
