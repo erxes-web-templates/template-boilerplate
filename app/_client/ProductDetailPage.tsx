@@ -180,7 +180,7 @@ export default function ProductDetailPage({
     loading: reviewsLoading,
     refetch: refetchReviews,
   } = useQuery(ecommerceQueries.productreviews, {
-    variables: { productIds: productId ? [productId] : [], customerId },
+    variables: { productIds: productId ? [productId] : [] },
     skip: !productId,
     fetchPolicy: "cache-and-network",
   });
