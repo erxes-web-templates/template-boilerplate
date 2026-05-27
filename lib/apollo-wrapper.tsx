@@ -19,7 +19,7 @@ function makeClient() {
     credentials: "include",
     headers: {
       "erxes-pos-token": process.env.NEXT_PUBLIC_POS_TOKEN || "",
-      "x-app-token": process.env.ERXES_APP_TOKEN || "",
+      "x-app-token": process.env.NEXT_PUBLIC_ERXES_APP_TOKEN || "",
     },
     fetchOptions: { cache: "no-store" },
   });

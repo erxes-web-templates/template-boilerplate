@@ -73,11 +73,6 @@ const PaymentPage = () => {
   const erxesCustomerId =
     userData?.clientPortalCurrentUser?.erxesCustomerId ?? undefined;
 
-  const { data: configData } = useQuery(authQueries.currentConfig, {
-    fetchPolicy: "cache-first",
-  });
-  const appToken = configData?.currentConfig?.erxesAppToken ?? null;
-
   const { data: orderData } = useQuery(orderQueries.currentOrder, {
     variables: {
       customerId: erxesCustomerId,
@@ -134,12 +129,7 @@ const PaymentPage = () => {
     }
   }, []);
 
-  const mutationContext = appToken
-    ? { headers: { "x-app-token": appToken } }
-    : undefined;
-
   const [checkInvoiceMutation] = useMutation(paymentMutations.checkInvoice, {
-    context: mutationContext,
     onCompleted(data) {
       const status: string = data?.cpInvoicesCheck ?? "";
       if (status === "paid") {
@@ -204,7 +194,6 @@ const PaymentPage = () => {
   const [addTransaction, { loading: isAddingTransaction }] = useMutation(
     paymentMutations.addTransaction,
     {
-      context: mutationContext,
       onCompleted(data) {
         const tx = data?.cpPaymentTransactionsAdd;
         if (tx) {
@@ -223,7 +212,6 @@ const PaymentPage = () => {
   const [createInvoice, { loading: isCreatingInvoice }] = useMutation(
     paymentMutations.createInvoice,
     {
-      context: mutationContext,
       onCompleted(data) {
         const payload = data?.cpInvoiceCreate;
         if (payload) {
