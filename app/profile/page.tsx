@@ -303,7 +303,7 @@ export default function ProfilePage() {
           title: "Амжилттай гарлаа",
           description: "Та дахин нэвтрэх боломжтой.",
         });
-        router.push("/auth/login");
+        window.location.href = "/auth/login";
       },
     },
   );

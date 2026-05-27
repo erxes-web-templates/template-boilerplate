@@ -10,8 +10,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "../../lib/CartContext";
 import { templateUrl } from "../../lib/utils";
 import { isBuildMode } from "../../lib/buildMode";
-import { toHtml, type HtmlValue } from "../../lib/html";
-
 type ButtonState = "idle" | "adding" | "added";
 
 export type ProductCardProduct = {
@@ -21,7 +19,7 @@ export type ProductCardProduct = {
   categoryName?: string | null;
   image?: string | null;
   inStock: boolean;
-  description?: HtmlValue;
+  description?: string | null;
 };
 
 type ProductCardProps = {
@@ -60,10 +58,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               id: product.id,
               name: product.name || "Untitled product",
               unitPrice: Number.isFinite(product.price) ? product.price : 0,
-              description:
-                typeof product.description === "string"
-                  ? product.description
-                  : String(product.description?.__html ?? ""),
+              description: product.description ?? "",
               imageUrl: product.image ?? null,
               categoryName: product.categoryName ?? null,
             },
@@ -123,11 +118,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             <h3 className="text-lg font-semibold text-foreground">
               {product.name}
             </h3>
-            {product.description ? (
-              <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-                <span dangerouslySetInnerHTML={toHtml(product.description)} />
-              </p>
-            ) : null}
           </div>
           <p className="text-lg font-semibold text-foreground">
             {formatCurrency(product.price)}

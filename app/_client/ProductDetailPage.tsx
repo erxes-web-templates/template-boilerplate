@@ -33,6 +33,7 @@ import ecommerceQueries from "../../graphql/ecommerce/queries";
 import ecommerceMutations from "../../graphql/ecommerce/mutations";
 import { templateUrl } from "@/lib/utils";
 import { isBuildMode } from "../../lib/buildMode";
+import { blockNoteToHtml, blockNoteToPlainText } from "../../lib/blocknote";
 import {
   clearLocalLastViewedProducts,
   getLocalLastViewedProducts,
@@ -272,7 +273,7 @@ export default function ProductDetailPage({
     Array.isArray(customFields.features) && customFields.features.length > 0
       ? (customFields.features as string[])
       : typeof product?.description === "string"
-      ? product.description
+      ? blockNoteToPlainText(product.description)
           .split("\n")
           .map((line) => line.trim())
           .filter(Boolean)
@@ -645,7 +646,7 @@ export default function ProductDetailPage({
                       <CardContent className="prose max-w-none p-6 text-sm leading-6 text-muted-foreground">
                         <div
                           dangerouslySetInnerHTML={{
-                            __html: product.description,
+                            __html: blockNoteToHtml(product.description),
                           }}
                         />
                       </CardContent>
@@ -786,9 +787,9 @@ export default function ProductDetailPage({
 
                 {derivedFeatures.length > 0 && (
                   <div className="space-y-3 rounded-2xl border border-border bg-card/60 p-5">
-                    <h3 className="text-sm font-semibold uppercase tracking-wide text-primary">
+                    {/* <h3 className="text-sm font-semibold uppercase tracking-wide text-primary">
                       Features
-                    </h3>
+                    </h3> */}
                     <ul className="space-y-2 text-sm text-muted-foreground">
                       {derivedFeatures.map((feature) => (
                         <li key={feature} className="flex items-start gap-2">
