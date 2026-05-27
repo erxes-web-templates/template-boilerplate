@@ -13,9 +13,10 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../components/ui/card";
-import { Input } from "../../../components/ui/input";
+import { PasswordInput } from "../../../components/ui/password-input";
 import { Label } from "../../../components/ui/label";
 import { Button } from "../../../components/ui/button";
+import { AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { templateUrl } from "../../../lib/utils";
 
@@ -24,6 +25,33 @@ export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? undefined;
   const identifier = searchParams.get("identifier") ?? undefined;
+
+  if (!token) {
+    return (
+      <div className="flex my-[100px] items-center justify-center px-6 py-12">
+        <Card className="w-full max-w-md shadow-lg">
+          <CardHeader className="space-y-2 text-center">
+            <div className="flex justify-center">
+              <AlertCircle className="h-12 w-12 text-destructive" />
+            </div>
+            <CardTitle className="text-2xl font-semibold">Invalid reset link</CardTitle>
+            <CardDescription>
+              This password reset link is missing or invalid. Please request a
+              new one from the login page.
+            </CardDescription>
+          </CardHeader>
+          <CardFooter className="justify-center text-sm text-muted-foreground">
+            <Link
+              href={templateUrl("/auth/login")}
+              className="font-medium text-primary hover:underline"
+            >
+              Back to sign in
+            </Link>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
 
   const [newPassword, setNewPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -62,9 +90,8 @@ export default function ResetPasswordPage() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="newPassword">New password</Label>
-              <Input
+              <PasswordInput
                 id="newPassword"
-                type="password"
                 autoComplete="new-password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -74,9 +101,8 @@ export default function ResetPasswordPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm">Confirm password</Label>
-              <Input
+              <PasswordInput
                 id="confirm"
-                type="password"
                 autoComplete="new-password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
