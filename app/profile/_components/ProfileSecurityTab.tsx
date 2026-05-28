@@ -2,11 +2,10 @@
 
 import { FormEvent } from "react";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/ui/password-input";
 
 type PasswordForm = {
-  currentPassword: string;
   newPassword: string;
   confirmPassword: string;
 };
@@ -25,22 +24,11 @@ const ProfileSecurityTab = ({
   onSubmit,
 }: ProfileSecurityTabProps) => (
   <form className="max-w-lg space-y-4" onSubmit={onSubmit}>
-    <div className="space-y-2">
-      <Label htmlFor="currentPassword">Одоогийн нууц үг</Label>
-      <Input
-        id="currentPassword"
-        type="password"
-        value={form.currentPassword}
-        onChange={(event) => onChange("currentPassword", event.target.value)}
-        required
-      />
-    </div>
     <div className="grid gap-4 md:grid-cols-2">
       <div className="space-y-2">
         <Label htmlFor="newPassword">Шинэ нууц үг</Label>
-        <Input
+        <PasswordInput
           id="newPassword"
-          type="password"
           minLength={8}
           value={form.newPassword}
           onChange={(event) => onChange("newPassword", event.target.value)}
@@ -49,9 +37,8 @@ const ProfileSecurityTab = ({
       </div>
       <div className="space-y-2">
         <Label htmlFor="confirmPassword">Нууц үг давтах</Label>
-        <Input
+        <PasswordInput
           id="confirmPassword"
-          type="password"
           minLength={8}
           value={form.confirmPassword}
           onChange={(event) => onChange("confirmPassword", event.target.value)}

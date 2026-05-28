@@ -45,7 +45,7 @@ const ContactSection = ({ section }: { section: Section }) => {
     },
   });
   const { cpDetail } = useClientPortal({
-    id: params.id,
+    id: process.env.ERXES_WEB_ID || params.id,
   });
 
   return (

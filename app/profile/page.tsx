@@ -223,7 +223,6 @@ export default function ProfilePage() {
   }, [error]);
 
   const [passwordForm, setPasswordForm] = useState({
-    currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
@@ -324,7 +323,6 @@ export default function ProfilePage() {
           description: "Шинэ нууц үг үйлчилж эхэллээ.",
         });
         setPasswordForm({
-          currentPassword: "",
           newPassword: "",
           confirmPassword: "",
         });
@@ -380,7 +378,7 @@ export default function ProfilePage() {
 
     await changePasswordMutation({
       variables: {
-        currentPassword: passwordForm.currentPassword,
+        _id: user?._id,
         newPassword: passwordForm.newPassword,
       },
     });

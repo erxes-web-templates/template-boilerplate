@@ -76,30 +76,29 @@ const forgotPassword = gql`
 `;
 
 const userEdit = gql`
-  mutation clientPortalUsersEdit(
+  mutation cpUsersEdit(
     $_id: String!
     $email: String
     $firstName: String
     $lastName: String
     $phone: String
-    $type: String
+    $username: String
     $companyName: String
     $companyRegistrationNumber: String
-    $password: String
     $avatar: String
+    $erxesCustomerId: String
   ) {
-    clientPortalUsersEdit(
+    cpUsersEdit(
       _id: $_id
       email: $email
       firstName: $firstName
       lastName: $lastName
       phone: $phone
-      type: $type
+      username: $username
       companyName: $companyName
       companyRegistrationNumber: $companyRegistrationNumber
-      password: $password
-
       avatar: $avatar
+      erxesCustomerId: $erxesCustomerId
     ) {
       _id
     }
@@ -108,21 +107,15 @@ const userEdit = gql`
 
 const changePhone = gql`
   mutation changePhone($_id: String!, $phone: String) {
-    clientPortalUsersEdit(_id: $_id, phone: $phone) {
+    cpUsersEdit(_id: $_id, phone: $phone) {
       _id
     }
   }
 `;
 
 const userChangePassword = gql`
-  mutation clientPortalUserChangePassword(
-    $currentPassword: String!
-    $newPassword: String!
-  ) {
-    clientPortalUserChangePassword(
-      currentPassword: $currentPassword
-      newPassword: $newPassword
-    ) {
+  mutation cpUsersSetPassword($_id: String!, $newPassword: String!) {
+    cpUsersSetPassword(_id: $_id, newPassword: $newPassword) {
       _id
     }
   }
