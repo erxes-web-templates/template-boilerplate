@@ -19,11 +19,6 @@ import BannerSection from "../_components/sections/BannerSection";
 import ToursSection from "../_components/sections/ToursSection";
 import BookingFormSection from "../_components/sections/BookingFormSection";
 
-export const metadata = {
-  title: pageData.title,
-  description: pageData.description,
-};
-
 export default function PrivacyPage() {
   if (isBuildMode()) {
     return <PrivacyPageClient />;

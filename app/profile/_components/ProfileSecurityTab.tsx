@@ -3,7 +3,7 @@
 import { FormEvent } from "react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { PasswordInput } from "@/components/ui/password-input";
+import { PasswordInput } from "../../../components/ui/password-input";
 
 type PasswordForm = {
   newPassword: string;

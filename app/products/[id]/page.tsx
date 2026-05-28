@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { isBuildMode } from "../../../lib/buildMode";
 import ProductDetailPageClient from "../../_client/ProductDetailPage";
 import {
@@ -10,6 +11,22 @@ import {
 type PageProps = {
   params: Promise<{ id: string }>;
 };
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  if (isBuildMode()) return { title: "Product" };
+  const { id } = await params;
+  const result = await fetchProductDetail({ variables: { _id: id }, fetchPolicy: "no-cache" });
+  const product = result.data?.cpPoscProductDetail;
+  return {
+    title: product?.name ?? "Product",
+    description: product?.description
+      ? product.description.replace(/<[^>]*>/g, "").slice(0, 160)
+      : undefined,
+    ...(product?.attachment?.url && {
+      openGraph: { images: [product.attachment.url] },
+    }),
+  };
+}
 
 export default async function ProductDetailPage({ params }: PageProps) {
   const { id } = await params;

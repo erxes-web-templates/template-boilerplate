@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { isBuildMode } from "../../lib/buildMode";
 import ProductsPageClient from "../_client/ProductsPage";
 import {
@@ -6,6 +7,16 @@ import {
 } from "../../graphql/products/server";
 import { fetchWebPage } from "../../lib/fetchWebPage";
 import { Section } from "../../types/sections";
+
+export async function generateMetadata(): Promise<Metadata> {
+  if (isBuildMode()) return { title: "Products" };
+  const page = await fetchWebPage(process.env.ERXES_WEB_ID || "", "products");
+  return {
+    title: page?.name ?? "Products",
+    description: page?.description ?? undefined,
+    ...(page?.coverImage && { openGraph: { images: [page.coverImage] } }),
+  };
+}
 
 export default async function ProductsPage() {
   if (isBuildMode()) {

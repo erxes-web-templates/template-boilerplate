@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
 import pageData from "../../data/pages/about.json";
 import { renderSections } from "../../lib/renderSections";
 import { Section } from "../../types/sections";
 import { isBuildMode } from "../../lib/buildMode";
+import { fetchWebPage } from "../../lib/fetchWebPage";
 import AboutPageClient from "../_client/AboutPage";
 import HeroSection from "../_components/sections/HeroSection";
 import AboutSection from "../_components/sections/AboutSection";
@@ -19,10 +21,15 @@ import BannerSection from "../_components/sections/BannerSection";
 import ToursSection from "../_components/sections/ToursSection";
 import BookingFormSection from "../_components/sections/BookingFormSection";
 
-export const metadata = {
-  title: pageData.title,
-  description: pageData.description,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  if (isBuildMode()) return { title: pageData.title, description: pageData.description };
+  const page = await fetchWebPage(process.env.ERXES_WEB_ID || "", "about");
+  return {
+    title: page?.name ?? pageData.title,
+    description: page?.description ?? pageData.description,
+    ...(page?.coverImage && { openGraph: { images: [page.coverImage] } }),
+  };
+}
 
 export default function AboutPage() {
   if (isBuildMode()) {
