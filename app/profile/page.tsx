@@ -223,6 +223,7 @@ export default function ProfilePage() {
   }, [error]);
 
   const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
@@ -307,6 +308,19 @@ export default function ProfilePage() {
     },
   );
 
+  const [verifyPassword, { loading: verifyingPassword }] = useMutation(
+    authMutations.login,
+    {
+      onError() {
+        toast({
+          title: "Одоогийн нууц үг буруу байна",
+          description: "Нууц үгээ дахин шалгана уу.",
+          variant: "destructive",
+        });
+      },
+    },
+  );
+
   const [changePasswordMutation, { loading: changingPassword }] = useMutation(
     authMutations.userChangePassword,
     {
@@ -323,6 +337,7 @@ export default function ProfilePage() {
           description: "Шинэ нууц үг үйлчилж эхэллээ.",
         });
         setPasswordForm({
+          currentPassword: "",
           newPassword: "",
           confirmPassword: "",
         });
@@ -373,6 +388,26 @@ export default function ProfilePage() {
         description: "Шинэ нууц үг болон баталгаажуулалт ижил байх ёстой.",
         variant: "destructive",
       });
+      return;
+    }
+
+    try {
+      const result = await verifyPassword({
+        variables: {
+          phone: user?.phone || undefined,
+          email: user?.email || undefined,
+          password: passwordForm.currentPassword,
+        },
+      });
+      if (!result.data?.clientPortalUserLoginWithCredentials) {
+        toast({
+          title: "Одоогийн нууц үг буруу байна",
+          description: "Нууц үгээ дахин шалгана уу.",
+          variant: "destructive",
+        });
+        return;
+      }
+    } catch {
       return;
     }
 
@@ -621,7 +656,7 @@ export default function ProfilePage() {
                 {activeTab === "security" && (
                   <ProfileSecurityTab
                     form={passwordForm}
-                    loading={changingPassword}
+                    loading={verifyingPassword || changingPassword}
                     onChange={handlePasswordFormChange}
                     onSubmit={handlePasswordSubmit}
                   />
