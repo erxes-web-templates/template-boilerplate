@@ -1,0 +1,15 @@
+{
+  "title": "Privacy Policy",
+  "description": "Our privacy policy",
+  "coverImage": "",
+  "pageItems": [
+    {
+      "config": {},
+      "type": "text",
+      "content": "",
+      "order": 0,
+      "contentType": "cms:page",
+      "contentTypeId": ""
+    }
+  ]
+}

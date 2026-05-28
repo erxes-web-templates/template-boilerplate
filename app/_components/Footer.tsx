@@ -243,7 +243,7 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
             <Link href={templateUrl("/legal")} className="hover:text-white/70 transition-colors">
               Privacy Policy
             </Link>
-            <Link href={templateUrl("/legal")} className="hover:text-white/70 transition-colors">
+            <Link href={templateUrl("/terms")} className="hover:text-white/70 transition-colors">
               Terms of Service
             </Link>
           </div>

@@ -1,8 +1,8 @@
-import pageData from "../../data/pages/privacy.json";
+import pageData from "../../data/pages/terms.json";
 import { renderSections } from "../../lib/renderSections";
 import { Section } from "../../types/sections";
 import { isBuildMode } from "../../lib/buildMode";
-import PrivacyPageClient from "../_client/PrivacyPage";
+import TermsPageClient from "../_client/TermsPage";
 import HeroSection from "../_components/sections/HeroSection";
 import AboutSection from "../_components/sections/AboutSection";
 import FormSection from "../_components/sections/FormSection";
@@ -24,9 +24,9 @@ export const metadata = {
   description: pageData.description,
 };
 
-export default function PrivacyPage() {
+export default function TermsPage() {
   if (isBuildMode()) {
-    return <PrivacyPageClient />;
+    return <TermsPageClient />;
   }
 
   const sectionComponents = {
