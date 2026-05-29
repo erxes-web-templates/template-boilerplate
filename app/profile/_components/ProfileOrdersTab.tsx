@@ -90,9 +90,13 @@ type PaymentOption = {
   config?: any;
 };
 
+type PaidFilter = "all" | "paid" | "unpaid";
+
 type ProfileOrdersTabProps = {
   orders: Order[];
   loading?: boolean;
+  paidFilter: PaidFilter;
+  onPaidFilterChange: (filter: PaidFilter) => void;
 };
 
 const formatCurrency = (value?: number | null) =>
@@ -848,18 +852,9 @@ function OrderPaymentDialog({
 
 // ─── Main Tab ─────────────────────────────────────────────────────────────────
 
-type PaidFilter = "all" | "paid" | "unpaid";
-
-const ProfileOrdersTab = ({ orders, loading }: ProfileOrdersTabProps) => {
+const ProfileOrdersTab = ({ orders, loading, paidFilter, onPaidFilterChange }: ProfileOrdersTabProps) => {
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
   const [payOrder, setPayOrder] = useState<Order | null>(null);
-  const [paidFilter, setPaidFilter] = useState<PaidFilter>("all");
-
-  const filteredOrders = useMemo(() => {
-    if (paidFilter === "paid") return orders.filter(isOrderPaid);
-    if (paidFilter === "unpaid") return orders.filter((o) => !isOrderPaid(o));
-    return orders;
-  }, [orders, paidFilter]);
 
   if (loading) {
     return (
@@ -891,21 +886,21 @@ const ProfileOrdersTab = ({ orders, loading }: ProfileOrdersTabProps) => {
             key={key}
             size="sm"
             variant={paidFilter === key ? "default" : "outline"}
-            onClick={() => setPaidFilter(key)}
+            onClick={() => onPaidFilterChange(key)}
           >
             {label}
           </Button>
         ))}
       </div>
 
-      {filteredOrders.length === 0 && (
+      {orders.length === 0 && (
         <p className="text-sm text-muted-foreground">
           Тохирох захиалга олдсонгүй.
         </p>
       )}
 
       <div className="space-y-4">
-        {filteredOrders.map((order) => (
+        {orders.map((order) => (
           <Card key={order._id} className="border border-muted">
             <CardHeader className="flex flex-row items-center justify-between gap-3">
               <div>

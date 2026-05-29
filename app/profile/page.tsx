@@ -132,6 +132,8 @@ export default function ProfilePage() {
     searchParams?.get("clientPortalId"),
   );
 
+  const [paidFilter, setPaidFilter] = useState<"all" | "paid" | "unpaid">("all");
+
   const {
     data: ordersData,
     loading: ordersLoading,
@@ -139,17 +141,7 @@ export default function ProfilePage() {
   } = useQuery(orderQueries.fullOrders, {
     variables: {
       customerId: user?.erxesCustomerId ?? undefined,
-      sortField: "createdAt",
-      sortDirection: -1,
-      statuses: [
-        "new",
-        "doing",
-        "done",
-        "complete",
-        "reDoing",
-        "pending",
-        "return",
-      ],
+      isPaid: paidFilter === "all" ? undefined : paidFilter === "paid",
     },
     skip: !user?.erxesCustomerId,
     fetchPolicy: "cache-and-network",
@@ -639,6 +631,8 @@ export default function ProfilePage() {
                   <ProfileOrdersTab
                     orders={orders}
                     loading={ordersLoading || bmsOrdersLoading}
+                    paidFilter={paidFilter}
+                    onPaidFilterChange={setPaidFilter}
                   />
                 )}
                 {activeTab === "wishlist" && (
