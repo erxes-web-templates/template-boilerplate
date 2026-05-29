@@ -6,7 +6,6 @@ import { X } from "lucide-react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -14,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { getFileUrl, templateUrl } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useCart } from "../../../lib/CartContext";
 import productMutations from "../../../graphql/products/mutations";
 import Link from "next/link";
 
@@ -43,9 +43,35 @@ const ProfileWishlistTab = ({
   onRemoved,
 }: ProfileWishlistTabProps) => {
   const { toast } = useToast();
+  const { addToCart } = useCart();
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [addingId, setAddingId] = useState<string | null>(null);
 
   const [wishlistRemove] = useMutation(productMutations.wishlistRemove);
+
+  const handleAddToCart = async (entry: WishlistItem) => {
+    const product = entry.product;
+    if (!product?._id) return;
+    setAddingId(entry._id);
+    try {
+      await addToCart({
+        id: product._id,
+        name: product.name ?? "",
+        unitPrice: product.unitPrice ?? 0,
+        imageUrl: product.attachment?.url ?? null,
+        description: product.description ?? null,
+      });
+      window.dispatchEvent(new Event("cart:open"));
+    } catch (err: any) {
+      toast({
+        title: "Сагсанд нэмэхэд алдаа гарлаа",
+        description: err?.message ?? "Дахин оролдоно уу.",
+        variant: "destructive",
+      });
+    } finally {
+      setAddingId(null);
+    }
+  };
 
   const handleRemove = async (wishId: string) => {
     setRemovingId(wishId);
@@ -141,8 +167,12 @@ const ProfileWishlistTab = ({
                   Барааг харах
                 </Link>
               </Button>
-              <Button asChild variant="default" size="sm" disabled>
-                <Link href={templateUrl("/cart")}>Сагсанд нэмэх</Link>
+              <Button
+                size="sm"
+                disabled={addingId === entry._id || !product?._id}
+                onClick={() => handleAddToCart(entry)}
+              >
+                {addingId === entry._id ? "Нэмж байна…" : "Сагсанд нэмэх"}
               </Button>
             </CardFooter>
           </Card>
