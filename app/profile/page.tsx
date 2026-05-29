@@ -48,6 +48,7 @@ type ProfileOrder = {
   createdAt?: string | null;
   modifiedAt?: string | null;
   paidDate?: string | null;
+  paidAmounts?: Array<{ _id?: string; type?: string; amount?: number }> | null;
   number?: string | null;
   totalAmount?: number | null;
   finalAmount?: number | null;

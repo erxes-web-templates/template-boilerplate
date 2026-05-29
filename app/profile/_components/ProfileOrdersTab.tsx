@@ -56,6 +56,7 @@ type Order = {
   createdAt?: string | null;
   modifiedAt?: string | null;
   paidDate?: string | null;
+  paidAmounts?: Array<{ _id?: string; type?: string; amount?: number }> | null;
   number?: string | null;
   totalAmount?: number | null;
   finalAmount?: number | null;
@@ -115,8 +116,12 @@ const statusLabel: Record<string, string> = {
 
 const PAYABLE_STATUSES = new Set(["new", "doing", "reDoing", "pending"]);
 
+const isOrderPaid = (order: Order) =>
+  (order.paidAmounts?.length ?? 0) > 0 && !!order.paidDate;
+
 const isPayable = (order: Order) =>
   order.source !== "bms" &&
+  !isOrderPaid(order) &&
   order.saleStatus !== "confirmed" &&
   PAYABLE_STATUSES.has(order.status ?? "");
 
@@ -843,9 +848,18 @@ function OrderPaymentDialog({
 
 // ─── Main Tab ─────────────────────────────────────────────────────────────────
 
+type PaidFilter = "all" | "paid" | "unpaid";
+
 const ProfileOrdersTab = ({ orders, loading }: ProfileOrdersTabProps) => {
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
   const [payOrder, setPayOrder] = useState<Order | null>(null);
+  const [paidFilter, setPaidFilter] = useState<PaidFilter>("all");
+
+  const filteredOrders = useMemo(() => {
+    if (paidFilter === "paid") return orders.filter(isOrderPaid);
+    if (paidFilter === "unpaid") return orders.filter((o) => !isOrderPaid(o));
+    return orders;
+  }, [orders, paidFilter]);
 
   if (loading) {
     return (
@@ -862,10 +876,36 @@ const ProfileOrdersTab = ({ orders, loading }: ProfileOrdersTabProps) => {
       </p>
     );
   }
+
+  const filterButtons: { key: PaidFilter; label: string }[] = [
+    { key: "all", label: "Бүгд" },
+    { key: "paid", label: "Төлөгдсөн" },
+    { key: "unpaid", label: "Төлөгдөөгүй" },
+  ];
+
   return (
     <>
+      <div className="mb-4 flex gap-2">
+        {filterButtons.map(({ key, label }) => (
+          <Button
+            key={key}
+            size="sm"
+            variant={paidFilter === key ? "default" : "outline"}
+            onClick={() => setPaidFilter(key)}
+          >
+            {label}
+          </Button>
+        ))}
+      </div>
+
+      {filteredOrders.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          Тохирох захиалга олдсонгүй.
+        </p>
+      )}
+
       <div className="space-y-4">
-        {orders.map((order) => (
+        {filteredOrders.map((order) => (
           <Card key={order._id} className="border border-muted">
             <CardHeader className="flex flex-row items-center justify-between gap-3">
               <div>
@@ -890,11 +930,17 @@ const ProfileOrdersTab = ({ orders, loading }: ProfileOrdersTabProps) => {
                 {order.source === "bms" && (
                   <Badge variant="secondary">BMS</Badge>
                 )}
-                <Badge variant="outline">
-                  {statusLabel[order.status ?? ""] ??
-                    order.status ??
-                    "Төлөв тодорхойгүй"}
-                </Badge>
+                {isOrderPaid(order) ? (
+                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                    Төлбөр төлөгдсөн
+                  </Badge>
+                ) : (
+                  <Badge variant="outline">
+                    {statusLabel[order.status ?? ""] ??
+                      order.status ??
+                      "Төлөв тодорхойгүй"}
+                  </Badge>
+                )}
               </div>
             </CardHeader>
 
