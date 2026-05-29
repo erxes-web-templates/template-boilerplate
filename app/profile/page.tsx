@@ -340,18 +340,9 @@ export default function ProfilePage() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!user?._id) {
-      toast({
-        title: "Алдаа гарлаа",
-        description: "Хэрэглэгчийн мэдээллийг олсонгүй.",
-        variant: "destructive",
-      });
-      return;
-    }
 
     await updateUser({
       variables: {
-        _id: user._id,
         firstName: formState.firstName,
         lastName: formState.lastName,
         email: formState.email,

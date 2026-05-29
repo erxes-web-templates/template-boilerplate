@@ -77,28 +77,24 @@ const forgotPassword = gql`
 
 const userEdit = gql`
   mutation clientPortalUserEdit(
-    $_id: String!
     $email: String
+    $phone: String
     $firstName: String
     $lastName: String
-    $phone: String
+    $avatar: String
     $username: String
     $companyName: String
     $companyRegistrationNumber: String
-    $avatar: String
-    $erxesCustomerId: String
   ) {
     clientPortalUserEdit(
-      _id: $_id
       email: $email
+      phone: $phone
       firstName: $firstName
       lastName: $lastName
-      phone: $phone
+      avatar: $avatar
       username: $username
       companyName: $companyName
       companyRegistrationNumber: $companyRegistrationNumber
-      avatar: $avatar
-      erxesCustomerId: $erxesCustomerId
     ) {
       _id
     }
@@ -106,8 +102,8 @@ const userEdit = gql`
 `;
 
 const changePhone = gql`
-  mutation changePhone($_id: String!, $phone: String) {
-    clientPortalUserEdit(_id: $_id, phone: $phone) {
+  mutation changePhone($phone: String) {
+    clientPortalUserEdit(phone: $phone) {
       _id
     }
   }
