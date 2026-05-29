@@ -864,14 +864,6 @@ const ProfileOrdersTab = ({ orders, loading, paidFilter, onPaidFilterChange }: P
     );
   }
 
-  if (!orders?.length) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        Таны захиалгын түүх хоосон байна.
-      </p>
-    );
-  }
-
   const filterButtons: { key: PaidFilter; label: string }[] = [
     { key: "all", label: "Бүгд" },
     { key: "paid", label: "Төлөгдсөн" },
@@ -893,9 +885,11 @@ const ProfileOrdersTab = ({ orders, loading, paidFilter, onPaidFilterChange }: P
         ))}
       </div>
 
-      {orders.length === 0 && (
+      {!orders?.length && (
         <p className="text-sm text-muted-foreground">
-          Тохирох захиалга олдсонгүй.
+          {paidFilter === "all"
+            ? "Таны захиалгын түүх хоосон байна."
+            : "Тохирох захиалга олдсонгүй."}
         </p>
       )}
 
