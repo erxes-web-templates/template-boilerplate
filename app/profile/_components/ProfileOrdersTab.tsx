@@ -117,7 +117,7 @@ const statusLabel: Record<string, string> = {
 const PAYABLE_STATUSES = new Set(["new", "doing", "reDoing", "pending"]);
 
 const isOrderPaid = (order: Order) =>
-  (order.paidAmounts?.length ?? 0) > 0 && !!order.paidDate;
+  (order.paidAmounts?.length ?? 0) > 0 || !!order.paidDate;
 
 const isPayable = (order: Order) =>
   order.source !== "bms" &&
@@ -935,11 +935,7 @@ const ProfileOrdersTab = ({ orders, loading }: ProfileOrdersTabProps) => {
                     Төлбөр төлөгдсөн
                   </Badge>
                 ) : (
-                  <Badge variant="outline">
-                    {statusLabel[order.status ?? ""] ??
-                      order.status ??
-                      "Төлөв тодорхойгүй"}
-                  </Badge>
+                  <Badge variant="outline">Хүлээгдэж байна</Badge>
                 )}
               </div>
             </CardHeader>
