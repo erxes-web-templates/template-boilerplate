@@ -286,6 +286,8 @@ export default function ProfilePage() {
     },
   );
 
+  const [updateCustomer] = useMutation(authMutations.customerEdit);
+
   const [logoutMutation, { loading: loggingOut }] = useMutation(
     authMutations.logout,
     {
@@ -341,14 +343,24 @@ export default function ProfilePage() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    await updateUser({
-      variables: {
-        firstName: formState.firstName,
-        lastName: formState.lastName,
-        email: formState.email,
-        phone: formState.phone,
-      },
-    });
+    await Promise.all([
+      updateUser({
+        variables: {
+          firstName: formState.firstName,
+          lastName: formState.lastName,
+          email: formState.email,
+          phone: formState.phone,
+        },
+      }),
+      updateCustomer({
+        variables: {
+          firstName: formState.firstName,
+          lastName: formState.lastName,
+          primaryEmail: formState.email,
+          primaryPhone: formState.phone,
+        },
+      }),
+    ]);
   };
 
   const handlePasswordFormChange = (

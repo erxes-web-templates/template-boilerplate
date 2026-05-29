@@ -109,6 +109,24 @@ const changePhone = gql`
   }
 `;
 
+const customerEdit = gql`
+  mutation clientPortalCustomerEdit(
+    $firstName: String
+    $lastName: String
+    $primaryEmail: String
+    $primaryPhone: String
+  ) {
+    clientPortalCustomerEdit(
+      firstName: $firstName
+      lastName: $lastName
+      primaryEmail: $primaryEmail
+      primaryPhone: $primaryPhone
+    ) {
+      _id
+    }
+  }
+`;
+
 const userChangePassword = gql`
   mutation cpUsersSetPassword($_id: String!, $newPassword: String!) {
     cpUsersSetPassword(_id: $_id, newPassword: $newPassword) {
@@ -170,6 +188,7 @@ const mutations = {
   createUser,
   getCode,
   userEdit,
+  customerEdit,
   resetPassword,
   userChangePassword,
   forgotPassword,
