@@ -205,9 +205,6 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
                     <CardTitle className="line-clamp-2 text-sm font-semibold">
                       {product?.name ?? "Untitled product"}
                     </CardTitle>
-                    <CardDescription className="line-clamp-2 text-xs">
-                      {product?.description ?? "No description provided."}
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2 p-3 pt-0 text-xs">
                     <p className="font-medium text-foreground">

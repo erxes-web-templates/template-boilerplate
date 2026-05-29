@@ -120,9 +120,6 @@ const ProfileWishlistTab = ({
               <CardTitle className="text-base font-semibold">
                 {product?.name ?? "Нэргүй бараа"}
               </CardTitle>
-              <CardDescription className="line-clamp-2 text-xs">
-                {product?.description ?? "Тайлбар байхгүй."}
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <p className="font-medium text-foreground">
