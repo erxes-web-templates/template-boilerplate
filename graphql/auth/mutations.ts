@@ -76,7 +76,7 @@ const forgotPassword = gql`
 `;
 
 const userEdit = gql`
-  mutation cpUsersEdit(
+  mutation clientPortalUserEdit(
     $_id: String!
     $email: String
     $firstName: String
@@ -88,7 +88,7 @@ const userEdit = gql`
     $avatar: String
     $erxesCustomerId: String
   ) {
-    cpUsersEdit(
+    clientPortalUserEdit(
       _id: $_id
       email: $email
       firstName: $firstName
@@ -107,7 +107,7 @@ const userEdit = gql`
 
 const changePhone = gql`
   mutation changePhone($_id: String!, $phone: String) {
-    cpUsersEdit(_id: $_id, phone: $phone) {
+    clientPortalUserEdit(_id: $_id, phone: $phone) {
       _id
     }
   }
