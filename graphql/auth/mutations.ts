@@ -128,10 +128,14 @@ const customerEdit = gql`
 `;
 
 const userChangePassword = gql`
-  mutation cpUsersSetPassword($_id: String!, $newPassword: String!) {
-    cpUsersSetPassword(_id: $_id, newPassword: $newPassword) {
-      _id
-    }
+  mutation ClientPortalUserChangePassword(
+    $currentPassword: String!
+    $newPassword: String!
+  ) {
+    clientPortalUserChangePassword(
+      currentPassword: $currentPassword
+      newPassword: $newPassword
+    )
   }
 `;
 const userVerify = gql`

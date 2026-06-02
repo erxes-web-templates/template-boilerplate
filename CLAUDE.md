@@ -2,7 +2,7 @@
 
 ## 1. Role
 
-You are a template developer building an erxes web template by cloning `template-boilerplate`. Your job is UI only: sections, components, and styling. Do not touch the auth flow, cart/checkout logic, GraphQL mutations, Apollo setup, `lib/client.ts`, `hooks/`, or `graphql/` (read those files to understand data shape, but never modify them).
+You are a template developer building an erxes web template by cloning `template-boilerplate`. Your job is UI only: sections, components, pages, and styling. Do not touch the auth flow, cart/checkout logic, GraphQL mutations, Apollo setup, `lib/client.ts`, `hooks/`, or `graphql/` (read those files to understand data shape, but never modify them).
 
 ---
 
@@ -118,3 +118,93 @@ Use real Unsplash URLs for `initUrl` image fields. Do not use local `/images/` p
 - [ ] `homePageSections.json` uses real Unsplash URLs for images
 - [ ] All section types are registered in `sectionComponents` and `KnownSectionType`
 - [ ] Mobile layout tested (all sections responsive)
+- [ ] Template is registered in `clone-templates.sh`, `sync-template-core.sh`, and `push-templates.sh`
+
+---
+
+## 9. Creating a New Template
+
+**Prerequisites**
+- `GH_ACCESS_TOKEN` in `apps/web-builder/.env` (GitHub PAT with `repo` scope)
+- A GitHub repo created under the `erxes-web-templates` org, named after your template (e.g. `tour-template-5`)
+
+**Steps**
+
+1. **Register in `clone-templates.sh`** — add the name to the `templates` array and add a `git clone` line:
+   ```bash
+   git clone --branch main "https://x-access-token:${GH_ACCESS_TOKEN}@github.com/erxes-web-templates/your-template-name.git" "$TEMPLATES_DIR/your-template-name"
+   ```
+
+2. **Clone all templates** from the `web-builder` root:
+   ```bash
+   ./scripts/clone-templates.sh
+   ```
+   Clones into `apps/templates/` and strips `.git` — result is a clean working copy.
+
+3. **Seed from boilerplate** — if the GitHub repo is empty, copy the boilerplate as a starting point:
+   ```bash
+   cp -r apps/templates/template-boilerplate apps/templates/your-template-name
+   ```
+
+4. **Register in sync and push scripts** — add the template name to `TEMPLATES` in both `sync-template-core.sh` and `push-templates.sh`.
+
+5. **Sync core infrastructure**:
+   ```bash
+   ./scripts/sync-template-core.sh
+   ```
+   Pulls the latest `lib/`, `graphql/`, `types/`, `hooks/` from boilerplate into your template. Run this after every `clone-templates.sh`.
+
+Now build your sections (see §4).
+
+**Naming convention**
+
+| What | Format | Example |
+|---|---|---|
+| GitHub repo name | `<type>-template-<N>` | `tour-template-5` |
+| Folder under `apps/templates/` | Matches repo name | `tour-template-5` |
+| `package.json` `name` | Matches folder name | `tour-template-5` |
+
+---
+
+## 10. Core Infrastructure Sync
+
+`lib/`, `graphql/`, `types/`, and `hooks/` are **owned by `template-boilerplate`**. Never edit them directly in a derived template — changes will be overwritten on the next sync.
+
+When boilerplate updates any of these, from the `web-builder` root:
+
+```bash
+# Sync all templates (lib/, graphql/, types/, hooks/)
+./scripts/sync-template-core.sh
+
+# Sync a specific page directory
+./scripts/sync-template-core.sh app/checkout
+
+# Sync a single file
+./scripts/sync-template-core.sh --file app/checkout/page.tsx
+
+# Copy only new files — never overwrites existing customizations
+./scripts/sync-template-core.sh --missing app/_client
+```
+
+After syncing, commit in each template with:
+
+```
+chore: sync lib/ from template-boilerplate
+
+- <brief description of what changed>
+```
+
+---
+
+## 11. Pushing a Template to GitHub
+
+From the `web-builder` root:
+
+```bash
+./scripts/push-templates.sh                             # default message
+./scripts/push-templates.sh "feat: add hero section"   # custom message
+```
+
+The script re-clones the target GitHub repo to a temp dir, rsyncs your local template over it (excluding `.git`, `node_modules`, `.next`), and pushes only if there are changes.
+
+Requirements: the template must be in `push-templates.sh`'s `TEMPLATES` array and its GitHub repo must exist under `erxes-web-templates/`.

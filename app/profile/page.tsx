@@ -303,19 +303,6 @@ export default function ProfilePage() {
     },
   );
 
-  const [verifyPassword, { loading: verifyingPassword }] = useMutation(
-    authMutations.login,
-    {
-      onError() {
-        toast({
-          title: "Одоогийн нууц үг буруу байна",
-          description: "Нууц үгээ дахин шалгана уу.",
-          variant: "destructive",
-        });
-      },
-    },
-  );
-
   const [changePasswordMutation, { loading: changingPassword }] = useMutation(
     authMutations.userChangePassword,
     {
@@ -387,29 +374,9 @@ export default function ProfilePage() {
       return;
     }
 
-    try {
-      const result = await verifyPassword({
-        variables: {
-          phone: user?.phone || undefined,
-          email: user?.email || undefined,
-          password: passwordForm.currentPassword,
-        },
-      });
-      if (!result.data?.clientPortalUserLoginWithCredentials) {
-        toast({
-          title: "Одоогийн нууц үг буруу байна",
-          description: "Нууц үгээ дахин шалгана уу.",
-          variant: "destructive",
-        });
-        return;
-      }
-    } catch {
-      return;
-    }
-
     await changePasswordMutation({
       variables: {
-        _id: user?._id,
+        currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword,
       },
     });
@@ -654,7 +621,7 @@ export default function ProfilePage() {
                 {activeTab === "security" && (
                   <ProfileSecurityTab
                     form={passwordForm}
-                    loading={verifyingPassword || changingPassword}
+                    loading={changingPassword}
                     onChange={handlePasswordFormChange}
                     onSubmit={handlePasswordSubmit}
                   />
