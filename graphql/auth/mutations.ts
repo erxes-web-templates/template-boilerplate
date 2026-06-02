@@ -135,7 +135,9 @@ const userChangePassword = gql`
     clientPortalUserChangePassword(
       currentPassword: $currentPassword
       newPassword: $newPassword
-    )
+    ) {
+      _id
+    }
   }
 `;
 const userVerify = gql`
