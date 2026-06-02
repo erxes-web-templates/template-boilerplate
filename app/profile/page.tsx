@@ -26,7 +26,7 @@ import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
-import { useToast } from "../../hooks/use-toast";
+import { toast } from "sonner";
 import ProfileSidebar from "./_components/ProfileSidebar";
 import ProfileOrdersTab from "./_components/ProfileOrdersTab";
 import ProfileWishlistTab from "./_components/ProfileWishlistTab";
@@ -112,7 +112,6 @@ export default function ProfilePage() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const currentUrl = pathname ?? "/profile";
-  const { toast } = useToast();
 
   const [activeTab, setActiveTab] = useState<SidebarKey>(
     () => (searchParams?.get("tab") as SidebarKey) || "profile",
@@ -270,15 +269,10 @@ export default function ProfilePage() {
     authMutations.userEdit,
     {
       onError(err) {
-        toast({
-          title: "Шинэчилж чадсангүй",
-          description: err.message,
-          variant: "destructive",
-        });
+        toast.error("Шинэчилж чадсангүй", { description: err.message });
       },
       onCompleted() {
-        toast({
-          title: "Амжилттай хадгаллаа",
+        toast.success("Амжилттай хадгаллаа", {
           description: "Таны мэдээллийг шинэчиллээ.",
         });
         refetch();
@@ -294,8 +288,7 @@ export default function ProfilePage() {
       onCompleted() {
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("refreshToken");
-        toast({
-          title: "Амжилттай гарлаа",
+        toast.success("Амжилттай гарлаа", {
           description: "Та дахин нэвтрэх боломжтой.",
         });
         window.location.href = "/auth/login";
@@ -313,19 +306,19 @@ export default function ProfilePage() {
           msg.includes("wrong") ||
           msg.includes("invalid") ||
           msg.includes("буруу");
-        toast({
-          title: isWrongPassword
+        toast.error(
+          isWrongPassword
             ? "Одоогийн нууц үг буруу байна"
             : "Нууц үг солиход алдаа гарлаа",
-          description: isWrongPassword
-            ? "Нууц үгээ дахин шалгана уу."
-            : err.message,
-          variant: "destructive",
-        });
+          {
+            description: isWrongPassword
+              ? "Нууц үгээ дахин шалгана уу."
+              : err.message,
+          },
+        );
       },
       onCompleted() {
-        toast({
-          title: "Нууц үг амжилттай шинэчлэгдлээ",
+        toast.success("Нууц үг амжилттай шинэчлэгдлээ", {
           description: "Шинэ нууц үг үйлчилж эхэллээ.",
         });
         setPasswordForm({
@@ -376,10 +369,8 @@ export default function ProfilePage() {
     event.preventDefault();
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      toast({
-        title: "Нууц үг таарахгүй байна",
+      toast.error("Нууц үг таарахгүй байна", {
         description: "Шинэ нууц үг болон баталгаажуулалт ижил байх ёстой.",
-        variant: "destructive",
       });
       return;
     }
