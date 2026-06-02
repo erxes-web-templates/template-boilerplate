@@ -307,15 +307,25 @@ export default function ProfilePage() {
     authMutations.userChangePassword,
     {
       onError(err) {
+        const msg = err.message?.toLowerCase() ?? "";
+        const isWrongPassword =
+          msg.includes("incorrect") ||
+          msg.includes("wrong") ||
+          msg.includes("invalid") ||
+          msg.includes("буруу");
         toast({
-          title: "Нууц үг солиход алдаа гарлаа",
-          description: err.message,
+          title: isWrongPassword
+            ? "Одоогийн нууц үг буруу байна"
+            : "Нууц үг солиход алдаа гарлаа",
+          description: isWrongPassword
+            ? "Нууц үгээ дахин шалгана уу."
+            : err.message,
           variant: "destructive",
         });
       },
       onCompleted() {
         toast({
-          title: "Нууц үг шинэчлэгдлээ",
+          title: "Нууц үг амжилттай шинэчлэгдлээ",
           description: "Шинэ нууц үг үйлчилж эхэллээ.",
         });
         setPasswordForm({
