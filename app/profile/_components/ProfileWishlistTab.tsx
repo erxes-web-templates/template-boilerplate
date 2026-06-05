@@ -52,6 +52,9 @@ const ProfileWishlistTab = ({
   const handleAddToCart = async (entry: WishlistItem) => {
     const product = entry.product;
     if (!product?._id) return;
+    const inStock =
+      typeof product.remainder === "number" ? product.remainder > 0 : true;
+    if (!inStock) return;
     setAddingId(entry._id);
     try {
       await addToCart({
@@ -114,6 +117,10 @@ const ProfileWishlistTab = ({
           ? getFileUrl(product.attachment.url)
           : undefined;
         const isRemoving = removingId === entry._id;
+        const inStock =
+          typeof product?.remainder === "number"
+            ? product.remainder > 0
+            : true;
 
         return (
           <Card
@@ -169,10 +176,14 @@ const ProfileWishlistTab = ({
               </Button>
               <Button
                 size="sm"
-                disabled={addingId === entry._id || !product?._id}
+                disabled={addingId === entry._id || !product?._id || !inStock}
                 onClick={() => handleAddToCart(entry)}
               >
-                {addingId === entry._id ? "Нэмж байна…" : "Сагсанд нэмэх"}
+                {addingId === entry._id
+                  ? "Нэмж байна…"
+                  : !inStock
+                  ? "Нөөц дууссан"
+                  : "Сагсанд нэмэх"}
               </Button>
             </CardFooter>
           </Card>

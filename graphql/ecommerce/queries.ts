@@ -33,7 +33,7 @@ const wishlist = gql`
         name
         description
         unitPrice
-
+        remainder
         attachment {
           url
         }
