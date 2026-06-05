@@ -24,7 +24,7 @@ type WishlistItem = {
     name?: string | null;
     description?: string | null;
     unitPrice?: number | null;
-    remainder?: number | null;
+    remainder?: number | { remainder?: number | null } | null;
     attachment?: {
       url?: string | null;
     };
@@ -35,6 +35,14 @@ type ProfileWishlistTabProps = {
   items: WishlistItem[];
   loading?: boolean;
   onRemoved?: () => void;
+};
+
+const getRemainderValue = (
+  r: number | { remainder?: number | null } | null | undefined
+): number | null => {
+  if (r == null) return null;
+  if (typeof r === "number") return r;
+  return r.remainder ?? null;
 };
 
 const ProfileWishlistTab = ({
@@ -52,8 +60,9 @@ const ProfileWishlistTab = ({
   const handleAddToCart = async (entry: WishlistItem) => {
     const product = entry.product;
     if (!product?._id) return;
+    const remainderValue = getRemainderValue(product.remainder);
     const inStock =
-      typeof product.remainder === "number" ? product.remainder > 0 : true;
+      typeof remainderValue === "number" ? remainderValue > 0 : true;
     if (!inStock) return;
     setAddingId(entry._id);
     try {
@@ -117,10 +126,9 @@ const ProfileWishlistTab = ({
           ? getFileUrl(product.attachment.url)
           : undefined;
         const isRemoving = removingId === entry._id;
+        const remainderValue = getRemainderValue(product?.remainder);
         const inStock =
-          typeof product?.remainder === "number"
-            ? product.remainder > 0
-            : true;
+          typeof remainderValue === "number" ? remainderValue > 0 : true;
 
         return (
           <Card
@@ -159,7 +167,7 @@ const ProfileWishlistTab = ({
                 Үнэ: ₮{Number(product?.unitPrice || 0).toLocaleString()}
               </p>
               <p className="text-xs text-muted-foreground">
-                Үлдэгдэл: {product?.remainder ?? 0}
+                Үлдэгдэл: {getRemainderValue(product?.remainder) ?? 0}
               </p>
             </CardContent>
             <CardFooter className="mt-auto flex justify-end gap-2 bg-muted/40 p-4">
