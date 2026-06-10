@@ -1,8 +1,26 @@
 import { gql } from "@apollo/client";
 
 const cpTags = gql`
-  query RoomTags($searchValue: String, $type: String) {
-    cpTags(searchValue: $searchValue, type: $type) {
+  query RoomTags(
+    $type: String
+    $searchValue: String
+    $parentId: String
+    $ids: [String]
+    $excludeIds: Boolean
+    $isGroup: Boolean
+    $instanceId: String
+    $includeWorkspaceTags: Boolean
+  ) {
+    cpTags(
+      type: $type
+      searchValue: $searchValue
+      parentId: $parentId
+      ids: $ids
+      excludeIds: $excludeIds
+      isGroup: $isGroup
+      instanceId: $instanceId
+      includeWorkspaceTags: $includeWorkspaceTags
+    ) {
       _id
       name
     }
@@ -10,19 +28,27 @@ const cpTags = gql`
 `;
 
 const rooms = gql`
-  query rooms(
-    $pipelineId: String
-    $boardId: String
+  query CpRooms(
+    $ids: [String]
     $categoryId: String
-    $perPage: Int
+    $tag: String
+    $searchValue: String
     $page: Int
+    $perPage: Int
+    $sortField: String
+    $sortDirection: Int
+    $tagIds: [String]
   ) {
-    products(
-      pipelineId: $pipelineId
-      boardId: $boardId
+    cpProducts(
+      ids: $ids
       categoryId: $categoryId
-      perPage: $perPage
+      tag: $tag
+      searchValue: $searchValue
       page: $page
+      perPage: $perPage
+      sortField: $sortField
+      sortDirection: $sortDirection
+      tagIds: $tagIds
     ) {
       _id
       name

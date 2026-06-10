@@ -219,22 +219,22 @@ const tags = gql`
   query Tags(
     $type: String
     $searchValue: String
-    $tagIds: [String]
     $parentId: String
     $ids: [String]
     $excludeIds: Boolean
-    $page: Int
-    $perPage: Int
+    $isGroup: Boolean
+    $instanceId: String
+    $includeWorkspaceTags: Boolean
   ) {
     cpTags(
       type: $type
       searchValue: $searchValue
-      tagIds: $tagIds
       parentId: $parentId
       ids: $ids
       excludeIds: $excludeIds
-      page: $page
-      perPage: $perPage
+      isGroup: $isGroup
+      instanceId: $instanceId
+      includeWorkspaceTags: $includeWorkspaceTags
     ) {
       _id
       name

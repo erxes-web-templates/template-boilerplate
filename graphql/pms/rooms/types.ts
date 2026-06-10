@@ -46,6 +46,12 @@ export interface TagsData {
 }
 
 export interface TagsVariables {
-  searchValue?: string;
   type?: string;
+  searchValue?: string;
+  parentId?: string;
+  ids?: string[];
+  excludeIds?: boolean;
+  isGroup?: boolean;
+  instanceId?: string;
+  includeWorkspaceTags?: boolean;
 }
