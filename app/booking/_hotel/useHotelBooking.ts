@@ -59,10 +59,10 @@ export default function useHotelBooking() {
   const currentUser = userData?.clientPortalCurrentUser || null;
 
   const { data: branchData, loading: branchLoading } = useQuery(
-    pmsConfigQueries.PmsBranchList,
+    pmsConfigQueries.CpPmsBranchList,
     { variables: { page: 1, perPage: 1 } },
   );
-  const branch = branchData?.pmsBranchList?.[0] || null;
+  const branch = branchData?.cpPmsBranchList?.[0] || null;
   const pipelineId =
     parsePipelineConfig(branch?.pipelineConfig)?.pipelineId || null;
   const roomCategoryId = branch?.roomCategories?.[0] || null;

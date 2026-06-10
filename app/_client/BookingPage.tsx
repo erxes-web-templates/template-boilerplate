@@ -83,14 +83,14 @@ const HotelBookingPage = () => {
   }, []);
 
   const { data: branchData, loading: branchLoading } = useQuery(
-    pmsConfigQueries.PmsBranchList,
+    pmsConfigQueries.CpPmsBranchList,
     {
       variables: { page: 1, perPage: 1 },
     },
   );
 
   const pipelineId = useMemo(() => {
-    const rawConfig = branchData?.pmsBranchList?.[0]?.pipelineConfig;
+    const rawConfig = branchData?.cpPmsBranchList?.[0]?.pipelineConfig;
     const parsedConfig = parsePipelineConfig(rawConfig);
     if (parsedConfig && typeof parsedConfig === "object") {
       return (parsedConfig as { pipelineId?: string }).pipelineId || null;

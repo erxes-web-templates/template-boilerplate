@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
-const PmsBranchList = gql`
-  query PmsBranchList($page: Int, $perPage: Int) {
-    pmsBranchList(page: $page, perPage: $perPage) {
+const CpPmsBranchList = gql`
+  query CpPmsBranchList($page: Int, $perPage: Int) {
+    cpCpPmsBranchList(page: $page, perPage: $perPage) {
       _id
       createdAt
       userId
@@ -37,9 +37,9 @@ const PmsBranchList = gql`
   }
 `;
 
-const PmsBranchDetail = gql`
-  query PmsBranchDetail($id: String!) {
-    pmsBranchDetail(_id: $id) {
+const CpPmsBranchDetail = gql`
+  query CpPmsBranchDetail($id: String!) {
+    cpCpPmsBranchDetail(_id: $id) {
       _id
       createdAt
       userId
@@ -76,5 +76,5 @@ const PmsBranchDetail = gql`
   }
 `;
 
-const queries = { PmsBranchList, PmsBranchDetail };
+const queries = { CpPmsBranchList, CpPmsBranchDetail };
 export default queries;
