@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 const CpPmsBranchList = gql`
   query CpPmsBranchList($page: Int, $perPage: Int) {
-    cpCpPmsBranchList(page: $page, perPage: $perPage) {
+    cpPmsBranchList(page: $page, perPage: $perPage) {
       _id
       createdAt
       userId
@@ -39,7 +39,7 @@ const CpPmsBranchList = gql`
 
 const CpPmsBranchDetail = gql`
   query CpPmsBranchDetail($id: String!) {
-    cpCpPmsBranchDetail(_id: $id) {
+    cpPmsBranchDetail(_id: $id) {
       _id
       createdAt
       userId
