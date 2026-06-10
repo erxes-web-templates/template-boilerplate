@@ -71,17 +71,16 @@ export default function useHotelBooking() {
     pmsRoomQueries.rooms,
     {
       variables: {
-        pipelineId,
         categoryId: roomCategoryId,
         perPage: 1000,
         page: 1,
       },
-      skip: !pipelineId || !roomCategoryId,
+      skip: !roomCategoryId,
     },
   );
   const allRooms = useMemo(
-    () => ((allRoomsData?.products || []) as HotelRoom[]),
-    [allRoomsData?.products],
+    () => ((allRoomsData?.cpProducts || []) as HotelRoom[]),
+    [allRoomsData?.cpProducts],
   );
 
   const { data: availableRoomsData, loading: checkRoomsLoading, error: roomsError } =
@@ -96,8 +95,8 @@ export default function useHotelBooking() {
       notifyOnNetworkStatusChange: true,
     });
   const availableRooms = useMemo(
-    () => ((availableRoomsData?.pmsCheckRooms || []) as HotelRoom[]),
-    [availableRoomsData?.pmsCheckRooms],
+    () => ((availableRoomsData?.cpPmsCheckRooms || []) as HotelRoom[]),
+    [availableRoomsData?.cpPmsCheckRooms],
   );
 
   const { data: stagesData } = useQuery(pmsSalesQueries.stages, {

@@ -133,7 +133,7 @@ const HotelBookingPage = () => {
       );
 
       const ids = results.flatMap(
-        (result) => result.data?.products?.map((item: any) => item._id) ?? [],
+        (result) => result.data?.cpProducts?.map((item: any) => item._id) ?? [],
       );
 
       if (active) {
@@ -168,7 +168,7 @@ const HotelBookingPage = () => {
     skip: !shouldQuery,
   });
 
-  const roomsDataList = roomsData?.pmsCheckRooms ?? [];
+  const roomsDataList = roomsData?.cpPmsCheckRooms ?? [];
   const notifyCartOpen = () => {
     if (typeof window === "undefined") {
       return;
