@@ -10,7 +10,7 @@ import {
 } from "../../../graphql/pms/rooms";
 import { Section } from "../../../types/sections";
 import { toHtml } from "../../../lib/html";
-import { templateUrl } from "@/lib/utils";
+import { templateUrl, getFileUrl } from "@/lib/utils";
 import { isBuildMode } from "../../../lib/buildMode";
 import {
   Card,
@@ -117,7 +117,7 @@ const RoomsSection = ({ section }: { section: Section }) => {
                 );
               }
 
-              const imageUrl = room?.attachment?.url;
+              const imageUrl = room?.attachment?.url ? getFileUrl(room.attachment.url) : null;
               const price = toCurrency(room?.unitPrice);
 
               return (

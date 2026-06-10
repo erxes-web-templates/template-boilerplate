@@ -9,7 +9,7 @@ import usePage from "../../lib/usePage";
 import { sectionComponents } from "../_components/sections";
 import Image from "next/image";
 import Link from "next/link";
-import { templateUrl } from "../../lib/utils";
+import { templateUrl, getFileUrl } from "../../lib/utils";
 import { toHtml } from "../../lib/html";
 import RoomBookingWidget from "../rooms/_components/RoomBookingWidget";
 import { ArrowLeft } from "lucide-react";
@@ -93,7 +93,7 @@ export default function RoomDetailPage({ initialRoomId, initialRoom }: Props) {
       {room.attachment?.url && (
         <div className="relative w-full h-[55vh] min-h-[360px] overflow-hidden">
           <Image
-            src={room.attachment.url}
+            src={getFileUrl(room.attachment.url)}
             alt={room.name ?? ""}
             fill
             priority
@@ -144,7 +144,7 @@ export default function RoomDetailPage({ initialRoomId, initialRoom }: Props) {
                       className="relative aspect-[4/3] rounded-xl overflow-hidden"
                     >
                       <Image
-                        src={img.url!}
+                        src={getFileUrl(img.url!)}
                         alt={`${room.name} photo ${index + 1}`}
                         fill
                         className="object-cover hover:scale-105 transition-transform duration-300"

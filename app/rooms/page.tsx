@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { isBuildMode } from "../../lib/buildMode";
+import { getFileUrl } from "../../lib/utils";
 import RoomsPageClient from "../_client/RoomsPage";
 import { fetchRooms } from "../../lib/fetchRooms";
 import { fetchWebPage } from "../../lib/fetchWebPage";
@@ -16,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: page?.name ?? "Rooms",
     description: page?.description ?? undefined,
-    ...(page?.coverImage && { openGraph: { images: [page.coverImage] } }),
+    ...(page?.coverImage && { openGraph: { images: [getFileUrl(page.coverImage)] } }),
   };
 }
 
