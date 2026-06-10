@@ -269,11 +269,11 @@ export default function useHotelBooking() {
     selectedRoomIds,
     selectedRooms,
     showErrors,
-    stages: stagesData?.salesStages || [],
+    stages: stagesData?.cpSalesStages || [],
     startDate,
     startDateRaw,
     summary,
-    tags: tagsData?.tags || [],
+    tags: tagsData?.cpTags || [],
     totalPrice,
     toggleRoom: (roomId: string) =>
       setSelectedRoomIds((prev) => {
@@ -294,7 +294,7 @@ export default function useHotelBooking() {
     setSelectedPaymentId,
     setShowErrors,
     setTransaction,
-    labels: labelsData?.salesPipelineLabels || [],
+    labels: labelsData?.cpSalesPipelineLabels || [],
     mutations: {
       addCpUser,
       addLabel,

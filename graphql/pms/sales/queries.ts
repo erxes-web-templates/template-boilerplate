@@ -191,7 +191,7 @@ const dealFullDetail = gql`
 
 const salesPipelineLabels = gql`
   query SalesPipelineLabels($pipelineId: String) {
-    salesPipelineLabels(pipelineId: $pipelineId) {
+    cpSalesPipelineLabels(pipelineId: $pipelineId) {
       _id
       name
     }
@@ -200,7 +200,7 @@ const salesPipelineLabels = gql`
 
 const stages = gql`
   query SalesStages($pipelineId: String) {
-    salesStages(pipelineId: $pipelineId) {
+    cpSalesStages(pipelineId: $pipelineId) {
       _id
       code
     }
@@ -226,7 +226,7 @@ const tags = gql`
     $page: Int
     $perPage: Int
   ) {
-    tags(
+    cpTags(
       type: $type
       searchValue: $searchValue
       tagIds: $tagIds
