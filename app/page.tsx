@@ -18,6 +18,7 @@ import CarouselSection from "./_components/sections/CarouselSection";
 import LastViewedProductsSection from "./_components/sections/LastViewedProductsSection";
 import BannerSection from "./_components/sections/BannerSection";
 import BookingFormSection from "./_components/sections/BookingFormSection";
+import RoomsSection from "./_components/sections/RoomsSection";
 
 const sectionComponents = {
   hero: HeroSection,
@@ -36,7 +37,7 @@ const sectionComponents = {
   banner: BannerSection,
   bookingForm: BookingFormSection,
   content: TextSection,
-  rooms: ProductsSection,
+  rooms: RoomsSection,
 };
 
 // In build mode this is rendered inside the web builder (client-side, live Apollo).
