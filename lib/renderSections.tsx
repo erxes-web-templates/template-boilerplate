@@ -17,6 +17,7 @@ type KnownSectionType =
   | "lastViewedProducts"
   | "banner"
   | "bookingForm"
+  | "booking-form"
   | "rooms"
   | "content";
 
