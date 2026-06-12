@@ -36,6 +36,7 @@ const sectionComponents = {
   lastViewedProducts: LastViewedProductsSection,
   banner: BannerSection,
   bookingForm: BookingFormSection,
+  "booking-form": BookingFormSection,
   content: TextSection,
   rooms: RoomsSection,
 };
