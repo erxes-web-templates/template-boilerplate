@@ -17,6 +17,7 @@ type KnownSectionType =
   | "lastViewedProducts"
   | "banner"
   | "bookingForm"
+  | "rooms"
   | "content";
 
 interface RenderSectionsProps {
