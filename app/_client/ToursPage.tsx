@@ -14,7 +14,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getFileUrl, templateUrl } from "@/lib/utils";
+import { getFileUrl, getMinTourPrice, templateUrl } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import usePage from "../../lib/usePage";
 import { sectionComponents } from "../_components/sections";
@@ -65,7 +65,14 @@ const ToursPage = ({ initialData }: Props) => {
               </CardDescription>
             </CardContent>
             <CardFooter className="flex justify-between items-center">
-              <span className="text-lg font-bold">{tour.cost}</span>
+              {(() => {
+                const price = getMinTourPrice(tour.pricingOptions);
+                return price != null ? (
+                  <span className="text-lg font-bold">
+                    {Number(price).toLocaleString()}₮
+                  </span>
+                ) : null;
+              })()}
               <Link href={templateUrl(`/tours/${tour.groupCode || tour._id}`)}>
                 <Button>Read more</Button>
               </Link>

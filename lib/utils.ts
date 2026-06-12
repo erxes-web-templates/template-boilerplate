@@ -136,6 +136,15 @@ export function mapSocialLinks(externalLinks: any) {
   return filteredSocials;
 }
 
+/** Returns the minimum price across all pricingOptions entries, or null if none. */
+export function getMinTourPrice(
+  pricingOptions?: Array<{ prices?: Array<{ price: number; type: string }> }> | null,
+): number | null {
+  const allPrices = pricingOptions?.flatMap((po) => po.prices ?? []) ?? [];
+  if (!allPrices.length) return null;
+  return Math.min(...allPrices.map((p) => p.price));
+}
+
 // export const templateUrl = (projectId: string, slug: string) => {
 //   return `/dashboard/projects/${projectId}?template=tour-boilerplate&pageName=${slug}`;
 // };

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Tag, X } from "lucide-react";
-import { templateUrl } from "../../../lib/utils";
+import { getMinTourPrice, templateUrl } from "../../../lib/utils";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
@@ -22,7 +22,12 @@ type TourItem = {
 };
 
 type Props = {
-  tour: { _id: string; cost?: number; groupCode?: string };
+  tour: {
+    _id: string;
+    cost?: number;
+    groupCode?: string;
+    pricingOptions?: Array<{ prices?: Array<{ price: number; type: string }> }>;
+  };
   groupTourItems: TourItem[];
 };
 
@@ -60,7 +65,7 @@ export default function TourBookingWidget({ tour, groupTourItems }: Props) {
 
   const selectedItem = groupTourItems.find((it) => it._id === selectedItemId);
   const maxTravelers = selectedItem?.groupSize || 20;
-  const basePrice = tour.cost || 0;
+  const basePrice = getMinTourPrice(tour.pricingOptions);
   const groupCode = selectedItem?.groupCode || tour.groupCode || tour._id;
 
   // Refs to avoid stale closures in mutation callbacks
@@ -172,7 +177,7 @@ export default function TourBookingWidget({ tour, groupTourItems }: Props) {
             className="text-3xl font-bold"
             style={{ color: "var(--primary)" }}
           >
-            MNT {Number(basePrice).toLocaleString()}
+            {basePrice != null ? `${Number(basePrice).toLocaleString()}₮` : "—"}
           </span>
         </div>
 

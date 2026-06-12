@@ -31,6 +31,6 @@ export const sectionComponents = {
   carousel: CarouselSection,
   lastViewedProducts: LastViewedProductsSection,
   banner: BannerSection,
-  "booking-form": BookingFormSection,
+  bookingForm: BookingFormSection,
   rooms: RoomsSection,
 };

@@ -14,7 +14,7 @@ import usePage from "../../lib/usePage";
 import { sectionComponents } from "../_components/sections";
 import Image from "next/image";
 import Link from "next/link";
-import { getFileUrl, templateUrl } from "../../lib/utils";
+import { getFileUrl, getMinTourPrice, templateUrl } from "../../lib/utils";
 import { toHtml } from "../../lib/html";
 import TourBookingWidget from "../tours/_components/TourBookingWidget";
 import { ArrowLeft, Calendar, Clock, DollarSign, Hash } from "lucide-react";
@@ -55,7 +55,8 @@ export default function TourDetailPage({ initialTourId, initialTourDetail }: Tou
   const loading = !skip && (groupsLoading || detailLoading);
   const groupTourItems = initialTourDetail?.items ?? groupDetailData?.cpBmToursGroupDetail?.items ?? [];
   const tour = groupTourItems[0] || null;
-
+  
+  console.log("Tour Detail Data:", { tour, groupTourItems });
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -118,14 +119,17 @@ export default function TourDetailPage({ initialTourId, initialTourDetail }: Tou
                 {tour.name}
               </h1>
               <div className="flex flex-wrap items-center gap-4">
-                {tour.cost != null && (
-                  <span
-                    className="px-4 py-2 rounded-xl text-white font-bold text-lg shadow-lg"
-                    style={{ backgroundColor: "var(--accent)" }}
-                  >
-                    MNT {Number(tour.cost).toLocaleString()}
-                  </span>
-                )}
+                {(() => {
+                  const price = getMinTourPrice(tour.pricingOptions);
+                  return price != null ? (
+                    <span
+                      className="px-4 py-2 rounded-xl text-white font-bold text-lg shadow-lg"
+                      style={{ backgroundColor: "var(--accent)" }}
+                    >
+                      {Number(price).toLocaleString()}₮
+                    </span>
+                  ) : null;
+                })()}
                 {tour.startDate && (
                   <span className="flex items-center gap-1.5 text-white/85 text-sm">
                     <Calendar className="h-4 w-4" />
@@ -266,9 +270,19 @@ export default function TourDetailPage({ initialTourId, initialTourDetail }: Tou
                               )}
                             </td>
                             <td className="px-6 py-4 font-semibold text-foreground">
-                              {item.cost != null
-                                ? `${Number(item.cost).toLocaleString()}₮`
-                                : "—"}
+                              {(() => {
+                                const prices = item.pricingOptions?.flatMap((po: { prices?: Array<{ price: number; type: string }> }) => po.prices ?? []) ?? [];
+                                return prices.length ? (
+                                  <div className="flex flex-col gap-0.5">
+                                    {prices.map((p: { price: number; type: string }) => (
+                                      <div key={p.type} className="text-sm">
+                                        <span className="text-xs text-muted-foreground mr-1 capitalize">{p.type}:</span>
+                                        {Number(p.price).toLocaleString()}₮
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : "—";
+                              })()}
                             </td>
                           </tr>
                         );

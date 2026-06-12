@@ -44,6 +44,14 @@ const TOUR_GROUP_DETAIL_QUERY = gql`
             content
           }
         }
+        pricingOptions {
+          prices {
+            price
+            type
+          }
+          minPersons
+          maxPersons
+        }
         startDate
         endDate
         groupSize

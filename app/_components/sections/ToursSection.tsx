@@ -13,7 +13,7 @@ import React from "react";
 import Link from "next/link";
 import { useQuery } from "@apollo/client";
 import { TOURS_GROUP_QUERY } from "../../../graphql/queries";
-import { getFileUrl, templateUrl } from "../../../lib/utils";
+import { getFileUrl, getMinTourPrice, templateUrl } from "../../../lib/utils";
 import { isBuildMode } from "../../../lib/buildMode";
 import { toHtml } from "../../../lib/html";
 import { Section } from "../../../types/sections";
@@ -77,11 +77,14 @@ const ToursSection = ({ section }: { section: Section }) => {
               </CardContent>
               <CardFooter className="flex items-center justify-between gap-4 border-t border-border p-4">
                 <div className="flex items-center gap-3">
-                  {tour.items[0].cost && (
-                    <span className="text-sm font-semibold text-primary">
-                      {tour.items[0].cost}
-                    </span>
-                  )}
+                  {(() => {
+                    const price = getMinTourPrice(tour.items[0].pricingOptions);
+                    return price != null ? (
+                      <span className="text-sm font-semibold text-primary">
+                        {Number(price).toLocaleString()}₮
+                      </span>
+                    ) : null;
+                  })()}
                   {tour.items[0].startDate && (
                     <span className="text-xs text-muted-foreground">
                       {dayjs(tour.items[0].startDate).format("MMM DD, YYYY")}

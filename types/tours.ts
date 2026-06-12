@@ -1,3 +1,14 @@
+interface PricingPrice {
+  price: number;
+  type: string;
+}
+
+interface PricingOption {
+  prices: PricingPrice[];
+  minPersons?: number;
+  maxPersons?: number;
+}
+
 interface BmTour {
   _id: string;
   branchId?: string;
@@ -13,6 +24,13 @@ interface BmTour {
   images: string[];
   imageThumbnail: string;
   groupCode?: string;
+  pricingOptions?: PricingOption[];
+}
+
+/** A group returned by cpBmToursGroup. pricingOptions is on each items[] entry. */
+interface BmTourGroup {
+  _id: string;
+  items: BmTour[];
 }
 
 interface BmToursData {
@@ -79,10 +97,13 @@ interface Itinerary {
 
 export type {
   BmTour,
+  BmTourGroup,
   BmToursData,
   BmTourDetail,
   BmTourDetailVariables,
   Itinerary,
+  PricingOption,
+  PricingPrice,
   BmToursGroupVariables,
   BmTourGroupDetailVariables,
 };

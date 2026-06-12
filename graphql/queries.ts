@@ -520,6 +520,14 @@ export const TOURS_GROUP_QUERY = gql`
           extra
           images
           imageThumbnail
+          pricingOptions {
+            prices {
+              price
+              type
+            }
+            minPersons
+            maxPersons
+          }
         }
       }
     }
@@ -550,6 +558,14 @@ export const TOUR_GROUP_DETAIL_QUERY = gql`
         advanceCheck
         advancePercent
         joinPercent
+        pricingOptions {
+          minPersons
+          maxPersons
+          prices {
+            price
+            type
+          }
+        }
         tagIds
         info1
         info2
