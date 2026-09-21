@@ -3,10 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Star } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Ban, Check, ImageOff, Loader2, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "../../lib/CartContext";
 import { templateUrl } from "../../lib/utils";
 import { isBuildMode } from "../../lib/buildMode";
@@ -91,77 +89,73 @@ export default function ProductCard({ product }: ProductCardProps) {
   const isAdding = buttonState === "adding";
   const isAdded = buttonState === "added";
 
+  const href = isBuilder
+    ? templateUrl(`/product&productId=${product.id}`)
+    : `/products/${product.id}`;
+
   return (
-    <Card className="overflow-hidden border border-border transition-shadow hover:shadow-lg">
-      <div className="relative aspect-square w-full overflow-hidden bg-muted">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+      <Link
+        href={href}
+        className="relative block aspect-square overflow-hidden bg-muted"
+      >
         {product.image ? (
           <Image
             src={product.image}
             alt={product.name}
             fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className={`object-cover transition-transform duration-500 group-hover:scale-105 ${
+              product.inStock ? "" : "opacity-40 grayscale"
+            }`}
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
           />
         ) : (
-          <div className="flex aspect-square w-full items-center justify-center text-sm text-muted-foreground">
-            Image coming soon
+          <div className="flex h-full w-full items-center justify-center">
+            <ImageOff className="h-8 w-8 text-muted-foreground/40" />
           </div>
         )}
+
         {product.categoryName ? (
-          <Badge className="absolute left-4 top-4">{product.categoryName}</Badge>
+          <span className="absolute left-3 top-3 rounded-full bg-background/80 px-3 py-1 text-xs font-medium text-foreground shadow-sm backdrop-blur-sm">
+            {product.categoryName}
+          </span>
         ) : null}
-      </div>
+      </Link>
 
-      <CardContent className="space-y-4 p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-semibold text-foreground">
-              {product.name}
-            </h3>
-          </div>
-          <p className="text-lg font-semibold text-foreground">
+      <div className="flex flex-1 flex-col p-5">
+        <Link href={href}>
+          <h3 className="line-clamp-2 text-base font-semibold leading-snug text-card-foreground transition-colors group-hover:text-primary">
+            {product.name}
+          </h3>
+        </Link>
+
+        {/* Price and the single action share the footer row, pinned to the
+            bottom so cards in a grid line up whatever the title length. */}
+        <div className="mt-auto flex items-center justify-between gap-3 pt-5">
+          <span className="font-heading text-lg font-bold tracking-tight text-foreground">
             {formatCurrency(product.price)}
-          </p>
-        </div>
+          </span>
 
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-            <span>Rating unavailable</span>
-          </div>
-          <Badge variant={product.inStock ? "default" : "secondary"}>
-            {product.inStock ? "In Stock" : "Out of Stock"}
-          </Badge>
-        </div>
-
-        <div className="flex gap-3">
-          <Button asChild className="w-full">
-            <Link
-              href={
-                isBuilder
-                  ? templateUrl(`/product&productId=${product.id}`)
-                  : `/products/${product.id}`
-              }
-            >
-              View Details
-            </Link>
-          </Button>
           <Button
-            variant="outline"
-            className="w-full"
+            size="icon"
+            variant="accent"
+            className="h-10 w-10 shrink-0 rounded-full"
             disabled={!product.inStock || !product.id || isAdding}
             onClick={handleAddToCart}
+            aria-label={product.name}
           >
-            {!product.inStock
-              ? "Out of stock"
-              : isAdding
-              ? "Adding..."
-              : isAdded
-                ? "Added to cart"
-                : "Add to Cart"}
+            {isAdding ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : isAdded ? (
+              <Check className="h-4 w-4" />
+            ) : product.inStock ? (
+              <ShoppingCart className="h-4 w-4" />
+            ) : (
+              <Ban className="h-4 w-4" />
+            )}
           </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </article>
   );
 }
