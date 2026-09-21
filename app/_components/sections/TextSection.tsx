@@ -5,6 +5,7 @@ import { templateUrl } from "@/lib/utils";
 import { toHtml } from "../../../lib/html";
 import { isBuildMode } from "../../../lib/buildMode";
 import Link from "next/link";
+import { SectionHeading, SectionShell } from "./_SectionHeading";
 
 const TextSection = ({ section }: { section: Section }) => {
   const isBuilder = isBuildMode();
@@ -13,29 +14,31 @@ const TextSection = ({ section }: { section: Section }) => {
       ? templateUrl(section.config.primaryCtaUrl)
       : section.config.primaryCtaUrl
     : "#";
+
   return (
-    <section className="py-16">
-      <div className="container mx-auto max-w-6xl px-4">
-        {section.config.title && (
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground mb-6">
-            {section.config.title}
-          </h2>
+    <SectionShell>
+      <SectionHeading
+        eyebrow={section.config.eyebrow}
+        title={section.config.title}
+        align="center"
+      />
+
+      <div className="mx-auto mt-8 max-w-3xl text-center">
+        {section.config.description && (
+          <div
+            className="text-base leading-relaxed text-muted-foreground md:text-lg [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-4"
+            dangerouslySetInnerHTML={toHtml(section.config.description)}
+          />
         )}
-        <div className="max-w-3xl">
-          {section.config.description && (
-            <div
-              className="text-sm text-muted-foreground leading-relaxed mb-6"
-              dangerouslySetInnerHTML={toHtml(section.config.description)}
-            />
-          )}
-          {section.config.primaryCtaUrl && (
-            <Link href={ctaHref}>
-              <Button>{section.config.primaryCta}</Button>
-            </Link>
-          )}
-        </div>
+        {section.config.primaryCtaUrl && (
+          <Link href={ctaHref} className="mt-8 inline-block">
+            <Button variant="accent" className="rounded-full px-8">
+              {section.config.primaryCta}
+            </Button>
+          </Link>
+        )}
       </div>
-    </section>
+    </SectionShell>
   );
 };
 

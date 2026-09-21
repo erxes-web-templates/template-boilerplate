@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import React, { Suspense } from "react";
 import CircleLoader from "@/components/common/CircleLoader";
 import EmptyState from "@/components/common/EmptyState";
+import { sectionBackgroundStyle } from "./renderSections";
 
 type SectionComponents = Record<string, React.ComponentType<{ section: Section }>>;
 
@@ -48,7 +49,9 @@ const usePage = (slug: string | null, sectionComponents: SectionComponents = {})
       <Suspense fallback={<CircleLoader />}>
         {sections.length > 0 &&
           sections.map((section: Section, index: number) => (
-            <div key={index}>{renderSection(section)}</div>
+            <div key={index} style={sectionBackgroundStyle(section)}>
+              {renderSection(section)}
+            </div>
           ))}
       </Suspense>
     );

@@ -85,7 +85,7 @@ const BannerSection = ({ section }: { section: Section }) => {
 
   return (
     <section className="py-12">
-      <div className="container mx-auto max-w-6xl px-4">
+      <div className="container mx-auto max-w-6xl px-4 md:px-6">
         <Card className="border-0 bg-transparent shadow-none">
           {href ? (
             <Link href={href} className="block">

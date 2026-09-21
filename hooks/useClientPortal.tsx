@@ -1,5 +1,3 @@
-"use client";
-
 import { useQuery } from "@apollo/client";
 import { CP_GET_CONFIG } from "../graphql/queries";
 

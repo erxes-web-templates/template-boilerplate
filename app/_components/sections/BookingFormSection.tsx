@@ -48,7 +48,7 @@ const BookingFormSection = ({ section }: { section: Section }) => {
   };
 
   return (
-    <section className="py-16 bg-gray-100">
+    <section className="bg-muted/30 py-20 md:py-28">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold mb-2">{title}</h2>

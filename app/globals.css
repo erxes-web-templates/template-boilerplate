@@ -32,6 +32,13 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+    /* The footer is deliberately not tied to --primary: the brand colour
+       also paints buttons and highlights, and a footer that repaints with it
+       swings from near-black to pale on a light brand. There is no footer
+       field in the client-portal appearance API, so this is a fixed default
+       — change it here, or point it at an API value once one exists. */
+    --footer: 240 6% 8%;
+    --footer-foreground: 0 0% 98%;
     --radius: 0.5rem;
   }
   .dark {

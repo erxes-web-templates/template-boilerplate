@@ -64,8 +64,8 @@ const RoomsSection = ({ section }: { section: Section }) => {
 
   if (!loading && !error && rooms.length === 0) {
     return (
-      <section className="py-16">
-        <div className="container mx-auto max-w-6xl px-4">
+      <section className="py-20 md:py-28">
+        <div className="container mx-auto max-w-6xl px-4 md:px-6">
           <EmptyState
             title="No rooms available"
             description="Try adjusting your filters or add rooms from the hotel management system."
@@ -76,12 +76,12 @@ const RoomsSection = ({ section }: { section: Section }) => {
   }
 
   return (
-    <section className="py-16">
-      <div className="container mx-auto max-w-6xl px-4">
+    <section className="py-20 md:py-28">
+      <div className="container mx-auto max-w-6xl px-4 md:px-6">
         {(title || description) && (
           <div className="mb-10">
             {title && (
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+              <h2 className="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                 {title}
               </h2>
             )}

@@ -58,16 +58,16 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
   const emails = parseStringOrArray(cpDetail?.externalLinks?.emails);
 
   return (
-    <footer style={{ backgroundColor: "var(--primary)" }} className="text-white">
+    <footer className="bg-footer text-footer-foreground">
       {/* Hero CTA band */}
       {(cpDetail?.name || cpDetail?.logo) && (
-        <div className="relative overflow-hidden border-b border-white/10">
+        <div className="relative overflow-hidden border-b border-footer-foreground/10">
           {/* subtle radial glow */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                "radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255,255,255,0.10) 0%, transparent 70%)",
+                "radial-gradient(ellipse 80% 60% at 50% 50%, hsl(var(--footer-foreground) / 0.10) 0%, transparent 70%)",
             }}
           />
           <div className="container mx-auto max-w-6xl px-4 py-16 relative z-10 flex flex-col items-center text-center gap-6">
@@ -77,23 +77,23 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
                 alt={cpDetail?.name || "Logo"}
                 width={180}
                 height={64}
-                className="object-contain brightness-0 invert opacity-90"
+                className="object-contain opacity-90 brightness-0 invert"
               />
             )}
             {cpDetail?.name && (
-              <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
+              <h2 className="text-3xl md:text-4xl font-bold text-footer-foreground tracking-tight">
                 {cpDetail.name}
               </h2>
             )}
             {cpDetail?.description && (
-              <p className="text-base text-white/70 max-w-xl leading-relaxed">
+              <p className="text-base text-footer-foreground/70 max-w-xl leading-relaxed">
                 {cpDetail.description}
               </p>
             )}
             {emails[0] && (
               <a
                 href={`mailto:${emails[0]}`}
-                className="inline-flex items-center gap-2 px-7 py-3 rounded-xl font-semibold text-sm bg-white/15 hover:bg-white/25 border border-white/20 text-white transition-all duration-200 backdrop-blur-sm"
+                className="inline-flex items-center gap-2 px-7 py-3 rounded-xl font-semibold text-sm bg-footer-foreground/15 hover:bg-footer-foreground/25 border border-footer-foreground/20 text-footer-foreground transition-all duration-200 backdrop-blur-sm"
               >
                 <Mail className="h-4 w-4" />
                 {emails[0]}
@@ -118,13 +118,13 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
                   className="object-contain brightness-0 invert"
                 />
               ) : (
-                <span className="text-xl font-bold text-white">
+                <span className="text-xl font-bold text-footer-foreground">
                   {cpDetail?.name || "Company"}
                 </span>
               )}
             </Link>
             {cpDetail?.description && (
-              <p className="mt-4 text-sm text-white/70 leading-relaxed">
+              <p className="mt-4 text-sm text-footer-foreground/70 leading-relaxed">
                 {cpDetail.description}
               </p>
             )}
@@ -137,7 +137,7 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={label}
-                    className="p-2 rounded-lg bg-white/10 hover:bg-white/25 transition-colors text-white/70 hover:text-white"
+                    className="p-2 rounded-lg bg-footer-foreground/10 hover:bg-footer-foreground/25 transition-colors text-footer-foreground/70 hover:text-footer-foreground"
                   >
                     <Icon className="h-4 w-4" />
                   </a>
@@ -148,7 +148,7 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-widest text-white/50 mb-4">
+            <h4 className="text-xs font-semibold uppercase tracking-widest text-footer-foreground/50 mb-4">
               Quick Links
             </h4>
             <ul className="space-y-2.5">
@@ -160,14 +160,14 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
                         href={templateUrl(menu.url || "/")}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-white/70 hover:text-white transition-colors"
+                        className="text-sm text-footer-foreground/70 hover:text-footer-foreground transition-colors"
                       >
                         {menu.label}
                       </a>
                     ) : (
                       <Link
                         href={templateUrl(menu.url || "/")}
-                        className="text-sm text-white/70 hover:text-white transition-colors"
+                        className="text-sm text-footer-foreground/70 hover:text-footer-foreground transition-colors"
                       >
                         {menu.label}
                       </Link>
@@ -185,7 +185,7 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
                   <li key={item.url}>
                     <Link
                       href={templateUrl(item.url)}
-                      className="text-sm text-white/70 hover:text-white transition-colors"
+                      className="text-sm text-footer-foreground/70 hover:text-footer-foreground transition-colors"
                     >
                       {item.label}
                     </Link>
@@ -197,13 +197,13 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
 
           {/* Contact info */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-widest text-white/50 mb-4">
+            <h4 className="text-xs font-semibold uppercase tracking-widest text-footer-foreground/50 mb-4">
               Contact Us
             </h4>
             <ul className="space-y-3">
               {cpDetail?.externalLinks?.address && (
-                <li className="flex gap-3 text-sm text-white/70">
-                  <MapPin className="h-4 w-4 shrink-0 mt-0.5 text-white/50" />
+                <li className="flex gap-3 text-sm text-footer-foreground/70">
+                  <MapPin className="h-4 w-4 shrink-0 mt-0.5 text-footer-foreground/50" />
                   <span>{cpDetail.externalLinks.address}</span>
                 </li>
               )}
@@ -211,9 +211,9 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
                 <li key={i}>
                   <a
                     href={`tel:${phone}`}
-                    className="flex gap-3 text-sm text-white/70 hover:text-white transition-colors"
+                    className="flex gap-3 text-sm text-footer-foreground/70 hover:text-footer-foreground transition-colors"
                   >
-                    <Phone className="h-4 w-4 shrink-0 mt-0.5 text-white/50" />
+                    <Phone className="h-4 w-4 shrink-0 mt-0.5 text-footer-foreground/50" />
                     {phone}
                   </a>
                 </li>
@@ -222,9 +222,9 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
                 <li key={i}>
                   <a
                     href={`mailto:${email}`}
-                    className="flex gap-3 text-sm text-white/70 hover:text-white transition-colors"
+                    className="flex gap-3 text-sm text-footer-foreground/70 hover:text-footer-foreground transition-colors"
                   >
-                    <Mail className="h-4 w-4 shrink-0 mt-0.5 text-white/50" />
+                    <Mail className="h-4 w-4 shrink-0 mt-0.5 text-footer-foreground/50" />
                     {email}
                   </a>
                 </li>
@@ -234,16 +234,16 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 pt-8 border-t border-white/20 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/40">
+        <div className="mt-12 pt-8 border-t border-footer-foreground/20 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-footer-foreground/40">
           <p>
             {cpDetail?.copyright ||
               `© ${new Date().getFullYear()} ${cpDetail?.name || "Company"}. All rights reserved.`}
           </p>
           <div className="flex gap-4">
-            <Link href={templateUrl("/legal")} className="hover:text-white/70 transition-colors">
+            <Link href={templateUrl("/legal")} className="hover:text-footer-foreground/70 transition-colors">
               Privacy Policy
             </Link>
-            <Link href={templateUrl("/terms")} className="hover:text-white/70 transition-colors">
+            <Link href={templateUrl("/terms")} className="hover:text-footer-foreground/70 transition-colors">
               Terms of Service
             </Link>
           </div>

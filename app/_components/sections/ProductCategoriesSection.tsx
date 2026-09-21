@@ -50,7 +50,7 @@ const ProductCategoriesSection = ({ section }: { section: Section }) => {
 
   if (!loading && !error && categories.length === 0) {
     return (
-      <section className="py-16">
+      <section className="py-20 md:py-28">
         <div className="container mx-auto max-w-5xl px-4">
           <EmptyState
             title="No categories selected"
@@ -63,8 +63,8 @@ const ProductCategoriesSection = ({ section }: { section: Section }) => {
   console.log(categories, "cattt");
 
   return (
-    <section className="py-16">
-      <div className="container mx-auto max-w-6xl px-4">
+    <section className="py-20 md:py-28">
+      <div className="container mx-auto max-w-6xl px-4 md:px-6">
         <div className="mx-auto mb-10 max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight">{title}</h2>
           {description && (

@@ -137,8 +137,8 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
     : "Open a product page and it will appear here on this browser.";
 
   return (
-    <section className="bg-background py-16">
-      <div className="container mx-auto max-w-6xl px-4">
+    <section className="bg-background py-20 md:py-28">
+      <div className="container mx-auto max-w-6xl px-4 md:px-6">
         <div className="mx-auto mb-10 max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight">{title}</h2>
           {description && (

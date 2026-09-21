@@ -14,6 +14,14 @@ import RoomsSection from "./RoomsSection";
 import TextSection from "./TextSection";
 import ToursSection from "./ToursSection";
 import YoutubeSection from "./YoutubeSection";
+import StatsSection from "./StatsSection";
+import FeaturesSection from "./FeaturesSection";
+import FaqSection from "./FaqSection";
+import TestimonialsSection from "./TestimonialsSection";
+import HowItWorksSection from "./HowItWorksSection";
+import RequestCategoriesSection from "./RequestCategoriesSection";
+import RequestFormSection from "./RequestFormSection";
+import TrackRequestSection from "./TrackRequestSection";
 
 export const sectionComponents = {
   hero: HeroSection,
@@ -34,4 +42,14 @@ export const sectionComponents = {
   "booking-form": BookingFormSection,
   bookingForm: BookingFormSection,
   rooms: RoomsSection,
+  stats: StatsSection,
+  features: FeaturesSection,
+  faq: FaqSection,
+  testimonials: TestimonialsSection,
+  howItWorks: HowItWorksSection,
+  // Ticket templates. channelId/pipelineId/statusId come from section
+  // config or NEXT_PUBLIC_ERXES_TICKET_* — see lib/ticketConfig.ts.
+  requestCategories: RequestCategoriesSection,
+  requestForm: RequestFormSection,
+  trackRequest: TrackRequestSection,
 };

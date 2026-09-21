@@ -6,7 +6,8 @@
     "dev": "next dev -p 3400",
     "build": "BUILD_MODE=build NEXT_PUBLIC_BUILD_MODE=build next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "preview": "BUILD_MODE=build NEXT_PUBLIC_BUILD_MODE=build next dev -p 3407"
   },
   "dependencies": {
     "@apollo/client": "^3.12.4",

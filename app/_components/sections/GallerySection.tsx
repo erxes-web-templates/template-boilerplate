@@ -82,7 +82,7 @@ const GallerySection = ({ section }: { section: Section }) => {
                   {selectedImage}
                 </DialogDescription>
               </DialogHeader>
-              <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-border/50 shadow-2xl">
+              <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border/50 shadow-2xl">
                 <CustomImage src={getFileUrl(selectedImage) || "/placeholder.svg"} alt={selectedImage} fill className="object-cover" />
               </div>
             </DialogContent>

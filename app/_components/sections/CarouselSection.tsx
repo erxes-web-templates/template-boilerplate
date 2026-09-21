@@ -38,7 +38,7 @@ type CarouselConfigItem = {
 };
 
 const resolveImageUrl = (key?: string | null) => {
-  if (!key) return undefined;
+  if (!key || typeof key !== "string") return undefined;
   if (key.startsWith("http://") || key.startsWith("https://")) {
     return key;
   }

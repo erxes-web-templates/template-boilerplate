@@ -26,6 +26,21 @@ export default function ResetPasswordPage() {
   const token = searchParams.get("token") ?? undefined;
   const identifier = searchParams.get("identifier") ?? undefined;
 
+  const [newPassword, setNewPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+
+  const [resetPassword, { loading }] = useMutation(mutations.resetPassword, {
+    onError(error) {
+      toast("Reset failed", { description: error.message });
+    },
+    onCompleted() {
+      toast("Password updated", {
+        description: "You can now sign in with your new password.",
+      });
+      router.push(templateUrl("/auth/login"));
+    },
+  });
+
   if (!token) {
     return (
       <div className="flex my-[100px] items-center justify-center px-6 py-12">
@@ -52,21 +67,6 @@ export default function ResetPasswordPage() {
       </div>
     );
   }
-
-  const [newPassword, setNewPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-
-  const [resetPassword, { loading }] = useMutation(mutations.resetPassword, {
-    onError(error) {
-      toast("Reset failed", { description: error.message });
-    },
-    onCompleted() {
-      toast("Password updated", {
-        description: "You can now sign in with your new password.",
-      });
-      router.push(templateUrl("/auth/login"));
-    },
-  });
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

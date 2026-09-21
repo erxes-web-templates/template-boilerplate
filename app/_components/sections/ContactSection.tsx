@@ -45,11 +45,11 @@ const ContactSection = ({ section }: { section: Section }) => {
     },
   });
   const { cpDetail } = useClientPortal({
-    id: process.env.ERXES_WEB_ID || params.id,
+    id: (process.env.ERXES_WEB_ID || params?.id || "") as string,
   });
 
   return (
-    <section id="about" className="py-16">
+    <section id="about" className="py-20 md:py-28">
       <div className="container mx-auto px-4">
         {/* Contact Information */}
         <div className="text-center mb-8">
@@ -186,7 +186,7 @@ const ContactSection = ({ section }: { section: Section }) => {
                 <CardContent>
                   {formSubmitted ? (
                     <div className="flex flex-col items-center justify-center py-8 text-center">
-                      <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
+                      <CheckCircle className="h-16 w-16 text-emerald-600 mb-4" />
                       <h3 className="text-xl font-medium mb-2">
                         Message Sent!
                       </h3>

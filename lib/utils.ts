@@ -11,31 +11,102 @@ export const uncapitalize = (str: string) => {
   return str.charAt(0).toLowerCase() + str.slice(1);
 };
 
+/** Values baked in at template build time, used when localStorage is empty. */
+const processEnvFallbacks = (): Record<string, string> => {
+  const fallbacks: Record<string, string> = {};
+  const put = (key: string, value?: string) => {
+    if (value) fallbacks[key] = value;
+  };
+
+  put("NEXT_PUBLIC_API_URL", process.env.NEXT_PUBLIC_ERXES_API_URL);
+  put("NEXT_PUBLIC_API_DOMAIN", process.env.NEXT_PUBLIC_API_DOMAIN);
+  put("NEXT_PUBLIC_POS_TOKEN", process.env.NEXT_PUBLIC_POS_TOKEN);
+  put("NEXT_PUBLIC_ERXES_APP_TOKEN", process.env.NEXT_PUBLIC_ERXES_APP_TOKEN);
+  put("NEXT_PUBLIC_ERXES_CP_ID", process.env.NEXT_PUBLIC_ERXES_CP_ID);
+
+  if (!fallbacks.NEXT_PUBLIC_API_URL) {
+    fallbacks.NEXT_PUBLIC_API_URL = "http://localhost:4000/graphql";
+  }
+  if (!fallbacks.NEXT_PUBLIC_API_DOMAIN) {
+    fallbacks.NEXT_PUBLIC_API_DOMAIN = new URL(
+      fallbacks.NEXT_PUBLIC_API_URL,
+    ).origin;
+  }
+
+  return fallbacks;
+};
+
+/**
+ * localStorage prefix for the builder env on this origin.
+ *
+ * One preview host serves every tenant, and localStorage is per-origin — so
+ * unprefixed `builder_env_*` keys let whichever project loaded last hand its
+ * API host and tokens to the next one. Scoping them to the project id from the
+ * preview path keeps each project reading only what its own builder posted.
+ *
+ * Off the preview route — a deployed site — nothing writes these keys at all,
+ * so the unprefixed fallback is only ever reached by legacy storage.
+ */
+export const builderEnvPrefix = (): string => {
+  if (typeof window === "undefined") return "builder_env_";
+
+  const match = /\/dashboard\/projects\/([^/?#]+)/.exec(
+    window.location.pathname,
+  );
+
+  return match ? `builder_env_${match[1]}_` : "builder_env_";
+};
+
+/**
+ * Every builder env key stored for this project on this origin.
+ *
+ * The envMaps-driven lookup below only sees keys the builder happened to
+ * advertise on `window.envMaps`, and in the builder preview that list does not
+ * survive a page reload — it is set by a postMessage, not persisted. Reading
+ * the stored keys directly means a reloaded preview still resolves the API URL
+ * and tokens the builder gave it, instead of silently dropping back to the
+ * template's compiled-in defaults.
+ *
+ * Values arrive already resolved. `<subdomain>` is substituted by the builder,
+ * against the builder's own hostname; doing it here would resolve the preview
+ * host instead — "nocturne" rather than the tenant — and point every query at a
+ * client portal that does not exist.
+ */
+const storedBuilderEnv = (): Record<string, string> => {
+  const stored: Record<string, string> = {};
+  if (typeof window === "undefined") return stored;
+
+  const prefix = builderEnvPrefix();
+
+  try {
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i);
+      if (!key || !key.startsWith(prefix)) continue;
+      const value = localStorage.getItem(key);
+      if (value) stored[key.slice(prefix.length)] = value;
+    }
+  } catch {
+    // Blocked storage — process.env fallbacks still apply.
+  }
+
+  return stored;
+};
+
 export const getEnv = (): any => {
-  const envs: any = {};
+  const envs: any = { ...processEnvFallbacks(), ...storedBuilderEnv() };
 
-  if (typeof window !== "undefined") {
-    const appVersion =
-      localStorage.getItem(`builder_env_NEXT_PUBLIC_APP_VERSION`) || "SAAS";
+  if (typeof window === "undefined") return envs;
 
-    const envMaps = (window as any).envMaps || [];
+  const prefix = builderEnvPrefix();
+  const envMaps = (window as any).envMaps || [];
 
-    if (appVersion === "SAAS") {
-      const subdomain = window.location.hostname
-        .replace(/(^\w+:|^)\/\//, "")
-        .split(".")[0];
-
-      for (const envMap of envMaps) {
-        const value = localStorage.getItem(`builder_env_${envMap.name}`) ?? "";
-        envs[envMap.name] = value.replace("<subdomain>", subdomain);
-      }
-
-      return envs;
-    }
-
+  try {
     for (const envMap of envMaps) {
-      envs[envMap.name] = localStorage.getItem(`builder_env_${envMap.name}`);
+      const value = localStorage.getItem(`${prefix}${envMap.name}`);
+      if (value) envs[envMap.name] = value;
     }
+  } catch {
+    // Blocked storage — storedBuilderEnv() and process.env already applied.
   }
 
   return envs;
@@ -148,3 +219,54 @@ export function getMinTourPrice(
 // export const templateUrl = (projectId: string, slug: string) => {
 //   return `/dashboard/projects/${projectId}?template=tour-boilerplate&pageName=${slug}`;
 // };
+
+/**
+ * The client portal's own app token, fetched the way the web builder fetches
+ * it.
+ *
+ * `cpWebPage` and friends scope their query by `clientPortal._id`, which the
+ * API decodes from the `x-app-token` JWT. A template ships with a token for
+ * whatever portal it was built against — the boilerplate's demo portal — so a
+ * preview using that token queries the wrong portal and gets nothing back,
+ * which is what "No contents available" means in the builder preview.
+ *
+ * The builder resolves this by reading `cpId` from its URL and asking the API
+ * for that portal's token. The preview URL carries `cpId` through, so the
+ * template can do exactly the same rather than have a staff credential handed
+ * to it over postMessage.
+ */
+const cpTokenCache: Record<string, string> = {};
+
+export const getCpToken = async (): Promise<string> => {
+  if (typeof window === "undefined") return "";
+
+  const cpId = new URLSearchParams(window.location.search).get("cpId");
+  if (!cpId) return "";
+  if (cpTokenCache[cpId]) return cpTokenCache[cpId];
+
+  const env = getEnv();
+  const apiUrl = env.NEXT_PUBLIC_API_URL
+    ? String(env.NEXT_PUBLIC_API_URL)
+    : `${env.NEXT_PUBLIC_API_DOMAIN ?? ""}/graphql`;
+  if (!apiUrl || apiUrl === "/graphql") return "";
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        query:
+          "query GetClientPortal($id: String!) { getClientPortal(_id: $id) { token } }",
+        variables: { id: cpId },
+      }),
+    });
+
+    const json = await response.json();
+    const token = json?.data?.getClientPortal?.token;
+    if (token) cpTokenCache[cpId] = token;
+    return token || "";
+  } catch {
+    return "";
+  }
+};

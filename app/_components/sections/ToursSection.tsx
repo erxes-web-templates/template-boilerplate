@@ -32,11 +32,11 @@ const ToursSection = ({ section }: { section: Section }) => {
   const isBuilder = isBuildMode();
 
   return (
-    <section className="py-16">
-      <div className="container mx-auto max-w-6xl px-4">
+    <section className="py-20 md:py-28">
+      <div className="container mx-auto max-w-6xl px-4 md:px-6">
         {section?.config?.title && (
           <div className="mb-10">
-            <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+            <h2 className="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               {section.config.title}
             </h2>
           </div>

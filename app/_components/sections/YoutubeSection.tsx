@@ -1,18 +1,31 @@
-import { Section } from "@/types/sections";
 import React from "react";
+import { Section } from "../../../types/sections";
+import { MEDIA, SectionHeading, SectionShell } from "./_SectionHeading";
 
 const YoutubeSection = ({ section }: { section: Section }) => {
-  const embedUrl = section.config.videoUrl.replace("watch?v=", "embed/");
+  if (!section.config?.videoId) return null;
+
   return (
-    <section className="relative h-[600px]">
-      <iframe
-        className="w-full h-full"
-        src={embedUrl}
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      ></iframe>
-    </section>
+    <SectionShell muted>
+      <SectionHeading
+        eyebrow={section.config.eyebrow}
+        title={section.config.title}
+        description={section.config.description}
+        align="center"
+      />
+
+      <div
+        className={`${MEDIA} mx-auto mt-12 aspect-video max-w-4xl shadow-sm ring-1 ring-border`}
+      >
+        <iframe
+          className="h-full w-full"
+          src={`https://www.youtube.com/embed/${section.config.videoId}`}
+          title={section.config.title || ""}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+    </SectionShell>
   );
 };
 

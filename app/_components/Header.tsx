@@ -253,8 +253,8 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
 
   return (
     <>
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
-      <div className="container mx-auto flex h-14 items-center justify-between gap-6 px-4">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70">
+      <div className="container mx-auto flex h-16 items-center justify-between gap-6 px-4 md:px-6">
         {/* Logo */}
         <Link href={templateUrl("/")} className="shrink-0">
           {cpDetail?.logo ? (
@@ -267,7 +267,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
               alt={cpDetail.name}
               width={40}
               height={40}
-              className="h-8 w-auto object-contain"
+              className="h-9 w-auto object-contain"
             />
           ) : (
             <span className="text-base font-semibold text-foreground">
@@ -292,7 +292,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                 onChange={handleInputChange}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
-                className="h-8 pl-9 pr-3 text-sm bg-muted/40 border-transparent focus:border-border focus:bg-background"
+                className="h-9 rounded-full border-transparent bg-muted/50 pl-9 pr-3 text-sm transition-colors focus:border-border focus:bg-background"
               />
             </div>
           </form>
