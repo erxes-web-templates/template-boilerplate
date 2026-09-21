@@ -1,4 +1,5 @@
 import { Section } from "../../../types/sections";
+import { cardSurfaceStyle } from "../../../lib/renderSections";
 import {
   CARD,
   SECTION_ICONS,
@@ -89,6 +90,7 @@ const FeaturesSection = ({ section }: { section: Section }) => {
             <div
               key={`${item.title}-${index}`}
               className={`${CARD} p-8 ${isCentered ? "text-center" : ""}`}
+              style={cardSurfaceStyle(section)}
             >
               {Icon && (
                 <div

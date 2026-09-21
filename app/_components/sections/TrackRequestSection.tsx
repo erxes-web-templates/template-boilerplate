@@ -9,6 +9,7 @@ import { getTicketConfig } from "../../../lib/ticketConfig";
 import { useRequestByIdOrReference } from "../../../hooks/useTickets";
 import { STAGE_TRACK } from "../../../lib/ticketMapping";
 import { SectionHeading } from "./_SectionHeading";
+import { cardSurfaceStyle } from "../../../lib/renderSections";
 
 /**
  * Look up a request by its reference.
@@ -91,14 +92,20 @@ const TrackRequestSection = ({ section }: { section: Section }) => {
         </form>
 
         {notFound && (
-          <p className="mt-6 rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
+          <p
+            className="mt-6 rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground"
+            style={cardSurfaceStyle(section)}
+          >
             No request matches that reference. Check it against your
             confirmation — it has to match exactly.
           </p>
         )}
 
         {request && (
-          <div className="mt-6 rounded-2xl border border-border bg-card p-6">
+          <div
+            className="mt-6 rounded-2xl border border-border bg-card p-6"
+            style={cardSurfaceStyle(section)}
+          >
             <p className="text-sm text-muted-foreground">{request.reference}</p>
             <h3 className="mt-1 text-lg font-semibold text-card-foreground">
               {request.title}

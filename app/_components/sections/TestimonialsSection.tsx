@@ -1,6 +1,7 @@
 import { Quote } from "lucide-react";
 import { Section } from "../../../types/sections";
 import { CARD, SectionHeading, SectionShell } from "./_SectionHeading";
+import { cardSurfaceStyle } from "../../../lib/renderSections";
 
 type Testimonial = {
   quote?: string;
@@ -40,6 +41,7 @@ const TestimonialsSection = ({ section }: { section: Section }) => {
             <figure
               key={`${item.author}-${index}`}
               className={`${CARD} flex h-full flex-col bg-background p-8`}
+              style={cardSurfaceStyle(section)}
             >
               <Quote
                 aria-hidden

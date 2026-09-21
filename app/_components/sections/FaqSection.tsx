@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/accordion";
 import { Section } from "../../../types/sections";
 import { SectionHeading, SectionShell } from "./_SectionHeading";
+import { cardSurfaceStyle } from "../../../lib/renderSections";
 
 type Faq = { question?: string; answer?: string };
 
@@ -42,6 +43,7 @@ const FaqSection = ({ section }: { section: Section }) => {
             key={`${item.question}-${index}`}
             value={`faq-${index}`}
             className="rounded-2xl border border-border bg-card px-6 data-[state=open]:shadow-sm"
+            style={cardSurfaceStyle(section)}
           >
             <AccordionTrigger className="py-5 text-left text-base font-semibold hover:no-underline">
               {item.question}

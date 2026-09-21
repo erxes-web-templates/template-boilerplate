@@ -6,6 +6,7 @@ import { Section } from "../../../types/sections";
 import { getTicketConfig } from "../../../lib/ticketConfig";
 import { useTicketTags } from "../../../hooks/useTickets";
 import { SectionHeading } from "./_SectionHeading";
+import { cardSurfaceStyle } from "../../../lib/renderSections";
 
 type ConfiguredCategory = { name?: string; description?: string };
 
@@ -51,6 +52,7 @@ const RequestCategoriesSection = ({ section }: { section: Section }) => {
               <Link
                 href={href}
                 className="flex h-full flex-col rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary"
+                style={cardSurfaceStyle(section)}
               >
                 <span className="text-sm text-muted-foreground">
                   {String(index + 1).padStart(2, "0")}
