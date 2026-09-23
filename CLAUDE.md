@@ -2,7 +2,9 @@
 
 ## 1. Role
 
-You are a template developer building an erxes web template by cloning `template-boilerplate`. Your job is UI only: sections, components, pages, and styling. Do not touch the auth flow, cart/checkout logic, GraphQL mutations, Apollo setup, `lib/client.ts`, `hooks/`, or `graphql/` (read those files to understand data shape, but never modify them).
+You are a template developer building an erxes web template by cloning `template-boilerplate`. Your job is UI only: sections, components, pages, and styling. Composition is yours — the header's logo can sit in the middle with the menu first, a card grid can become a list, a stack can become an editorial split. Data fetching, business logic and routing are not: do not touch the auth flow, cart/checkout logic, GraphQL mutations, Apollo setup, `lib/client.ts`, `hooks/`, or `graphql/` (read those files to understand data shape, but never modify them).
+
+Templates have no `node_modules` of their own and are compiled by the builder (see §9a). Never add a dependency to a template's `package.json`.
 
 ---
 
@@ -79,7 +81,8 @@ interface Section {
 - **Images**: Always use `next/image` `<Image>`. Never use a bare `<img>` tag.
 - **Internal links**: Always use `next/link` `<Link>`. Never use a bare `<a>` tag.
 - **Tailwind only**: No inline styles. No hardcoded hex colors — use CSS variables or Tailwind tokens.
-- **No lorem ipsum**: All placeholder text must be real copy in the template's target language.
+- **No static text in components**: Every string a visitor reads comes from `section.config` or the API — never a sentence written into the JSX. Headings, body copy, button labels, empty states and alt text included. Use `section.config?.heading` with a short neutral fallback (a word or two, or empty), not invented marketing copy, and seed the real value in initData. Lorem ipsum is banned for the same reason: the problem is not the language, it is text the site's owner cannot edit.
+- **Every section gets its own UI**: across templates, your `RoomsSection` must differ structurally from every other template's — not the same markup recoloured. Within a template, no two sections should share a structure. If a diff against the source shows only class names changing, it is not done.
 - **TypeScript**: No `any` except when accessing `section.config` (it is typed `any` intentionally). Never use `any` in your own interfaces.
 
 ---
@@ -132,14 +135,18 @@ Use real Unsplash URLs for `initUrl` image fields. Do not use local `/images/` p
 
 ## 8. Checklist Before Submitting a Template
 
-- [ ] All sections render without errors on `/`
-- [ ] `pnpm build` passes with 0 TypeScript errors
+- [ ] All sections render without errors in the builder preview
+- [ ] `cd apps/web-builder && yarn build` passes with 0 TypeScript errors (templates compile as part of the builder — there is no per-template build)
+- [ ] The preview shows THIS template, not the boilerplate — if it looks wrong, the `renderTemplate` case is missing
+- [ ] No static copy left in any component
 - [ ] No `|| 999` remainder fallback anywhere
 - [ ] No `console.log` left in components
 - [ ] `homePageSections.json` uses real Unsplash URLs for images
 - [ ] All section types are registered in `sectionComponents` and `KnownSectionType`
 - [ ] Mobile layout tested (all sections responsive)
-- [ ] Template is registered in `clone-templates.sh`, `sync-template-core.sh`, and `push-templates.sh`
+- [ ] `yarn template:check` passes with no errors
+- [ ] Template has a catalog thumbnail (`yarn template:shoot <id>`)
+- [ ] Manifest entry promoted from `wip` to `active` with its `catalog` block filled
 
 ---
 
@@ -147,43 +154,100 @@ Use real Unsplash URLs for `initUrl` image fields. Do not use local `/images/` p
 
 **Prerequisites**
 - `GH_ACCESS_TOKEN` in `apps/web-builder/.env` (GitHub PAT with `repo` scope)
-- A GitHub repo created under the `erxes-web-templates` org, named after your template (e.g. `tour-template-5`)
+- A GitHub repo created under the `erxes-web-templates` org, named after your template (e.g. `hotel-template-larch`)
 
-**Steps**
+**One command**
 
-1. **Register in `clone-templates.sh`** — add the name to the `templates` array and add a `git clone` line:
-   ```bash
-   git clone --branch main "https://x-access-token:${GH_ACCESS_TOKEN}@github.com/erxes-web-templates/your-template-name.git" "$TEMPLATES_DIR/your-template-name"
-   ```
+From the `web-builder` root:
 
-2. **Clone all templates** from the `web-builder` root:
-   ```bash
-   ./scripts/clone-templates.sh
-   ```
-   Clones into `apps/templates/` and strips `.git` — result is a clean working copy.
+```bash
+yarn template:new hotel-template-larch --type hotel --name "Larch"
+```
 
-3. **Seed from boilerplate** — if the GitHub repo is empty, copy the boilerplate as a starting point:
-   ```bash
-   cp -r apps/templates/template-boilerplate apps/templates/your-template-name
-   ```
+That copies the boilerplate into `apps/templates/`, names the package, adds the
+entry to `templates.manifest.json`, and regenerates every registration point —
+including the import and `case` in the builder's `renderTemplate`. There is
+nothing else to register by hand.
 
-4. **Register in sync and push scripts** — add the template name to `TEMPLATES` in both `sync-template-core.sh` and `push-templates.sh`.
+Templates have no `node_modules` of their own, so there is nothing to install.
+Then sync core infrastructure and start building sections (see §4):
 
-5. **Sync core infrastructure**:
-   ```bash
-   ./scripts/sync-template-core.sh
-   ```
-   Pulls the latest `lib/`, `graphql/`, `types/`, `hooks/` from boilerplate into your template. Run this after every `clone-templates.sh`.
+```bash
+./scripts/sync-template-core.sh
+cd apps/web-builder && yarn dev    # open a project and pick the template
+```
 
-Now build your sections (see §4).
+A new template starts at status `wip` — present, synced and pushed, but not
+offered in the builder. Promote it once its sections are built:
+
+```bash
+yarn template:shoot hotel-template-larch    # catalog thumbnail
+# then set status to "active" and fill the catalog block in templates.manifest.json
+yarn template:sync && yarn template:check
+```
 
 **Naming convention**
 
+The id is used in three places and they must agree — `yarn template:check`
+fails if they do not, and `yarn template:sync` fixes it.
+
 | What | Format | Example |
 |---|---|---|
-| GitHub repo name | `<type>-template-<N>` | `tour-template-5` |
-| Folder under `apps/templates/` | Matches repo name | `tour-template-5` |
-| `package.json` `name` | Matches folder name | `tour-template-5` |
+| GitHub repo name | `<type>-template-<name>` | `hotel-template-larch` |
+| Folder under `apps/templates/` | Matches repo name | `hotel-template-larch` |
+| `package.json` `name` | Matches folder name | `hotel-template-larch` |
+
+---
+
+## 9a. The Manifest
+
+`templates.manifest.json` at the repo root is the single source of truth for
+which templates exist. These four are **generated from it** and must never be
+edited by hand:
+
+| Generated | Managed region |
+|---|---|
+| `scripts/clone-templates.sh` | `TEMPLATE_SPECS` block |
+| `scripts/sync-template-core.sh` | `TEMPLATES` block |
+| `scripts/push-templates.sh` | `TEMPLATES` block |
+| `apps/web-builder/src/utils/templates.ts` | whole file |
+| `apps/web-builder/src/app/dashboard/projects/[id]/page.tsx` | `template-imports` and `template-cases` blocks |
+
+The last one is the one that matters. The others decide what is **listed**;
+`renderTemplate` decides what is **rendered**. A template can be in the
+catalog, the clone list and the sync list and still show the boilerplate,
+because that switch is what picks the layout. `yarn template:check` treats a
+catalog template missing from the switch as an error.
+
+```bash
+yarn template:sync              # regenerate everything from the manifest
+yarn template:sync --dry-run    # show what would change
+yarn template:check             # fail if anything has drifted
+```
+
+**Status** decides where a template appears:
+
+| Status | Cloned | Core-synced | Pushed | In builder |
+|---|---|---|---|---|
+| `active` | yes | yes | yes | yes — needs a `catalog` block |
+| `wip` | yes | yes | yes | no — `catalog` must be `null` |
+| `archived` | no | no | no | no |
+
+`yarn template:check` is the guard against the failure this design exists to
+prevent: a template folder that is on disk but in none of the lists, so it
+silently never reaches the builder. Run it in CI and before every PR.
+
+**Templates have no `node_modules` or `.next`.** The builder compiles their
+source through `"@templates/*": ["../templates/*"]` in its tsconfig, which also
+`include`s `../templates/**/*` and excludes any template `node_modules` —
+React, react-dom and react-hook-form are pinned to the hoisted copy so a stray
+install cannot collide. Never run `yarn install` inside a template, and never
+add a dependency to a template's `package.json`; it belongs to the builder.
+
+This is also why a template is only viewable inside the builder, at
+`/dashboard/projects/<projectId>?template=<id>`. The `dev` and `preview`
+scripts in template `package.json` files belong to the unmerged preview branch
+(§12) and do nothing useful on `main`.
 
 ---
 
@@ -233,6 +297,22 @@ Requirements: the template must be in `push-templates.sh`'s `TEMPLATES` array an
 ---
 
 ## 12. Builder Preview (how the template renders inside the web builder)
+
+> **Status: not on `main`.** This section describes the iframe preview
+> architecture, which lives on the `template-preview-architecture` branch and
+> has not been merged. On `main` the files below do not exist —
+> `apps/web-builder/src/utils/templatePreview.ts`,
+> `scripts/add-preview-route.sh`, `scripts/preview-templates.sh`, and the
+> `yarn preview:all` script. Do not follow these steps against `main`; they
+> will send you looking for files that are not there.
+>
+> What *is* on `main`: every template has its own `preview` script on its own
+> port, assigned by `templates.manifest.json` (§9a). `cd apps/templates/<id> &&
+> yarn preview` works today. When the preview branch merges, `DEV_PREVIEW_PORTS`
+> should be dropped in favour of `TEMPLATE_PREVIEW_PORTS`, which
+> `apps/web-builder/src/utils/templates.ts` already exports from the manifest —
+> that removes the "keep this in sync with your preview script's port" step
+> described below.
 
 The builder no longer renders a template inline in its own React tree. It
 points an iframe at the template's **own** server, so the preview loads this
