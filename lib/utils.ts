@@ -112,16 +112,40 @@ export const getEnv = (): any => {
   return envs;
 };
 
-export const getFileUrl = (url: string) => {
+/**
+ * Resolve an erxes file reference to something a browser can actually load.
+ *
+ * erxes hands back either a bare storage key, an absolute URL, or an object
+ * carrying one of those. The naive version prefixed everything, so an absolute
+ * URL came out mangled and a bare key rendered as a broken image — which is
+ * what product thumbnails in the cart, checkout and payment pages were hitting.
+ * Passing through anything already resolvable makes this safe to apply at the
+ * point of render, including to values stored in an older cart.
+ */
+export const getFileUrl = (url: any) => {
   if (!url) return "";
+  let fileKey = "";
+  if (typeof url === "string") {
+    fileKey = url;
+  } else if (typeof url === "object") {
+    fileKey = url.url || url.initUrl || "";
+  }
+  if (!fileKey) return "";
+  if (
+    fileKey.startsWith("http://") ||
+    fileKey.startsWith("https://") ||
+    fileKey.startsWith("/")
+  ) {
+    return fileKey;
+  }
   if (!isBuildMode()) {
-    return `${process.env.ERXES_FILE_URL}${url}`;
+    return `${process.env.ERXES_FILE_URL}${fileKey}`;
   }
   if (typeof window === "undefined") {
-    return `${process.env.NEXT_PUBLIC_API_DOMAIN}/read-file?key=${url}`;
+    return `${process.env.NEXT_PUBLIC_API_DOMAIN}/read-file?key=${fileKey}`;
   }
   const env = getEnv();
-  return `${env.NEXT_PUBLIC_API_DOMAIN}/read-file?key=${url}`;
+  return `${env.NEXT_PUBLIC_API_DOMAIN}/read-file?key=${fileKey}`;
 };
 
 export const templateUrl = (slug: string) => {

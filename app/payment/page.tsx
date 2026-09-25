@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { getFileUrl } from "../../lib/utils";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -32,10 +33,12 @@ import {
 } from "../../components/ui/dialog";
 import {
   ArrowLeft,
+  Check,
   CheckCircle,
   Clock,
   ExternalLink,
   RefreshCw,
+  ShieldCheck,
   XCircle,
 } from "lucide-react";
 
@@ -383,29 +386,61 @@ const PaymentPage = () => {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 px-4 py-10">
-      <header className="space-y-2">
+    <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
+      <header className="space-y-5">
         <Button
           variant="ghost"
           size="sm"
-          className="inline-flex items-center gap-2 px-0 text-sm"
+          className="-ml-2 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
           onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4" />
           Буцах
         </Button>
-        <div>
+
+        {/* Where the buyer is in the flow. Checkout hands over to this page
+            with no indication that anything remains, which is where orders get
+            abandoned. */}
+        <ol className="flex items-center gap-2 text-xs font-medium">
+          {[
+            { label: "Сагс", done: true },
+            { label: "Хүргэлт", done: true },
+            { label: "Төлбөр", done: false },
+          ].map((step, index, all) => (
+            <li key={step.label} className="flex items-center gap-2">
+              <span
+                className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] ${
+                  step.done
+                    ? "bg-primary/10 text-primary"
+                    : "bg-primary text-primary-foreground"
+                }`}
+              >
+                {step.done ? <Check className="h-3.5 w-3.5" /> : index + 1}
+              </span>
+              <span
+                className={step.done ? "text-muted-foreground" : "text-foreground"}
+              >
+                {step.label}
+              </span>
+              {index < all.length - 1 && (
+                <span className="mx-1 h-px w-6 bg-border sm:w-10" />
+              )}
+            </li>
+          ))}
+        </ol>
+
+        <div className="space-y-1">
           <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
             Төлбөрийн төв
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground">
             Захиалгын төлбөрөө төлөхийн тулд төлбөрийн хэлбэрээ сонгон, холбоос
             үүсгэнэ үү.
           </p>
         </div>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="mt-8 grid items-start gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <Card>
           <CardHeader>
             <CardTitle>Төлбөрийн сонголт</CardTitle>
@@ -447,10 +482,12 @@ const PaymentPage = () => {
                     <label
                       key={option._id}
                       htmlFor={`payment-${option._id}`}
-                      className={`flex cursor-pointer items-start gap-3 rounded-md border p-4 text-sm transition ${
-                        checked
-                          ? "border-primary bg-primary/5 text-foreground"
-                          : "border-border text-muted-foreground"
+                      className={`relative flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-all ${
+                        option.status !== "active"
+                          ? "cursor-not-allowed border-border opacity-60"
+                          : checked
+                            ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+                            : "border-border hover:border-primary/40 hover:bg-muted/40"
                       }`}
                     >
                       <RadioGroupItem
@@ -458,11 +495,11 @@ const PaymentPage = () => {
                         value={option._id}
                         disabled={option.status !== "active"}
                       />
-                      <div className="flex flex-1 flex-col">
-                        <span className="text-sm font-medium text-foreground">
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <span className="font-medium text-foreground">
                           {option.name}
                         </span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="truncate text-sm text-muted-foreground">
                           {config?.description ?? option.kind}
                         </span>
                         {option.status !== "active" && (
@@ -474,85 +511,109 @@ const PaymentPage = () => {
                           </Badge>
                         )}
                       </div>
+                      {checked && (
+                        <span className="flex h-6 w-6 flex-none items-center justify-center rounded-full bg-primary text-primary-foreground">
+                          <Check className="h-4 w-4" />
+                        </span>
+                      )}
                     </label>
                   );
                 })}
               </RadioGroup>
             )}
           </CardContent>
-          <CardFooter className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1 text-sm text-muted-foreground">
-              <p>
-                Нийт төлөх дүн:{" "}
-                <span className="font-semibold text-foreground">
-                  {formatCurrency(totalPrice)}
-                </span>
+          <CardFooter className="flex flex-col gap-4 border-t pt-6">
+            <Button
+              size="lg"
+              className="h-12 w-full text-base"
+              onClick={handleCreateInvoice}
+              disabled={
+                !selectedPaymentId || isCreatingInvoice || isAddingTransaction
+              }
+            >
+              {isCreatingInvoice || isAddingTransaction ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Төлбөрийн мэдээлэл бэлдэж байна...
+                </>
+              ) : (
+                <>Төлбөр төлөх · {formatCurrency(totalPrice)}</>
+              )}
+            </Button>
+
+            <div className="flex w-full flex-col items-center gap-2 text-center sm:flex-row sm:justify-between sm:text-left">
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Төлбөрийн системд шилжихэд хэдэн секунд шаардагдана.
               </p>
-              <p>Төлбөрийн системд шилжихэд хэдэн секунд шаардагдана.</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" onClick={refetchPayments}>
-                Сонголтуудыг шинэчлэх
-              </Button>
               <Button
-                onClick={handleCreateInvoice}
-                disabled={
-                  !selectedPaymentId || isCreatingInvoice || isAddingTransaction
-                }
+                variant="ghost"
+                size="sm"
+                className="text-xs text-muted-foreground"
+                onClick={refetchPayments}
               >
-                {isCreatingInvoice || isAddingTransaction
-                  ? "Төлбөрийн мэдээлэл бэлдэж байна..."
-                  : "Төлбөр төлөх"}
+                <RefreshCw className="mr-1.5 h-3 w-3" />
+                Сонголтуудыг шинэчлэх
               </Button>
             </div>
           </CardFooter>
         </Card>
 
-        <div className="space-y-4">
+        {/* Sticky, so the amount stays in view while payment methods are
+            scrolled on a long order. */}
+        <div className="space-y-4 lg:sticky lg:top-6">
           <Card>
             <CardHeader>
-              <CardTitle>Захиалгын товчоо</CardTitle>
+              <CardTitle className="flex items-center justify-between">
+                <span>Захиалгын товчоо</span>
+                <span className="text-sm font-normal text-muted-foreground">
+                  {cartItems.length} нэр төрөл
+                </span>
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm">
+            <CardContent className="space-y-4">
               {cartItems.map((item) => (
                 <div
                   key={`payment-summary-${item.id}`}
-                  className="flex items-center justify-between gap-3"
+                  className="flex items-start gap-3"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="relative h-12 w-12 overflow-hidden rounded-md bg-muted">
-                      {item.imageUrl ? (
-                        <Image
-                          src={item.imageUrl}
-                          alt={item.name}
-                          fill
-                          sizes="48px"
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
-                          No image
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">
-                        {item.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        × {item.quantity}
-                      </p>
-                    </div>
+                  <div className="relative h-16 w-16 flex-none overflow-hidden rounded-lg border bg-muted">
+                    {item.imageUrl ? (
+                      <Image
+                        src={getFileUrl(item.imageUrl)}
+                        alt={item.name}
+                        fill
+                        sizes="64px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
+                        Зураггүй
+                      </div>
+                    )}
+                    <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground px-1 text-[10px] font-medium text-background">
+                      {item.quantity}
+                    </span>
                   </div>
-                  <span className="font-medium text-foreground">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium leading-snug text-foreground">
+                      {item.name}
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {formatCurrency(item.unitPrice)} × {item.quantity}
+                    </p>
+                  </div>
+                  <span className="whitespace-nowrap text-sm font-semibold text-foreground">
                     {formatCurrency(item.unitPrice * item.quantity)}
                   </span>
                 </div>
               ))}
             </CardContent>
-            <CardFooter className="flex items-center justify-between text-sm font-semibold">
-              <span>Нийт</span>
-              <span>{formatCurrency(totalPrice)}</span>
+            <CardFooter className="flex items-center justify-between border-t pt-4">
+              <span className="text-sm text-muted-foreground">Нийт</span>
+              <span className="text-xl font-semibold text-foreground">
+                {formatCurrency(totalPrice)}
+              </span>
             </CardFooter>
           </Card>
 

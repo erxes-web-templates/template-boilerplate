@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { getFileUrl } from "../../lib/utils";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Ban, Check, ImageOff, Loader2, ShoppingCart } from "lucide-react";
@@ -101,7 +102,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       >
         {product.image ? (
           <Image
-            src={product.image}
+            src={getFileUrl(product.image)}
             alt={product.name}
             fill
             className={`object-cover transition-transform duration-500 group-hover:scale-105 ${

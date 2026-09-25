@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { getFileUrl } from "../../lib/utils";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -424,20 +425,20 @@ const CheckoutPage = () => {
         {cartItems.map((item) => (
           <div
             key={item.id}
-            className="flex items-start gap-4 rounded-md border border-border p-4"
+            className="flex items-start gap-4 rounded-xl border border-border p-4 transition-colors hover:border-primary/30"
           >
-            <div className="relative h-16 w-16 overflow-hidden rounded-md bg-muted">
+            <div className="relative h-20 w-20 flex-none overflow-hidden rounded-lg border bg-muted">
               {item.imageUrl ? (
                 <Image
-                  src={item.imageUrl}
+                  src={getFileUrl(item.imageUrl)}
                   alt={item.name}
                   fill
-                  sizes="64px"
+                  sizes="80px"
                   className="object-cover"
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
-                  No image
+                  Зураггүй
                 </div>
               )}
             </div>
@@ -539,7 +540,7 @@ const CheckoutPage = () => {
   );
 
   const renderInformationStep = () => (
-    <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+    <div className="grid items-start gap-6 lg:grid-cols-[1.2fr_0.8fr]">
       <Card>
         <CardHeader>
           <CardTitle>Хүргэлтийн мэдээлэл</CardTitle>
@@ -823,23 +824,26 @@ const CheckoutPage = () => {
             {cartItems.map((item) => (
               <div
                 key={`summary-${item.id}`}
-                className="flex items-center justify-between gap-3"
+                className="flex items-start justify-between gap-3"
               >
-                <div className="flex items-center gap-3">
-                  <div className="relative h-12 w-12 overflow-hidden rounded-md bg-muted">
+                <div className="flex min-w-0 flex-1 items-start gap-3">
+                  <div className="relative h-16 w-16 flex-none overflow-hidden rounded-lg border bg-muted">
                     {item.imageUrl ? (
                       <Image
-                        src={item.imageUrl}
+                        src={getFileUrl(item.imageUrl)}
                         alt={item.name}
                         fill
-                        sizes="48px"
+                        sizes="64px"
                         className="object-cover"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
-                        No image
+                        Зураггүй
                       </div>
                     )}
+                    <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground px-1 text-[10px] font-medium text-background">
+                      {item.quantity}
+                    </span>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-foreground">
@@ -866,7 +870,7 @@ const CheckoutPage = () => {
   );
 
   const renderReviewStep = () => (
-    <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+    <div className="grid items-start gap-6 lg:grid-cols-[1.2fr_0.8fr]">
       <Card>
         <CardHeader>
           <CardTitle>Холбоо барих мэдээлэл</CardTitle>
@@ -962,7 +966,7 @@ const CheckoutPage = () => {
                 <div className="relative h-12 w-12 overflow-hidden rounded-md bg-muted">
                   {item.imageUrl ? (
                     <Image
-                      src={item.imageUrl}
+                      src={getFileUrl(item.imageUrl)}
                       alt={item.name}
                       fill
                       sizes="48px"
@@ -970,7 +974,7 @@ const CheckoutPage = () => {
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
-                      No image
+                      Зураггүй
                     </div>
                   )}
                 </div>

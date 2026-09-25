@@ -351,7 +351,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                         <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-muted">
                           {item.imageUrl && (
                             <Image
-                              src={item.imageUrl}
+                              src={getFileUrl(item.imageUrl)}
                               alt={item.name}
                               fill
                               sizes="56px"
