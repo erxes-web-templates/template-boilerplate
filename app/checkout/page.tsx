@@ -31,7 +31,7 @@ import { useCart } from "../../lib/CartContext";
 import orderQueries from "../../graphql/order/queries";
 import orderMutations from "../../graphql/order/mutations";
 import authQueries from "../../graphql/auth/queries";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { Check, Minus, Plus, Trash2 } from "lucide-react";
 import { templateUrl } from "../../lib/utils";
 import useClientPortal from "../../hooks/useClientPortal";
 
@@ -72,8 +72,15 @@ type StepIndicatorProps = {
   currentStep: number;
 };
 
+/** Brand tints that survive a raw-hex --primary. See payment/page.tsx. */
+const tint = (pct: number) =>
+  `color-mix(in srgb, var(--primary) ${pct}%, transparent)`;
+
 const StepIndicator = ({ currentStep }: StepIndicatorProps) => (
-  <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-card px-4 py-3">
+  <div
+    className="flex items-center justify-between gap-4 rounded-xl border px-4 py-4"
+    style={{ backgroundColor: tint(5), borderColor: tint(18) }}
+  >
     {STEP_TITLES.map((title, index) => {
       const stepNumber = index + 1;
       const isActive = stepNumber === currentStep;
@@ -84,15 +91,24 @@ const StepIndicator = ({ currentStep }: StepIndicatorProps) => (
           className="flex flex-1 items-center gap-3 text-sm sm:text-base"
         >
           <div
-            className={`flex h-9 w-9 items-center justify-center rounded-full border text-sm font-semibold transition-colors ${
+            className="flex h-10 w-10 flex-none items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors"
+            style={
               isActive
-                ? "border-primary bg-primary text-primary-foreground"
+                ? {
+                    backgroundColor: "var(--primary)",
+                    borderColor: "var(--primary)",
+                    color: "hsl(var(--primary-foreground))",
+                  }
                 : isCompleted
-                ? "border-primary/50 bg-primary/10 text-primary"
-                : "border-border text-muted-foreground"
-            }`}
+                  ? {
+                      backgroundColor: tint(12),
+                      borderColor: tint(45),
+                      color: "var(--primary)",
+                    }
+                  : undefined
+            }
           >
-            {stepNumber}
+            {isCompleted ? <Check className="h-4 w-4" /> : stepNumber}
           </div>
           <span
             className={`hidden flex-1 text-sm font-medium md:block ${
@@ -425,7 +441,7 @@ const CheckoutPage = () => {
         {cartItems.map((item) => (
           <div
             key={item.id}
-            className="flex items-start gap-4 rounded-xl border border-border p-4 transition-colors hover:border-primary/30"
+            className="flex items-start gap-4 rounded-xl border border-border p-4 transition-colors hover:border-foreground/20"
           >
             <div className="relative h-20 w-20 flex-none overflow-hidden rounded-lg border bg-muted">
               {item.imageUrl ? (
@@ -645,11 +661,12 @@ const CheckoutPage = () => {
                     <label
                       key={option.value}
                       htmlFor={`invoice-${option.value}`}
-                      className={`flex cursor-pointer items-center gap-2 rounded-md border p-3 text-sm transition ${
+                      className={`flex cursor-pointer items-center gap-2 rounded-lg border-2 p-3 text-sm transition ${
                         checked
-                          ? "border-primary bg-primary/5 text-foreground"
-                          : "border-border text-muted-foreground"
+                          ? "border-primary text-foreground"
+                          : "border-border text-muted-foreground hover:border-border"
                       }`}
+                      style={checked ? { backgroundColor: tint(7) } : undefined}
                     >
                       <RadioGroupItem
                         id={`invoice-${option.value}`}
@@ -761,11 +778,12 @@ const CheckoutPage = () => {
                     <label
                       key={option.key}
                       htmlFor={`extra-${option.key}`}
-                      className={`flex cursor-pointer items-center gap-2 rounded-md border p-3 text-sm transition ${
+                      className={`flex cursor-pointer items-center gap-2 rounded-lg border-2 p-3 text-sm transition ${
                         checked
-                          ? "border-primary bg-primary/5 text-foreground"
-                          : "border-border text-muted-foreground"
+                          ? "border-primary text-foreground"
+                          : "border-border text-muted-foreground hover:border-border"
                       }`}
+                      style={checked ? { backgroundColor: tint(7) } : undefined}
                     >
                       <Checkbox
                         id={`extra-${option.key}`}
@@ -860,9 +878,13 @@ const CheckoutPage = () => {
               </div>
             ))}
           </CardContent>
-          <CardFooter className="flex items-center justify-between text-sm font-semibold">
-            <span>Нийт</span>
-            <span>{formatCurrency(totalPrice)}</span>
+          <CardFooter className="mt-2 flex items-center justify-between rounded-xl px-4 py-3"
+            style={{ backgroundColor: tint(8) }}
+          >
+            <span className="text-sm font-medium text-foreground">Нийт</span>
+            <span className="text-xl font-bold" style={{ color: "var(--primary)" }}>
+              {formatCurrency(totalPrice)}
+            </span>
           </CardFooter>
         </Card>
       </div>
@@ -994,9 +1016,14 @@ const CheckoutPage = () => {
           ))}
         </CardContent>
         <CardFooter className="flex flex-col gap-3">
-          <div className="flex items-center justify-between text-sm font-semibold">
-            <span>Нийт</span>
-            <span>{formatCurrency(totalPrice)}</span>
+          <div
+            className="flex w-full items-center justify-between rounded-xl px-4 py-3"
+            style={{ backgroundColor: tint(8) }}
+          >
+            <span className="text-sm font-medium text-foreground">Нийт</span>
+            <span className="text-xl font-bold" style={{ color: "var(--primary)" }}>
+              {formatCurrency(totalPrice)}
+            </span>
           </div>
           {activeOrder?._id && (
             <p className="text-xs text-muted-foreground">
@@ -1010,12 +1037,12 @@ const CheckoutPage = () => {
   );
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 px-4 py-10">
+    <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 md:py-12">
       <header className="space-y-1">
         <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
           Захиалгын төлбөр
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground">
           Захиалгын мэдээллээ баталгаажуулж, төлбөр төлөх алхамд шилжинэ үү.
         </p>
       </header>

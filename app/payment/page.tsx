@@ -42,6 +42,10 @@ import {
   XCircle,
 } from "lucide-react";
 
+/** Brand tints that survive a raw-hex --primary. */
+const tint = (pct: number) =>
+  `color-mix(in srgb, var(--primary) ${pct}%, transparent)`;
+
 const POLL_INTERVAL_MS = 3000;
 const TIMEOUT_MS = 2 * 60 * 1000; // 2 minutes
 
@@ -387,7 +391,13 @@ const PaymentPage = () => {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
-      <header className="space-y-5">
+      <header
+        className="space-y-5 rounded-2xl border p-6 md:p-8"
+        style={{
+          backgroundColor: tint(5),
+          borderColor: tint(18),
+        }}
+      >
         <Button
           variant="ghost"
           size="sm"
@@ -409,11 +419,15 @@ const PaymentPage = () => {
           ].map((step, index, all) => (
             <li key={step.label} className="flex items-center gap-2">
               <span
-                className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] ${
+                className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-semibold"
+                style={
                   step.done
-                    ? "bg-primary/10 text-primary"
-                    : "bg-primary text-primary-foreground"
-                }`}
+                    ? { backgroundColor: tint(14), color: "var(--primary)" }
+                    : {
+                        backgroundColor: "var(--primary)",
+                        color: "hsl(var(--primary-foreground))",
+                      }
+                }
               >
                 {step.done ? <Check className="h-3.5 w-3.5" /> : index + 1}
               </span>
@@ -482,13 +496,18 @@ const PaymentPage = () => {
                     <label
                       key={option._id}
                       htmlFor={`payment-${option._id}`}
-                      className={`relative flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-all ${
+                      className={`relative flex cursor-pointer items-center gap-4 rounded-xl border-2 p-4 transition-all ${
                         option.status !== "active"
                           ? "cursor-not-allowed border-border opacity-60"
                           : checked
-                            ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-                            : "border-border hover:border-primary/40 hover:bg-muted/40"
+                            ? "border-primary shadow-sm"
+                            : "border-border hover:shadow-sm"
                       }`}
+                      style={
+                        option.status === "active" && checked
+                          ? { backgroundColor: tint(6) }
+                          : undefined
+                      }
                     >
                       <RadioGroupItem
                         id={`payment-${option._id}`}
@@ -512,7 +531,13 @@ const PaymentPage = () => {
                         )}
                       </div>
                       {checked && (
-                        <span className="flex h-6 w-6 flex-none items-center justify-center rounded-full bg-primary text-primary-foreground">
+                        <span
+                          className="flex h-7 w-7 flex-none items-center justify-center rounded-full"
+                          style={{
+                            backgroundColor: "var(--primary)",
+                            color: "hsl(var(--primary-foreground))",
+                          }}
+                        >
                           <Check className="h-4 w-4" />
                         </span>
                       )}
@@ -609,9 +634,14 @@ const PaymentPage = () => {
                 </div>
               ))}
             </CardContent>
-            <CardFooter className="flex items-center justify-between border-t pt-4">
-              <span className="text-sm text-muted-foreground">Нийт</span>
-              <span className="text-xl font-semibold text-foreground">
+            <CardFooter className="mt-2 flex items-center justify-between rounded-xl px-4 py-3"
+              style={{ backgroundColor: tint(8) }}
+            >
+              <span className="text-sm font-medium text-foreground">Нийт</span>
+              <span
+                className="text-xl font-bold"
+                style={{ color: "var(--primary)" }}
+              >
                 {formatCurrency(totalPrice)}
               </span>
             </CardFooter>
@@ -682,7 +712,7 @@ const PaymentPage = () => {
           {/* Success */}
           {modalStatus === "paid" && (
             <div className="flex flex-col items-center gap-4 py-6 text-center">
-              <CheckCircle className="h-16 w-16 text-green-500" />
+              <CheckCircle className="h-16 w-16 text-primary" />
               <p className="text-sm text-muted-foreground">
                 Захиалгын дугаар:{" "}
                 <span className="font-medium text-foreground">
@@ -695,7 +725,7 @@ const PaymentPage = () => {
           {/* Expired */}
           {modalStatus === "expired" && (
             <div className="flex flex-col items-center gap-4 py-6 text-center">
-              <Clock className="h-16 w-16 text-amber-500" />
+              <Clock className="h-16 w-16 text-muted-foreground" />
               <div className="flex gap-2">
                 <Button
                   variant="outline"

@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useMemo, useCallback, useEffect, useState, useRef } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import { ArrowLeft, CheckCircle2, Heart, Star } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Heart, ImageOff, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,7 +32,7 @@ import authQueries from "../../graphql/auth/queries";
 import productMutations from "../../graphql/products/mutations";
 import ecommerceQueries from "../../graphql/ecommerce/queries";
 import ecommerceMutations from "../../graphql/ecommerce/mutations";
-import { templateUrl } from "@/lib/utils";
+import { templateUrl, getFileUrl } from "@/lib/utils";
 import { isBuildMode } from "../../lib/buildMode";
 import { blockNoteToHtml, blockNoteToPlainText } from "../../lib/blocknote";
 import {
@@ -129,15 +130,14 @@ export default function ProductDetailPage({
       product.attachment?.url,
       ...(product.attachmentMore?.map((file) => file?.url || "") ?? []),
     ];
+    // erxes returns bare storage keys. Resolving here means every consumer —
+    // main image, thumbnails, the selected-image state — holds a URL a browser
+    // can actually load. The previous map returned the key untouched, which is
+    // why product images rendered broken.
     return images
       .filter((url): url is string => Boolean(url))
-      .map((url) => {
-        try {
-          return url;
-        } catch (error) {
-          return url;
-        }
-      });
+      .map((url) => getFileUrl(url))
+      .filter(Boolean);
   }, [product]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -579,13 +579,32 @@ export default function ProductDetailPage({
             </Card>
           )}
 
+          {/* Mirrors the loaded layout exactly — same 5-column grid, same 4:5
+              aspect, same thumbnail strip — so nothing jumps or reflows when
+              the product arrives. The old skeleton used a different grid and a
+              fixed height, which is what made loading look broken. */}
           {isLoading && (
-            <div className="grid gap-10 lg:grid-cols-[minmax(0,520px)_1fr]">
-              <div className="h-[520px] animate-pulse rounded-3xl border border-border bg-muted/40" />
-              <div className="space-y-4">
-                <div className="h-10 w-2/3 animate-pulse rounded bg-muted/40" />
-                <div className="h-6 w-1/3 animate-pulse rounded bg-muted/40" />
-                <div className="h-32 animate-pulse rounded bg-muted/40" />
+            <div className="grid gap-12 lg:grid-cols-5">
+              <div className="space-y-4 lg:col-span-3">
+                <div className="aspect-[4/5] w-full animate-pulse rounded-2xl border border-border bg-muted" />
+                <div className="grid grid-cols-6 gap-3">
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="aspect-square animate-pulse rounded-lg border border-border bg-muted"
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-6 lg:col-span-2">
+                <div className="space-y-3">
+                  <div className="h-5 w-24 animate-pulse rounded-full bg-muted" />
+                  <div className="h-9 w-3/4 animate-pulse rounded bg-muted" />
+                  <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
+                </div>
+                <div className="h-10 w-40 animate-pulse rounded bg-muted" />
+                <div className="h-11 w-full animate-pulse rounded-md bg-muted" />
+                <div className="h-24 w-full animate-pulse rounded bg-muted" />
               </div>
             </div>
           )}
@@ -601,16 +620,24 @@ export default function ProductDetailPage({
           {product && (
             <div className="grid gap-12 lg:grid-cols-5">
               <div className="space-y-4 lg:col-span-3">
-                <div className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-border bg-muted shadow-sm lg:max-h-[800px] w-full mx-auto flex justify-center items-center">
+                <div className="group relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-border bg-muted">
                   {selectedImage ? (
-                    <img
+                    <Image
+                      key={selectedImage}
                       src={selectedImage}
                       alt={product.name ?? "Product image"}
-                      className="h-full w-auto object-cover lg:max-h-[800px]"
+                      fill
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 55vw"
+                      className="object-contain transition-opacity duration-300"
+                      onLoadingComplete={(img) =>
+                        img.classList.remove("opacity-0")
+                      }
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
-                      Image coming soon
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-muted-foreground">
+                      <ImageOff className="h-8 w-8 opacity-40" />
+                      <span className="text-sm">Зураггүй</span>
                     </div>
                   )}
                 </div>
@@ -622,18 +649,22 @@ export default function ProductDetailPage({
                         type="button"
                         key={`${image}-${index}`}
                         onClick={() => setSelectedImage(image)}
-                        className={`relative aspect-square overflow-hidden rounded-xl border transition-all ${
+                        aria-label={`Зураг ${index + 1}`}
+                        aria-pressed={selectedImage === image}
+                        className={`relative aspect-square overflow-hidden rounded-lg border-2 bg-muted transition-all ${
                           selectedImage === image
-                            ? "border-primary shadow-lg"
-                            : "border-border hover:border-primary"
+                            ? "border-primary ring-2 ring-primary"
+                            : "border-border hover:border-primary/50"
                         }`}
                       >
-                        <img
+                        <Image
                           src={image}
                           alt={`${product.name ?? "Product"} thumbnail ${
                             index + 1
                           }`}
-                          className="h-full w-full object-cover"
+                          fill
+                          sizes="96px"
+                          className="object-cover"
                         />
                       </button>
                     ))}
@@ -651,26 +682,6 @@ export default function ProductDetailPage({
                         />
                       </CardContent>
                     </Card>
-                  )}
-                  {gallery.length > 1 && (
-                    <div className="gap-3">
-                      {gallery.map((image, index) => (
-                        <button
-                          type="button"
-                          key={`${image}-${index}`}
-                          onClick={() => setSelectedImage(image)}
-                          className={`relative aspect-square overflow-hidden rounded-xl transition-all`}
-                        >
-                          <img
-                            src={image}
-                            alt={`${product.name ?? "Product"} thumbnail ${
-                              index + 1
-                            }`}
-                            className="h-full w-full object-cover"
-                          />
-                        </button>
-                      ))}
-                    </div>
                   )}
                 </div>
               </div>
@@ -695,14 +706,14 @@ export default function ProductDetailPage({
                     {formatCurrency(product.unitPrice)}
                   </p>
                   <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1 text-yellow-500">
+                    <div className="flex items-center gap-1 text-accent">
                       {Array.from({ length: 5 }).map((_, index) => (
                         <Star
                           key={index}
                           className={`h-4 w-4 ${
                             ratingDisplay &&
                             index < Math.round(Number(ratingDisplay))
-                              ? "fill-yellow-500 text-yellow-500"
+                              ? "fill-accent text-accent"
                               : "text-muted-foreground"
                           }`}
                         />
@@ -778,7 +789,7 @@ export default function ProductDetailPage({
                     <Heart
                       className={`h-5 w-5 transition-colors ${
                         isWishlisted
-                          ? "fill-red-500 stroke-red-500"
+                          ? "fill-accent stroke-accent"
                           : "stroke-current"
                       }`}
                     />
@@ -870,15 +881,17 @@ export default function ProductDetailPage({
                   >
                     <div className="relative aspect-square overflow-hidden bg-muted">
                       {item.attachment?.url ? (
-                        <img
-                          src={item.attachment.url}
+                        <Image
+                          src={getFileUrl(item.attachment.url)}
                           alt={item.name ?? "Similar product"}
-                          className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                          loading="lazy"
+                          fill
+                          sizes="(max-width: 640px) 100vw, 25vw"
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
-                          Image coming soon
+                        <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-muted-foreground">
+                          <ImageOff className="h-6 w-6 opacity-40" />
+                          <span className="text-xs">Зураггүй</span>
                         </div>
                       )}
                     </div>
