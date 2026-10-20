@@ -137,21 +137,22 @@ export const getEnv = (): any => {
  * resolve it.
  */
 export const getFileApiBase = (): string => {
-  if (typeof window !== "undefined") {
-    const hostname = window.location.hostname;
+  if (typeof window === "undefined") return "";
 
-    if (hostname === "localhost" || hostname === "127.0.0.1") {
-      const local = getEnv().NEXT_PUBLIC_API_DOMAIN as string | undefined;
-      return (local || "http://localhost:4000").replace(/\/+$/, "");
-    }
+  const hostname = window.location.hostname;
+  if (hostname === "localhost" || hostname === "127.0.0.1") {
+    const local = getEnv().NEXT_PUBLIC_API_DOMAIN as string | undefined;
+    return (local || "http://localhost:4000").replace(/\/+$/, "");
+  }
 
-    // erxes SaaS serves files from <tenant>.api.erxes.io/api. Derived from the
-    // host rather than read from env, because a deployed template on
-    // <tenant>.next.erxes.io has no builder to substitute <subdomain> and the
-    // configured values disagree with the host that actually serves files.
-    if (hostname.endsWith(".erxes.io")) {
-      return `https://${hostname.split(".")[0]}.api.erxes.io/api`;
-    }
+  // Files live beside GraphQL on the gateway: <tenant>.<app>.erxes.io resolves
+  // to https://<tenant>.next.erxes.io/gateway. For a deployed template that is
+  // its own origin, so reads and uploads are same-origin and CORS never enters
+  // into it. NEXT_PUBLIC_API_DOMAIN still points at <tenant>.api.erxes.io/api,
+  // which answers 503 and omits Access-Control-Allow-Credentials.
+  const parts = window.location.host.split(".");
+  if (parts.length === 4) {
+    return `https://${parts[0]}.next.erxes.io/gateway`;
   }
 
   const configured = getEnv().NEXT_PUBLIC_API_DOMAIN as string | undefined;
