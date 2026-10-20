@@ -1,4 +1,4 @@
-import { getEnv } from "./utils";
+import { getEnv, getFileApiBase } from "./utils";
 
 /**
  * Upload a file to erxes.
@@ -20,14 +20,17 @@ export type UploadedFile = {
 };
 
 export const getUploadUrl = (): string => {
+  const base = getFileApiBase();
+  if (base) return `${base}/upload-file`;
+
+  // Server side, where there is no hostname to derive the tenant from.
   const env = getEnv();
-  const apiUrl =
-    process.env.NEXT_PUBLIC_API_URL || env.NEXT_PUBLIC_API_URL || "";
   const domain =
     process.env.NEXT_PUBLIC_API_DOMAIN || env.NEXT_PUBLIC_API_DOMAIN || "";
-
   if (domain) return `${domain.replace(/\/+$/, "")}/upload-file`;
-  // Fall back to deriving it from the GraphQL endpoint.
+
+  const apiUrl =
+    process.env.NEXT_PUBLIC_API_URL || env.NEXT_PUBLIC_API_URL || "";
   return apiUrl.replace(/\/graphql\/?$/, "/upload-file");
 };
 

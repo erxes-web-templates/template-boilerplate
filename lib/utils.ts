@@ -122,6 +122,41 @@ export const getEnv = (): any => {
  * Passing through anything already resolvable makes this safe to apply at the
  * point of render, including to values stored in an older cart.
  */
+
+/**
+ * Base URL for the erxes file endpoints.
+ *
+ * A deployed template is served from `<tenant>.next.erxes.io`, and nothing on
+ * that host substitutes the `<subdomain>` placeholder — the builder does that,
+ * and the builder is not present. The old production branch instead used
+ * `process.env.ERXES_FILE_URL`, baked at build time, so one build could only
+ * ever be right for one tenant.
+ *
+ * Deriving the tenant from the host actually serving the page makes a single
+ * build correct for every tenant, and matches how the builder's own uploaders
+ * resolve it.
+ */
+export const getFileApiBase = (): string => {
+  const env = getEnv();
+  const configured = env.NEXT_PUBLIC_API_DOMAIN as string | undefined;
+  if (
+    configured &&
+    /^https?:\/\//.test(configured) &&
+    !configured.includes("<subdomain>")
+  ) {
+    return configured.replace(/\/+$/, "");
+  }
+
+  if (typeof window === "undefined") return "";
+
+  const hostname = window.location.hostname;
+  if (hostname === "localhost" || hostname === "127.0.0.1") {
+    return "http://localhost:4000";
+  }
+
+  return `https://${hostname.split(".")[0]}.api.erxes.io/api`;
+};
+
 export const getFileUrl = (url: any) => {
   if (!url) return "";
   let fileKey = "";
@@ -138,14 +173,14 @@ export const getFileUrl = (url: any) => {
   ) {
     return fileKey;
   }
-  if (!isBuildMode()) {
+  const base = getFileApiBase();
+  if (base) return `${base}/read-file?key=${fileKey}`;
+
+  // Server-side render, or a build that pins its own file host.
+  if (process.env.ERXES_FILE_URL) {
     return `${process.env.ERXES_FILE_URL}${fileKey}`;
   }
-  if (typeof window === "undefined") {
-    return `${process.env.NEXT_PUBLIC_API_DOMAIN}/read-file?key=${fileKey}`;
-  }
-  const env = getEnv();
-  return `${env.NEXT_PUBLIC_API_DOMAIN}/read-file?key=${fileKey}`;
+  return `${process.env.NEXT_PUBLIC_API_DOMAIN}/read-file?key=${fileKey}`;
 };
 
 export const templateUrl = (slug: string) => {
