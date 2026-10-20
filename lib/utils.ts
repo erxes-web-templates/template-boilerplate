@@ -137,8 +137,24 @@ export const getEnv = (): any => {
  * resolve it.
  */
 export const getFileApiBase = (): string => {
-  const env = getEnv();
-  const configured = env.NEXT_PUBLIC_API_DOMAIN as string | undefined;
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      const local = getEnv().NEXT_PUBLIC_API_DOMAIN as string | undefined;
+      return (local || "http://localhost:4000").replace(/\/+$/, "");
+    }
+
+    // erxes SaaS serves files from <tenant>.api.erxes.io/api. Derived from the
+    // host rather than read from env, because a deployed template on
+    // <tenant>.next.erxes.io has no builder to substitute <subdomain> and the
+    // configured values disagree with the host that actually serves files.
+    if (hostname.endsWith(".erxes.io")) {
+      return `https://${hostname.split(".")[0]}.api.erxes.io/api`;
+    }
+  }
+
+  const configured = getEnv().NEXT_PUBLIC_API_DOMAIN as string | undefined;
   if (
     configured &&
     /^https?:\/\//.test(configured) &&
@@ -147,14 +163,7 @@ export const getFileApiBase = (): string => {
     return configured.replace(/\/+$/, "");
   }
 
-  if (typeof window === "undefined") return "";
-
-  const hostname = window.location.hostname;
-  if (hostname === "localhost" || hostname === "127.0.0.1") {
-    return "http://localhost:4000";
-  }
-
-  return `https://${hostname.split(".")[0]}.api.erxes.io/api`;
+  return "";
 };
 
 export const getFileUrl = (url: any) => {
