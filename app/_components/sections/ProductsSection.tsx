@@ -2,15 +2,17 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { useProductsQuery, type ProductSummary } from "../../../graphql/products";
-import { Section } from "../../../types/sections";
+import { useProductsQuery, type ProductSummary } from "@site-core/graphql/products";
+import { Section } from "@site-core/types/sections";
 import { templateUrl } from "@/lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
+import { isBuildMode } from "@site-core/lib/buildMode";
 import { Button } from "@/components/ui/button";
 import EmptyState from "@/components/common/EmptyState";
 import ProductCard from "../../../components/common/ProductCard";
+import { useSiteText } from "../siteText";
 
 const ProductsSection = ({ section }: { section: Section }) => {
+  const t = useSiteText();
   const limit = Number(section.config?.limit ?? 6);
   const categoryId = section.config?.categoryId || null;
   const tag = section.config?.tag || null;
@@ -40,6 +42,8 @@ const ProductsSection = ({ section }: { section: Section }) => {
   const description = section.config?.description || "";
 
   if (!loading && !error && products.length === 0) {
+    // Setup guidance for the builder; visitors just don't see the section.
+    if (!isBuilder) return null;
     return (
       <section className="py-20 md:py-28">
         <div className="container mx-auto max-w-6xl px-4 md:px-6">
@@ -72,7 +76,7 @@ const ProductsSection = ({ section }: { section: Section }) => {
 
         {error && (
           <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
-            Unable to load products. Please try again later.
+            {t("products.loadError")}
           </div>
         )}
 
@@ -99,13 +103,13 @@ const ProductsSection = ({ section }: { section: Section }) => {
                   key={product?._id || index}
                   product={{
                     id: product?._id ?? "",
-                    name: product?.name ?? "Untitled product",
+                    name: product?.name ?? t("products.untitled"),
                     price:
                       typeof product?.unitPrice === "number" &&
                       Number.isFinite(product.unitPrice)
                         ? product.unitPrice
                         : 0,
-                    categoryName: product?.category?.name ?? "Uncategorized",
+                    categoryName: product?.category?.name ?? t("products.uncategorized"),
                     image: product?.attachment?.url ?? null,
                     inStock:
                       typeof product?.remainder === "number" && Number.isFinite(product.remainder)

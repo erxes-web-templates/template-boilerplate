@@ -1,4 +1,4 @@
-import { Section } from "../../../types/sections";
+import { Section } from "@site-core/types/sections";
 import { SectionHeading, SectionShell } from "./_SectionHeading";
 
 type Stat = { value?: string; label?: string; note?: string };

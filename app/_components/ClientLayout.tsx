@@ -19,7 +19,7 @@ import LegalPage from "../legal/page";
 import PostDetailPage from "../_client/BlogPostPage";
 import ProductDetailPage from "../_client/ProductDetailPage";
 import BlogsPage from "../_client/BlogPage";
-import { GET_CMS_PAGES } from "../../graphql/queries";
+import { GET_CMS_PAGES } from "@site-core/graphql/queries";
 import { useQuery } from "@apollo/client";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
@@ -28,7 +28,7 @@ import Script from "next/script";
 import { getEnv } from "@/lib/utils";
 import InquiryPage from "../inquiry/page";
 import CheckoutPage from "../checkout/page";
-import { CartProvider } from "../../lib/CartContext";
+import { CartProvider } from "@site-core/lib/CartContext";
 import PaymentPage from "../payment/page";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import BookingPage from "../_client/BookingPage";
@@ -36,6 +36,10 @@ import RoomsPage from "../_client/RoomsPage";
 import RoomDetailPage from "../_client/RoomDetailPage";
 import ConfirmationPage from "../_client/ConfirmationPage";
 
+import { loadOwnerFonts } from "@site-core/lib/fonts";
+import { applyOwnerPalette } from "@site-core/lib/ownerPalette";
+import { ownerColorTokens } from "./sections/theme";
+import { SiteTextProvider } from "./siteText";
 /**
  * Pick a readable foreground for whatever primary the client chose.
  *
@@ -187,7 +191,10 @@ export default function ClientBoilerplateLayout() {
 
     const root = document.documentElement;
     const setVar = (variable: string, value?: string | null) => {
+      // Removed rather than skipped when unset, so clearing a choice in Colors
+      // & Appearance brings the template's own value back in the preview.
       if (value) root.style.setProperty(variable, value);
+      else root.style.removeProperty(variable);
     };
 
     setVar("--primary", appearances?.primaryColor || styles?.baseColor);
@@ -199,11 +206,11 @@ export default function ClientBoilerplateLayout() {
     setVar("--secondary-color", appearances?.secondaryColor);
     setVar(
       "--accent",
-      appearances?.accentColor || (styles as any)?.activeTabColor,
+      appearances?.accentColor || (styles as any)?.linkColor,
     );
     setVar(
       "--accent-foreground",
-      readableHexOn(appearances?.accentColor || (styles as any)?.activeTabColor),
+      readableHexOn(appearances?.accentColor || (styles as any)?.linkColor),
     );
 
     const bodyFont =
@@ -216,6 +223,9 @@ export default function ClientBoilerplateLayout() {
     setVar("--font-body", bodyFont);
     setVar("--font-heading", headingFont || bodyFont);
     setVar("--font-mono", appearances?.fontMono);
+    // Load the chosen families' files; the variables alone don't.
+    loadOwnerFonts();
+    applyOwnerPalette(ownerColorTokens);
   }, [cpDetail]);
 
   const renderPageContent = () => {
@@ -249,6 +259,7 @@ export default function ClientBoilerplateLayout() {
   };
 
   return (
+    <SiteTextProvider texts={cpDetail?.texts}>
     <div className="bg-background relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.03),transparent_50%)] pointer-events-none" />
@@ -316,5 +327,6 @@ export default function ClientBoilerplateLayout() {
         </div>
       </CartProvider>
     </div>
+    </SiteTextProvider>
   );
 }

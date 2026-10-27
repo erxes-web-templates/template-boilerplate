@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { Section } from "../../../types/sections";
-import { getTicketConfig } from "../../../lib/ticketConfig";
-import { useTicketTags } from "../../../hooks/useTickets";
+import { Section } from "@site-core/types/sections";
+import { getTicketConfig } from "@site-core/lib/ticketConfig";
+import { useTicketTags } from "@site-core/hooks/useTickets";
 import { SectionHeading } from "./_SectionHeading";
-import { cardSurfaceStyle } from "../../../lib/renderSections";
+import { cardSurfaceStyle } from "./render";
 
 type ConfiguredCategory = { name?: string; description?: string };
 

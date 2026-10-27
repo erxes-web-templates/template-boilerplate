@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Section } from "../../../types/sections";
+import { Section } from "@site-core/types/sections";
 import { getFileUrl } from "@/lib/utils";
 import { templateUrl } from "@/lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
+import { isBuildMode } from "@site-core/lib/buildMode";
 import { Card, CardFooter } from "@/components/ui/card";
 
 type LinkType = "product" | "productCategory" | "productTag" | "external";
@@ -60,17 +60,18 @@ const BannerSection = ({ section }: { section: Section }) => {
       {imageUrl ? (
         <Image
           src={imageUrl}
-          alt={title || "Banner image"}
+          alt={title}
           fill
           sizes="100vw"
           className="object-cover"
           priority
         />
-      ) : (
+      ) : isBuildMode() ? (
+        // A placeholder for the builder only; visitors see the plain panel.
         <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
           Banner image
         </div>
-      )}
+      ) : null}
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60" />
       <div className="relative z-10 flex h-full flex-col justify-start gap-3 p-8 text-white sm:p-12">
         <h2 className="text-3xl font-semibold leading-tight sm:text-4xl">
@@ -94,7 +95,7 @@ const BannerSection = ({ section }: { section: Section }) => {
           ) : (
             content
           )}
-          {!href && (
+          {!href && isBuildMode() && (
             <CardFooter className="mt-4 p-0 text-sm text-muted-foreground">
               Add a link in the banner editor to make this image clickable.
             </CardFooter>

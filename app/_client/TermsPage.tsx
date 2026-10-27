@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import usePage from "../../lib/usePage";
+import usePage from "../_components/sections/render";
 import { sectionComponents } from "../_components/sections";
 
 const TermsPage = () => {

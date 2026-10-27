@@ -13,15 +13,16 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useQuery } from "@apollo/client";
-import { GET_CMS_POSTS } from "../../../graphql/queries";
+import { GET_CMS_POSTS } from "@site-core/graphql/queries";
 import { getFileUrl, templateUrl } from "@/lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
-import { toHtml } from "../../../lib/html";
-import { Section } from "../../../types/sections";
-import { CmsPost } from "../../../types/cms";
+import { isBuildMode } from "@site-core/lib/buildMode";
+import { toHtml } from "@site-core/lib/html";
+import { Section } from "@site-core/types/sections";
+import { CmsPost } from "@site-core/types/cms";
+import { useSiteText } from "../siteText";
 
 const CmsPostsSection = ({ section }: { section: Section }) => {
-
+  const t = useSiteText();
   const { data } = useQuery(GET_CMS_POSTS, {
     variables: {
       limit: section.config.perPage,
@@ -74,7 +75,7 @@ const CmsPostsSection = ({ section }: { section: Section }) => {
                   }
                 >
                   <Button variant="outline" size="sm">
-                    {section.config.primaryCta || "Read more"}
+                    {section.config.primaryCta || t("posts.readMore")}
                   </Button>
                 </Link>
               </CardFooter>
@@ -87,7 +88,7 @@ const CmsPostsSection = ({ section }: { section: Section }) => {
               href={isBuilder ? templateUrl(section.config.primaryCtaUrl) : section.config.primaryCtaUrl}
               className="text-sm font-medium text-primary hover:underline"
             >
-              {section.config.primaryCta || "View all"}
+              {section.config.primaryCta || t("posts.viewAll")}
             </Link>
           </div>
         )}

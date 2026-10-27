@@ -3,12 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@apollo/client";
 import Link from "next/link";
-import { Section } from "../../../types/sections";
-import authQueries from "../../../graphql/auth/queries";
-import orderQueries from "../../../graphql/order/queries";
-import { useProductsQuery } from "../../../graphql/products";
+import { Section } from "@site-core/types/sections";
+import authQueries from "@site-core/graphql/auth/queries";
+import orderQueries from "@site-core/graphql/order/queries";
+import { useProductsQuery } from "@site-core/graphql/products";
 import { getFileUrl, templateUrl } from "@/lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
+import { isBuildMode } from "@site-core/lib/buildMode";
 import EmptyState from "@/components/common/EmptyState";
 import {
   Card,
@@ -19,7 +19,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getLocalLastViewedProducts } from "../../../lib/lastViewedProducts";
+import { getLocalLastViewedProducts } from "@site-core/lib/lastViewedProducts";
+import { useSiteText } from "../siteText";
 
 type ViewedProduct = {
   _id: string;
@@ -47,6 +48,7 @@ const formatNumber = (value?: number | null) => {
 };
 
 const LastViewedProductsSection = ({ section }: { section: Section }) => {
+  const t = useSiteText();
   const title = section.config?.title ?? "Recently viewed products";
   const description = section.config?.description ?? "";
   const limit = Math.max(1, Number(section.config?.limit ?? 6));
@@ -130,11 +132,11 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
   const activeLoading = resolvedCustomerId ? loading : guestProductsLoading;
   const activeError = resolvedCustomerId ? error : guestProductsError;
   const emptyTitle = resolvedCustomerId
-    ? "No viewed products yet"
-    : "No locally viewed products yet";
+    ? t("recent.emptyTitle")
+    : t("recent.guestEmptyTitle");
   const emptyDescription = resolvedCustomerId
-    ? "Start browsing products to see them appear here."
-    : "Open a product page and it will appear here on this browser.";
+    ? t("recent.emptyBody")
+    : t("recent.guestEmptyBody");
 
   return (
     <section className="bg-background py-20 md:py-28">
@@ -150,8 +152,7 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
 
         {activeError ? (
           <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-            Unable to load recently viewed products right now. Please try again
-            later.
+            {t("recent.loadError")}
           </div>
         ) : !activeLoading && activeItems.length === 0 ? (
           <EmptyState
@@ -192,18 +193,18 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={imageUrl}
-                        alt={product?.name ?? "Product"}
+                        alt={product?.name ?? t("products.untitled")}
                         className="h-full w-full object-cover"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
-                        No image available
+                        {t("products.noImage")}
                       </div>
                     )}
                   </div>
                   <CardHeader className="space-y-1 p-3">
                     <CardTitle className="line-clamp-2 text-sm font-semibold">
-                      {product?.name ?? "Untitled product"}
+                      {product?.name ?? t("products.untitled")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 p-3 pt-0 text-xs">
@@ -213,7 +214,7 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
                     <p className="text-xs text-muted-foreground">
                       {viewedAt
                         ? new Date(viewedAt).toLocaleString()
-                        : "Unknown"}
+                        : t("recent.unknownTime")}
                     </p>
                   </CardContent>
                   <CardFooter className="mt-auto border-t bg-muted/40 p-3">
@@ -231,7 +232,7 @@ const LastViewedProductsSection = ({ section }: { section: Section }) => {
                               : "/products"
                         }
                       >
-                        View product
+                        {t("products.view")}
                       </Link>
                     </Button>
                   </CardFooter>

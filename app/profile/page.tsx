@@ -9,11 +9,11 @@ import {
   usePathname,
 } from "next/navigation";
 import { useMutation, useQuery } from "@apollo/client";
-import authQueries from "../../graphql/auth/queries";
-import authMutations from "../../graphql/auth/mutations";
-import orderQueries from "../../graphql/order/queries";
-import ecommerceQueries from "../../graphql/ecommerce/queries";
-import { queries as tmsQueries } from "../../graphql/tms";
+import authQueries from "@site-core/graphql/auth/queries";
+import authMutations from "@site-core/graphql/auth/mutations";
+import orderQueries from "@site-core/graphql/order/queries";
+import ecommerceQueries from "@site-core/graphql/ecommerce/queries";
+import { queries as tmsQueries } from "@site-core/graphql/tms";
 import {
   Card,
   CardContent,
@@ -32,7 +32,7 @@ import ProfileOrdersTab from "./_components/ProfileOrdersTab";
 import ProfileWishlistTab from "./_components/ProfileWishlistTab";
 import ProfileViewedTab from "./_components/ProfileViewedTab";
 import ProfileSecurityTab from "./_components/ProfileSecurityTab";
-import { templateUrl } from "../../lib/utils";
+import { templateUrl } from "@site-core/lib/utils";
 
 type User = {
   _id: string;

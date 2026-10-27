@@ -86,3 +86,13 @@
     font-family: var(--font-heading, var(--font-body, Arial, Helvetica, sans-serif));
   }
 }
+
+/*
+ * A background picked for a section in the builder is painted on its wrapper
+ * (sectionSurfaceProps in lib/renderSections.tsx). Most sections also paint
+ * their own root, which covered it, so only the colour is cleared here —
+ * background images stay.
+ */
+[data-section-background] > * {
+  background-color: transparent !important;
+}

@@ -6,9 +6,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Section } from "../../../types/sections";
+import { Section } from "@site-core/types/sections";
 import { SectionHeading, SectionShell } from "./_SectionHeading";
-import { cardSurfaceStyle } from "../../../lib/renderSections";
+import { cardSurfaceStyle } from "./render";
 
 type Faq = { question?: string; answer?: string };
 

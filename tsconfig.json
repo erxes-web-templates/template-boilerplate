@@ -24,6 +24,11 @@
       }
     ],
     "paths": {
+      "@site-core/*": ["./core/*", "../../../packages/site-core/*"],
+      "@/lib/*": ["./core/lib/*", "../../../packages/site-core/lib/*"],
+      "@/graphql/*": ["./core/graphql/*", "../../../packages/site-core/graphql/*"],
+      "@/hooks/*": ["./core/hooks/*", "../../../packages/site-core/hooks/*"],
+      "@/types/*": ["./core/types/*", "../../../packages/site-core/types/*"],
       "@/*": [
         "./*"
       ]

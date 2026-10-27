@@ -3,14 +3,14 @@
 import { useMemo } from "react";
 import { useQuery } from "@apollo/client";
 import { useSearchParams } from "next/navigation";
-import { queries as roomQueries, useTagsQuery } from "../../graphql/pms/rooms";
-import type { RoomSummary } from "../../graphql/pms/rooms";
-import usePage from "../../lib/usePage";
+import { queries as roomQueries, useTagsQuery } from "@site-core/graphql/pms/rooms";
+import type { RoomSummary } from "@site-core/graphql/pms/rooms";
+import usePage from "../_components/sections/render";
 import { sectionComponents } from "../_components/sections";
 import Image from "next/image";
 import Link from "next/link";
-import { templateUrl, getFileUrl } from "../../lib/utils";
-import { toHtml } from "../../lib/html";
+import { templateUrl, getFileUrl } from "@site-core/lib/utils";
+import { toHtml } from "@site-core/lib/html";
 import RoomBookingWidget from "../rooms/_components/RoomBookingWidget";
 import { ArrowLeft } from "lucide-react";
 

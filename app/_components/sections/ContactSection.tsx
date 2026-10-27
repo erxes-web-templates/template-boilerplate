@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Section } from "../../../types/sections";
+import { Section } from "@site-core/types/sections";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   MapPin,
@@ -15,10 +15,13 @@ import {
 } from "lucide-react";
 import DynamicForm from "../../../components/common/DynamicForm";
 import { useMutation, useQuery } from "@apollo/client";
-import { GET_FORM_DETAIL } from "../../../graphql/queries";
-import { FORM_SUBMISSION } from "../../../graphql/mutations";
+import { GET_FORM_DETAIL } from "@site-core/graphql/queries";
+import { FORM_SUBMISSION } from "@site-core/graphql/mutations";
 import useClientPortal from "@/hooks/useClientPortal";
 import { useParams } from "next/navigation";
+import { useSiteText } from "../siteText";
+import { isBuildMode } from "@site-core/lib/buildMode";
+
 const parseStringOrArray = (value: unknown): string[] => {
   if (!value) return [];
   if (Array.isArray(value)) return value;
@@ -29,6 +32,7 @@ const parseStringOrArray = (value: unknown): string[] => {
 };
 
 const ContactSection = ({ section }: { section: Section }) => {
+  const t = useSiteText();
   const params = useParams<{ id: string }>();
   const [formSubmitted, setFormSubmitted] = useState(false);
 
@@ -36,13 +40,12 @@ const ContactSection = ({ section }: { section: Section }) => {
     variables: {
       id: section.config.formId,
     },
+    skip: !section.config.formId,
   });
 
   const formData = data?.cpFormDetail || {};
   const [submitForm] = useMutation(FORM_SUBMISSION, {
-    onCompleted: (data) => {
-      console.log(data);
-    },
+    onCompleted: () => setFormSubmitted(true),
   });
   const { cpDetail } = useClientPortal({
     id: (process.env.ERXES_WEB_ID || params?.id || "") as string,
@@ -70,7 +73,7 @@ const ContactSection = ({ section }: { section: Section }) => {
                   <div className="flex items-start">
                     <MapPin className="h-6 w-6 text-primary mr-4 mt-0.5" />
                     <div>
-                      <h3 className="font-medium">Our Location</h3>
+                      <h3 className="font-medium">{t("contact.where")}</h3>
                       <p className="text-muted-foreground">
                         {cpDetail?.externalLinks?.address}
                       </p>
@@ -80,7 +83,7 @@ const ContactSection = ({ section }: { section: Section }) => {
                   <div className="flex items-start">
                     <Phone className="h-6 w-6 text-primary mr-4 mt-0.5" />
                     <div>
-                      <h3 className="font-medium">Phone Number</h3>
+                      <h3 className="font-medium">{t("contact.call")}</h3>
                       <p className="text-muted-foreground">
                         {parseStringOrArray(cpDetail?.externalLinks?.phones).map(
                           (phone: string) => (
@@ -100,7 +103,7 @@ const ContactSection = ({ section }: { section: Section }) => {
                   <div className="flex items-start">
                     <Mail className="h-6 w-6 text-primary mr-4 mt-0.5" />
                     <div>
-                      <h3 className="font-medium">Email Address</h3>
+                      <h3 className="font-medium">{t("contact.write")}</h3>
                       <p className="text-muted-foreground">
                         {parseStringOrArray(cpDetail?.externalLinks?.emails).map(
                           (email: string) => (
@@ -118,7 +121,7 @@ const ContactSection = ({ section }: { section: Section }) => {
                   </div>
 
                   <div className="pt-4">
-                    <h3 className="font-medium mb-3">Follow Us on</h3>
+                    <h3 className="font-medium mb-3">{t("contact.follow")}</h3>
                     <div className="flex space-x-4">
                       {cpDetail?.externalLinks?.facebook && (
                         <a
@@ -188,12 +191,17 @@ const ContactSection = ({ section }: { section: Section }) => {
                     <div className="flex flex-col items-center justify-center py-8 text-center">
                       <CheckCircle className="h-16 w-16 text-emerald-600 mb-4" />
                       <h3 className="text-xl font-medium mb-2">
-                        Message Sent!
+                        {t("contact.sentTitle")}
                       </h3>
                     </div>
-                  ) : (
+                  ) : section.config.formId ? (
                     <DynamicForm formData={formData} submitForm={submitForm} />
-                  )}
+                  ) : isBuildMode() ? (
+                    // A hint for the builder only; visitors see no empty form.
+                    <p className="py-8 text-center text-sm text-muted-foreground">
+                      Select a form in the builder to collect enquiries
+                    </p>
+                  ) : null}
                 </CardContent>
               </div>
             </div>

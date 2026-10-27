@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { isBuildMode } from "../../../lib/buildMode";
+import { isBuildMode } from "@site-core/lib/buildMode";
 import BlogPostPageClient from "../../_client/BlogPostPage";
-import { fetchCmsPost } from "../../../lib/fetchCms";
+import { fetchCmsPost } from "@site-core/lib/fetchCms";
 
 type PageProps = {
   params: Promise<{ id: string }>;

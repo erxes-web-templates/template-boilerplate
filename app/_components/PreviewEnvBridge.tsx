@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 // Relative, not "@/": the builder's tsconfig maps "@/" to its own src.
-import { builderEnvPrefix } from "../../lib/utils";
+import { builderEnvPrefix } from "@site-core/lib/utils";
 
 type EnvMessage = {
   type: "erxes-builder-env";

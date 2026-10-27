@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   useCallback,
@@ -10,12 +12,12 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
-import { CPDetail, MenuItem } from "../../types/cms";
+import { CPDetail, MenuItem } from "@site-core/types/cms";
 import { useQuery } from "@apollo/client";
-import { GET_CMS_MENU_LIST } from "../../graphql/queries";
+import { GET_CMS_MENU_LIST } from "@site-core/graphql/queries";
 import Image from "next/image";
 import { getFileUrl, templateUrl } from "@/lib/utils";
-import { isBuildMode } from "../../lib/buildMode";
+import { isBuildMode } from "@site-core/lib/buildMode";
 import {
   ShoppingCart,
   Search,
@@ -38,8 +40,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useCart } from "../../lib/CartContext";
-import { useProductsQuery } from "../../graphql/products";
+import { useCart } from "@site-core/lib/CartContext";
+import { useProductsQuery } from "@site-core/graphql/products";
+import { useSiteText } from "./siteText";
 
 const formatCurrency = (value: number) => {
   if (!Number.isFinite(value)) return "₮0";
@@ -47,6 +50,7 @@ const formatCurrency = (value: number) => {
 };
 
 export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
+  const t = useSiteText();
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -292,6 +296,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                 onChange={handleInputChange}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
+                aria-label={t("search.label")}
                 className="h-9 rounded-full border-transparent bg-muted/50 pl-9 pr-3 text-sm transition-colors focus:border-border focus:bg-background"
               />
             </div>
@@ -305,6 +310,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
               variant="ghost"
               size="icon"
               className="hidden h-8 w-8 md:flex"
+              aria-label={t("header.account")}
             >
               <User className="h-4 w-4" />
             </Button>
@@ -313,7 +319,12 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
           {/* Cart */}
           <Sheet open={isCartSheetOpen} onOpenChange={setIsCartSheetOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative h-8 w-8">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative h-8 w-8"
+                aria-label={t("cart.title")}
+              >
                 <ShoppingCart className="h-4 w-4" />
                 {hasItems && (
                   <Badge className="absolute -right-1 -top-1 h-4 w-4 rounded-full p-0 flex items-center justify-center text-[10px] bg-primary text-primary-foreground border-0">
@@ -328,7 +339,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
             >
               <SheetHeader className="text-left">
                 <SheetTitle className="text-base font-semibold">
-                  Cart
+                  {t("cart.title")}
                   {hasItems && (
                     <span className="ml-2 text-sm font-normal text-muted-foreground">
                       ({totalItems})
@@ -336,7 +347,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                   )}
                 </SheetTitle>
                 <SheetDescription className="text-sm text-muted-foreground">
-                  {!hasItems && "Your cart is empty."}
+                  {!hasItems && t("cart.empty")}
                 </SheetDescription>
               </SheetHeader>
 
@@ -381,6 +392,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                                   )
                                 }
                                 disabled={item.quantity <= 1 || isSyncing}
+                                aria-label={t("cart.decrease")}
                               >
                                 <Minus className="h-3 w-3" />
                               </Button>
@@ -398,6 +410,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                                   )
                                 }
                                 disabled={isSyncing}
+                                aria-label={t("cart.increase")}
                               >
                                 <Plus className="h-3 w-3" />
                               </Button>
@@ -408,6 +421,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                               className="h-6 w-6 text-muted-foreground hover:text-destructive"
                               onClick={() => void removeFromCart(item.id)}
                               disabled={isSyncing}
+                              aria-label={t("cart.remove")}
                             >
                               <Trash2 className="h-3 w-3" />
                             </Button>
@@ -419,13 +433,13 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                 </ScrollArea>
               ) : (
                 <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed border-border text-sm text-muted-foreground">
-                  Add products to get started.
+                  {t("cart.emptyHint")}
                 </div>
               )}
 
               <div className="border-t border-border pt-4 space-y-3">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Total</span>
+                  <span className="text-muted-foreground">{t("cart.total")}</span>
                   <span className="font-semibold text-foreground">
                     {formatCurrency(totalPrice)}
                   </span>
@@ -440,7 +454,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                       href={templateUrl("/checkout")}
                       onClick={() => setIsCartSheetOpen(false)}
                     >
-                      Checkout
+                      {t("cart.checkout")}
                     </Link>
                   </Button>
                   <Button
@@ -448,7 +462,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                     disabled={!hasItems || isSyncing}
                     onClick={() => void clearCart()}
                   >
-                    Clear
+                    {t("cart.clear")}
                   </Button>
                 </div>
               </div>
@@ -458,7 +472,12 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
           {/* Mobile menu */}
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 md:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 md:hidden"
+                aria-label={t("header.openMenu")}
+              >
                 <Menu className="h-4 w-4" />
               </Button>
             </SheetTrigger>
@@ -516,7 +535,7 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
           {shouldQueryProducts ? (
             searchLoading ? (
               <div className="p-4 text-center text-sm text-muted-foreground">
-                Searching…
+                {t("search.searching")}
               </div>
             ) : searchResults.length ? (
               <ul>
@@ -563,18 +582,18 @@ export default function Header({ cpDetail }: { cpDetail: CPDetail }) {
                     onClick={() => handleSearchSubmit()}
                     className="flex w-full items-center justify-center py-2.5 text-sm font-medium text-primary hover:bg-muted transition-colors"
                   >
-                    View all results →
+                    {t("search.viewAll")}
                   </button>
                 </li>
               </ul>
             ) : (
               <div className="p-4 text-center text-sm text-muted-foreground">
-                No results found.
+                {t("search.noResults")}
               </div>
             )
           ) : (
             <div className="p-4 text-center text-sm text-muted-foreground">
-              Type at least 2 characters to search.
+              {t("search.tooShort")}
             </div>
           )}
         </div>,

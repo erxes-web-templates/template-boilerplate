@@ -13,8 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { getFileUrl, templateUrl } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { useCart } from "../../../lib/CartContext";
-import productMutations from "../../../graphql/products/mutations";
+import { useCart } from "@site-core/lib/CartContext";
+import productMutations from "@site-core/graphql/products/mutations";
 import Link from "next/link";
 
 type WishlistItem = {

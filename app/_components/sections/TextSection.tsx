@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import React from "react";
-import { Section } from "../../../types/sections";
+import { Section } from "@site-core/types/sections";
 import { templateUrl } from "@/lib/utils";
-import { toHtml } from "../../../lib/html";
-import { isBuildMode } from "../../../lib/buildMode";
+import { toHtml } from "@site-core/lib/html";
+import { isBuildMode } from "@site-core/lib/buildMode";
 import Link from "next/link";
 import { SectionHeading, SectionShell } from "./_SectionHeading";
 

@@ -4,6 +4,11 @@
 
 You are a template developer building an erxes web template by cloning `template-boilerplate`. Your job is UI only: sections, components, pages, and styling. Composition is yours — the header's logo can sit in the middle with the menu first, a card grid can become a list, a stack can become an editorial split. Data fetching, business logic and routing are not: do not touch the auth flow, cart/checkout logic, GraphQL mutations, Apollo setup, `lib/client.ts`, `hooks/`, or `graphql/` (read those files to understand data shape, but never modify them).
 
+Those shared folders — `lib/`, `graphql/`, `hooks/` and `types/` — are not in
+the template at all. They live once in the monorepo's `packages/site-core` and
+every template imports them as `@site-core/*` (see §10). Paths such as
+`lib/client.ts` below mean `packages/site-core/lib/client.ts`.
+
 Templates have no `node_modules` of their own and are compiled by the builder (see §9a). Never add a dependency to a template's `package.json`.
 
 ---
@@ -48,7 +53,7 @@ Every section is a React component that receives a `{ section: Section }` prop.
 - `section.config` is a JSON object set by the web builder at runtime. Read it in your component to get layout, color, content, and image overrides.
 - `section.contentType` is metadata (e.g. `"bms:tours"`, `"ecommerce:products"`). It is used by the web builder UI to surface the right content pickers. It does not affect rendering — do not branch logic on it.
 
-The `Section` type (from `types/sections.ts`):
+The `Section` type (from `@site-core/types/sections`):
 
 ```ts
 interface Section {
@@ -67,7 +72,7 @@ interface Section {
 
 1. **Create** `app/_components/sections/MySection.tsx`. Accept `{ section: Section }` as the only prop. Read all configurable values from `section.config`.
 2. **Export** it from `app/_components/sections/index.ts` by adding it to the `sectionComponents` object with the section type string as the key.
-3. **Register** in `lib/renderSections.tsx` — add the type string to the `KnownSectionType` union.
+3. **Register** in `packages/site-core/lib/renderSections.tsx` — add the type string to the `KnownSectionType` union. That file is shared by every template; adding a type to the union is safe, changing anything else there is a core change (§10).
 4. **Verify wiring** in `app/page.tsx`. The `sectionComponents` spread should pick it up automatically — confirm there is no explicit exclusion.
 5. **Seed** `apps/web-builder/src/initData/<template>/homePageSections.json` with a new entry using the correct `type` and `contentType` values.
 
@@ -81,7 +86,7 @@ interface Section {
 - **Images**: Always use `next/image` `<Image>`. Never use a bare `<img>` tag.
 - **Internal links**: Always use `next/link` `<Link>`. Never use a bare `<a>` tag.
 - **Tailwind only**: No inline styles. No hardcoded hex colors — use CSS variables or Tailwind tokens.
-- **No static text in components**: Every string a visitor reads comes from `section.config` or the API — never a sentence written into the JSX. Headings, body copy, button labels, empty states and alt text included. Use `section.config?.heading` with a short neutral fallback (a word or two, or empty), not invented marketing copy, and seed the real value in initData. Lorem ipsum is banned for the same reason: the problem is not the language, it is text the site's owner cannot edit.
+- **No static text in components**: Every string a visitor reads comes from `section.config`, the API, or site text — never a sentence written into the JSX. Headings, body copy, button labels, empty states and alt text included. Use `section.config?.heading` with a short neutral fallback (a word or two, or empty), not invented marketing copy, and seed the real value in initData. Interface text that isn't part of any one section (header and footer labels, empty and error states, form buttons) goes in `app/_components/siteText.ts` with an English default and is read with `useSiteText()` from that module; the owner edits it in the builder's Site text panel. Lorem ipsum is banned for the same reason: the problem is not the language, it is text the site's owner cannot edit.
 - **Every section gets its own UI**: across templates, your `RoomsSection` must differ structurally from every other template's — not the same markup recoloured. Within a template, no two sections should share a structure. If a diff against the source shows only class names changing, it is not done.
 - **TypeScript**: No `any` except when accessing `section.config` (it is typed `any` intentionally). Never use `any` in your own interfaces.
 
@@ -116,7 +121,8 @@ Use real Unsplash URLs for `initUrl` image fields. Do not use local `/images/` p
 | `app/_components/sections/*.tsx` | Your section components |
 | `app/_components/sections/index.ts` | Register sections in `sectionComponents` |
 | `components/common/*.tsx` | Shared UI (ProductCard, RoomCard, etc.) |
-| `lib/renderSections.tsx` | Add new section types to `KnownSectionType` |
+| `app/_components/sections/theme.ts` | Which of your palette tokens a section's text/background colour and the owner's secondary/accent colours drive |
+| `app/_components/siteText.ts` | Your site-text catalog (keys are permanent once shipped) |
 | `app/page.tsx` | Verify section wiring |
 | `tailwind.config.ts` | Theme tokens, fonts, colors |
 | `public/` | Static images for fallbacks |
@@ -125,9 +131,8 @@ Use real Unsplash URLs for `initUrl` image fields. Do not use local `/images/` p
 
 | Path | Reason |
 |---|---|
-| `lib/client.ts` | Apollo server client — ISR config lives here |
-| `hooks/` | Shared and tested — hands off |
-| `graphql/` | Read to understand data shape, never modify |
+| `packages/site-core/` (`@site-core/*`) | Shared by every template — changes go through §10, never as a one-template tweak |
+| `app/_components/sections/render.ts` | Binds the core's `renderSections` / `usePage` to `theme.ts`; import those from here, not from `@site-core` |
 | `app/checkout/`, `app/cart/`, `app/auth/`, `app/profile/` | Business logic, not UI templates |
 | `app/_components/ClientShell.tsx` | Portal config wiring |
 
@@ -169,11 +174,11 @@ entry to `templates.manifest.json`, and regenerates every registration point —
 including the import and `case` in the builder's `renderTemplate`. There is
 nothing else to register by hand.
 
-Templates have no `node_modules` of their own, so there is nothing to install.
-Then sync core infrastructure and start building sections (see §4):
+Templates have no `node_modules` of their own, so there is nothing to install,
+and the copy already uses the shared core (§10), so there is nothing to sync.
+Start building sections (see §4):
 
 ```bash
-./scripts/sync-template-core.sh
 cd apps/web-builder && yarn dev    # open a project and pick the template
 ```
 
@@ -245,22 +250,46 @@ install cannot collide. Never run `yarn install` inside a template, and never
 add a dependency to a template's `package.json`; it belongs to the builder.
 
 This is also why a template is only viewable inside the builder, at
-`/dashboard/projects/<projectId>?template=<id>`. The `dev` and `preview`
-scripts in template `package.json` files belong to the unmerged preview branch
-(§12) and do nothing useful on `main`.
+`/dashboard/projects/<projectId>?template=<id>` (see §12). The `dev` and
+`preview` scripts in template `package.json` files are left over from an
+earlier preview design and are not used.
 
 ---
 
-## 10. Core Infrastructure Sync
+## 10. The Shared Core (`packages/site-core`)
 
-`lib/`, `graphql/`, `types/`, and `hooks/` are **owned by `template-boilerplate`**. Never edit them directly in a derived template — changes will be overwritten on the next sync.
+`lib/`, `graphql/`, `hooks/` and `types/` exist once, in the monorepo's
+`packages/site-core`, and every template imports them as `@site-core/*`. Nothing
+is copied into templates, so there is nothing to sync and no copy to drift.
 
-When boilerplate updates any of these, from the `web-builder` root:
+The core cannot import any one template, so a template hands it what is its
+own through three small files:
+
+| File | Passes the core |
+|---|---|
+| `app/_components/sections/render.ts` | `theme.ts`'s `sectionTextTokens`, bound into `renderSections` and `usePage` |
+| `app/_components/siteText.ts` | its catalog, via `createSiteText(siteText)` → `SiteTextProvider`, `useSiteText` |
+| `ClientShell.tsx` / `ClientLayout.tsx` | `ownerColorTokens` from `theme.ts`, via `applyOwnerPalette(ownerColorTokens)` |
+
+How the alias resolves:
+
+- **In the monorepo**, `tsconfig.json` maps `@site-core/*` (and `@/lib/*`,
+  `@/graphql/*`, `@/hooks/*`, `@/types/*`) to `../../../packages/site-core`;
+  the builder's tsconfig maps `@site-core/*` the same way.
+- **In the published repo**, `push-templates.sh` copies the package into the
+  repo as `core/`, and the same tsconfig entries list `./core` first. The repo
+  stays a standalone Next app the backend can build and deploy as before.
+  `next.config.ts` imports its helper from `./core` for that reason, and
+  `tailwind.config.ts` scans both `./core` and the package.
+
+A change to the core reaches every template on its next push. Make it in
+`packages/site-core`, check it from `apps/web-builder` with `npx tsc --noEmit`
+(it compiles every template), and preview a couple of templates.
+
+`sync-template-core.sh` still syncs **pages** from the boilerplate — for those,
+from the `web-builder` root:
 
 ```bash
-# Sync all templates (lib/, graphql/, types/, hooks/)
-./scripts/sync-template-core.sh
-
 # Sync a specific page directory
 ./scripts/sync-template-core.sh app/checkout
 
@@ -269,14 +298,6 @@ When boilerplate updates any of these, from the `web-builder` root:
 
 # Copy only new files — never overwrites existing customizations
 ./scripts/sync-template-core.sh --missing app/_client
-```
-
-After syncing, commit in each template with:
-
-```
-chore: sync lib/ from template-boilerplate
-
-- <brief description of what changed>
 ```
 
 ---
@@ -298,126 +319,29 @@ Requirements: the template must be in `push-templates.sh`'s `TEMPLATES` array an
 
 ## 12. Builder Preview (how the template renders inside the web builder)
 
-> **Status: not on `main`.** This section describes the iframe preview
-> architecture, which lives on the `template-preview-architecture` branch and
-> has not been merged. On `main` the files below do not exist —
-> `apps/web-builder/src/utils/templatePreview.ts`,
-> `scripts/add-preview-route.sh`, `scripts/preview-templates.sh`, and the
-> `yarn preview:all` script. Do not follow these steps against `main`; they
-> will send you looking for files that are not there.
->
-> What *is* on `main`: every template has its own `preview` script on its own
-> port, assigned by `templates.manifest.json` (§9a). `cd apps/templates/<id> &&
-> yarn preview` works today. When the preview branch merges, `DEV_PREVIEW_PORTS`
-> should be dropped in favour of `TEMPLATE_PREVIEW_PORTS`, which
-> `apps/web-builder/src/utils/templates.ts` already exports from the manifest —
-> that removes the "keep this in sync with your preview script's port" step
-> described below.
+The builder previews a template in an iframe pointed at its own route,
+`/template-preview/<template>/<projectId>` — same origin as the builder, so
+there is no second server to run or host. That route renders this template's
+`ClientLayout` and links this template's stylesheet only:
 
-The builder no longer renders a template inline in its own React tree. It
-points an iframe at the template's **own** server, so the preview loads this
-template's `globals.css`, fonts and env — the exact CSS the built site uses.
-
-Rendering inline meant the builder's Tailwind build had to know about every
-template's custom tokens. It didn't, so `bg-night`, `text-ink`, `.display-xl`,
-`.arch` and friends compiled to nothing and every template previewed in the
-builder's own palette and Inter.
-
-### Run a preview
-
-```bash
-yarn preview     # BUILD_MODE=build next dev -p <template port>
-```
-
-`BUILD_MODE=build` matters: it makes `isBuildMode()` agree on the server and
-the client, avoiding hydration mismatches.
-
-### The pieces
-
-| File | Role |
+| Piece | Role |
 |---|---|
-| `app/dashboard/projects/[id]/page.tsx` | The preview route. Renders `ClientLayout`. `isBuildMode()` already keys off this path and `templateUrl()` already emits links of this shape. |
-| `app/_components/PreviewEnvBridge.tsx` | Receives the builder's env over `postMessage` and writes it into this origin's localStorage. |
-| `app/_components/ClientShell.tsx` | Drops to providers-only on the preview path, because `ClientLayout` brings its own Header and Footer. |
-| `lib/utils.ts` → `getEnv()` | Falls back to `process.env` so a cross-origin preview still resolves the API host. |
-| `apps/web-builder/src/utils/templatePreview.ts` | Builder side: resolves the preview origin and collects the env to post. |
+| `src/app/template-preview/[template]/[id]/page.tsx` (builder) | Renders the template's `ClientLayout`, loaded on its own (`templatePreviewLayouts.tsx`, generated) so no other template's code or CSS reaches the page |
+| `src/app/template-preview-css/[template]/route.ts` (builder) | Builds this template's `app/globals.css` with this template's `tailwind.config.ts`; prebuilt at `next build` for production |
+| `src/lib/templatePreview.ts` (builder) | Keeps the preview in step with the builder over a `BroadcastChannel`: saves refetch, unsaved colour/font/site-text drafts apply live |
+| `@site-core/lib/buildMode` | Treats `/template-preview/` as build mode |
 
-### Registering a preview origin
+A template previews this way once its `tailwind.config.ts` uses
+`content: { relative: true, files: [...] }` — the builder builds the CSS from
+its own directory, so the globs must be relative to the config.
+`yarn template:sync` lists such templates in `IFRAME_PREVIEW_TEMPLATES`; the
+rest still render inline in the builder's page (wrong fonts and tokens for
+anything custom). The boilerplate is set up this way, so a template made from
+it previews in the iframe from the start.
 
-The builder resolves the origin in this order:
+Two rules keep the preview faithful:
 
-1. `NEXT_PUBLIC_TEMPLATE_PREVIEW_ORIGINS` — a JSON map, e.g.
-   `{"hotel-template-nocturne":"https://nocturne.preview.erxes.io"}`
-2. `http://localhost:<port>` in development, from `DEV_PREVIEW_PORTS` in
-   `templatePreview.ts` — keep this in sync with your `preview` script's port
-3. `null` — the builder falls back to the old inline render
-
-So a new template needs its port added to **both** its `preview` script and
-`DEV_PREVIEW_PORTS`, and a deployed origin added to the env map for production.
-
-To install this route into a freshly cloned template:
-
-```bash
-./scripts/add-preview-route.sh <template-name> <port>   # apply
-./scripts/add-preview-route.sh <template-name> --check   # verify only
-```
-
-It copies the two new files and writes the `preview` script, then *verifies*
-the rest rather than patching it: `ClientShell.tsx` and `lib/utils.ts` diverge
-between templates (each shell wraps `children` differently, and some templates
-carry their own `getFileUrl`), so overwriting them with the boilerplate copies
-destroys real work. Anything it cannot safely do it prints as a `→` to fix by
-hand.
-
-### Running previews while you work
-
-The builder switches templates in real time (`?template=` is a search param),
-and each one previews on its own port — so to switch freely, those ports have
-to be listening.
-
-```bash
-cd apps/web-builder && yarn dev        # the builder, port 3400
-yarn preview                           # the template you are editing
-```
-
-For everything else, from the repo root:
-
-```bash
-yarn preview:all                            # every template, one command
-./scripts/preview-templates.sh --skip <name> # ...except the one you are editing
-```
-
-That script serves a production build (`next build` + `next start`) rather than
-`next dev`, because `next dev` keeps a file watcher per template and one alone
-is enough to hit `EMFILE: too many open files` on macOS. No hot reload, so keep
-using `yarn preview` for the template you are actually changing.
-
-Do **not** use the root `yarn dev` for this. It is `turbo run dev --parallel`,
-which starts every template's `dev` script — and those were never renumbered,
-so most still collide on 3400/3401.
-
-If a template is not running, the builder now falls back to rendering it inline
-(wrong fonts and tokens, but not blank) and shows a notice with a retry. See
-`PREVIEW_READY_TIMEOUT_MS` in the builder's project page.
-
-Leaving template `node_modules` installed used to break the builder — its
-tsconfig `include`s `../templates/**/*`, so each template's React 19 types
-collided with the builder's React 18, and its Tailwind `content` glob scanned
-every template's `node_modules`. Both are fixed in `apps/web-builder`
-(`paths` pins react/react-dom/react-hook-form to the hoisted copy; the Tailwind
-globs are scoped to `app/`, `components/`, `lib/`), so installed templates are
-now fine to leave in place.
-
-### Env crosses origins by handshake
-
-localStorage is per-origin, so the preview cannot read what the builder stored.
-On mount the template posts `erxes-preview-ready` to its parent; the builder
-replies with `erxes-builder-env`, targeted at the preview origin (never `*`).
-`PreviewEnvBridge` writes those into its own localStorage and re-renders.
-
-### Known gap
-
-`app/booking/page.tsx` branches on `process.env.TEMPLATE_TYPE`, which is baked
-in at the template's own build time — so it is now correct in the preview too.
-It was wrong under the old inline render, where it resolved against the
-builder's env and always fell back to `"tour"`.
+- **Load fonts from `app/globals.css`** (`@import url(...)` of Google Fonts), not
+  `next/font` in `app/layout.tsx`. The preview renders `ClientLayout`, never
+  `layout.tsx`, so fonts loaded there are missing from the preview.
+- **No `@config` in `globals.css`.** The builder passes the config itself.

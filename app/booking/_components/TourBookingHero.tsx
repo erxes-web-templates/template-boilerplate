@@ -1,7 +1,7 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { getFileUrl } from "../../../lib/utils";
+import { getFileUrl } from "@site-core/lib/utils";
 
 const steps = [
   { label: "Select Tour", num: 1 },

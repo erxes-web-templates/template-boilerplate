@@ -16,6 +16,8 @@ export const isBuildMode = () => {
   if (typeof window !== "undefined") {
     return (
       window.location.pathname.includes("/dashboard/projects/") ||
+      // The builder's iframe preview route (one per template).
+      window.location.pathname.startsWith("/template-preview/") ||
       getBuildMode() === "build"
     );
   }

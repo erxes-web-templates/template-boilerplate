@@ -2,20 +2,20 @@
 
 import { useQuery } from "@apollo/client";
 import { useSearchParams } from "next/navigation";
-import { TOURS_GROUP_QUERY } from "../../graphql/queries";
-import { queries as tmsQueries } from "../../graphql/tms";
+import { TOURS_GROUP_QUERY } from "@site-core/graphql/queries";
+import { queries as tmsQueries } from "@site-core/graphql/tms";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../../components/ui/accordion";
-import usePage from "../../lib/usePage";
+import usePage from "../_components/sections/render";
 import { sectionComponents } from "../_components/sections";
 import Image from "next/image";
 import Link from "next/link";
-import { getFileUrl, getMinTourPrice, templateUrl } from "../../lib/utils";
-import { toHtml } from "../../lib/html";
+import { getFileUrl, getMinTourPrice, templateUrl } from "@site-core/lib/utils";
+import { toHtml } from "@site-core/lib/html";
 import TourBookingWidget from "../tours/_components/TourBookingWidget";
 import { ArrowLeft, Calendar, Clock, DollarSign, Hash } from "lucide-react";
 

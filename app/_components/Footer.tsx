@@ -3,9 +3,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useQuery } from "@apollo/client";
-import { GET_CMS_MENU_LIST } from "../../graphql/queries";
-import { templateUrl, getFileUrl } from "../../lib/utils";
-import { CPDetail, MenuItem } from "../../types/cms";
+import { GET_CMS_MENU_LIST } from "@site-core/graphql/queries";
+import { templateUrl, getFileUrl } from "@site-core/lib/utils";
+import { CPDetail, MenuItem } from "@site-core/types/cms";
 import {
   Twitter,
   Instagram,
@@ -17,6 +17,7 @@ import {
   Phone,
   Mail,
 } from "lucide-react";
+import { useSiteText, type SiteTextKey } from "./siteText";
 
 const parseStringOrArray = (value: unknown): string[] => {
   if (!value) return [];
@@ -32,7 +33,18 @@ const parseStringOrArray = (value: unknown): string[] => {
   return [];
 };
 
+// Shown until the owner builds a footer menu; labels are site text so a
+// Mongolian site does not fall back to English links.
+const FALLBACK_LINKS: { key: SiteTextKey; url: string }[] = [
+  { key: "footer.linkHome", url: "/" },
+  { key: "footer.linkTours", url: "/tours" },
+  { key: "footer.linkAbout", url: "/about" },
+  { key: "footer.linkContact", url: "/contact" },
+  { key: "footer.linkInquiry", url: "/inquiry" },
+];
+
 export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
+  const t = useSiteText();
   const { data } = useQuery(GET_CMS_MENU_LIST, {
     variables: { kind: "footer" },
   });
@@ -56,6 +68,7 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
 
   const phones = parseStringOrArray(cpDetail?.externalLinks?.phones);
   const emails = parseStringOrArray(cpDetail?.externalLinks?.emails);
+  const name = cpDetail?.name || t("footer.nameFallback");
 
   return (
     <footer className="bg-footer text-footer-foreground">
@@ -74,7 +87,7 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
             {cpDetail?.logo && (
               <Image
                 src={getFileUrl(typeof cpDetail.logo === "object" ? cpDetail.logo?.url : cpDetail.logo)}
-                alt={cpDetail?.name || "Logo"}
+                alt={name}
                 width={180}
                 height={64}
                 className="object-contain opacity-90 brightness-0 invert"
@@ -112,14 +125,14 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
               {cpDetail?.logo ? (
                 <Image
                   src={getFileUrl(typeof cpDetail.logo === "object" ? cpDetail.logo?.url : cpDetail.logo)}
-                  alt={cpDetail?.name || "Logo"}
+                  alt={name}
                   width={140}
                   height={48}
                   className="object-contain brightness-0 invert"
                 />
               ) : (
                 <span className="text-xl font-bold text-footer-foreground">
-                  {cpDetail?.name || "Company"}
+                  {name}
                 </span>
               )}
             </Link>
@@ -149,7 +162,7 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
           {/* Quick Links */}
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-widest text-footer-foreground/50 mb-4">
-              Quick Links
+              {t("footer.linksHeading")}
             </h4>
             <ul className="space-y-2.5">
               {menus.length > 0 ? (
@@ -175,19 +188,13 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
                   </li>
                 ))
               ) : (
-                [
-                  { label: "Home", url: "/" },
-                  { label: "Tours", url: "/tours" },
-                  { label: "About Us", url: "/about" },
-                  { label: "Contact", url: "/contact" },
-                  { label: "Inquiry", url: "/inquiry" },
-                ].map((item) => (
+                FALLBACK_LINKS.map((item) => (
                   <li key={item.url}>
                     <Link
                       href={templateUrl(item.url)}
                       className="text-sm text-footer-foreground/70 hover:text-footer-foreground transition-colors"
                     >
-                      {item.label}
+                      {t(item.key)}
                     </Link>
                   </li>
                 ))
@@ -198,7 +205,7 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
           {/* Contact info */}
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-widest text-footer-foreground/50 mb-4">
-              Contact Us
+              {t("footer.contactHeading")}
             </h4>
             <ul className="space-y-3">
               {cpDetail?.externalLinks?.address && (
@@ -237,14 +244,14 @@ export default function Footer({ cpDetail }: { cpDetail: CPDetail }) {
         <div className="mt-12 pt-8 border-t border-footer-foreground/20 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-footer-foreground/40">
           <p>
             {cpDetail?.copyright ||
-              `© ${new Date().getFullYear()} ${cpDetail?.name || "Company"}. All rights reserved.`}
+              `© ${new Date().getFullYear()} ${name}. ${t("footer.rights")}`}
           </p>
           <div className="flex gap-4">
             <Link href={templateUrl("/legal")} className="hover:text-footer-foreground/70 transition-colors">
-              Privacy Policy
+              {t("footer.privacy")}
             </Link>
             <Link href={templateUrl("/terms")} className="hover:text-footer-foreground/70 transition-colors">
-              Terms of Service
+              {t("footer.terms")}
             </Link>
           </div>
         </div>

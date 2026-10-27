@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 import { gql, useQuery } from "@apollo/client";
-import PageLoader from "../components/common/PageLoader";
+import PageLoader from "@/components/common/PageLoader";
 
 interface User {
   _id: string;

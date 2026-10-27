@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Section } from "../../../types/sections";
+import { Section } from "@site-core/types/sections";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,8 +16,10 @@ import {
 } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
+import { useSiteText } from "../siteText";
 
 const BookingFormSection = ({ section }: { section: Section }) => {
+  const t = useSiteText();
   const router = useRouter();
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
@@ -58,7 +60,7 @@ const BookingFormSection = ({ section }: { section: Section }) => {
         </div>
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
-            <CardTitle className="text-lg">Availability check</CardTitle>
+            <CardTitle className="text-lg">{t("booking.cardTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
             <form
@@ -66,7 +68,7 @@ const BookingFormSection = ({ section }: { section: Section }) => {
               className="grid gap-4 md:grid-cols-6"
             >
               <div className="space-y-2">
-                <Label htmlFor="booking-start-date">Check-in</Label>
+                <Label htmlFor="booking-start-date">{t("booking.arrive")}</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -81,7 +83,7 @@ const BookingFormSection = ({ section }: { section: Section }) => {
                       {startDate ? (
                         format(startDate, "PPP")
                       ) : (
-                        <span>Pick a date</span>
+                        <span>{t("booking.selectDate")}</span>
                       )}
                     </Button>
                   </PopoverTrigger>
@@ -102,7 +104,7 @@ const BookingFormSection = ({ section }: { section: Section }) => {
                 </Popover>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="booking-end-date">Check-out</Label>
+                <Label htmlFor="booking-end-date">{t("booking.leave")}</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -117,7 +119,7 @@ const BookingFormSection = ({ section }: { section: Section }) => {
                       {endDate ? (
                         format(endDate, "PPP")
                       ) : (
-                        <span>Pick a date</span>
+                        <span>{t("booking.selectDate")}</span>
                       )}
                     </Button>
                   </PopoverTrigger>
@@ -135,7 +137,7 @@ const BookingFormSection = ({ section }: { section: Section }) => {
                 </Popover>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="booking-adults">Adults</Label>
+                <Label htmlFor="booking-adults">{t("booking.adults")}</Label>
                 <Input
                   id="booking-adults"
                   type="number"
@@ -148,7 +150,7 @@ const BookingFormSection = ({ section }: { section: Section }) => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="booking-children">Children</Label>
+                <Label htmlFor="booking-children">{t("booking.children")}</Label>
                 <Input
                   id="booking-children"
                   type="number"
@@ -160,7 +162,7 @@ const BookingFormSection = ({ section }: { section: Section }) => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="booking-rooms">Rooms</Label>
+                <Label htmlFor="booking-rooms">{t("booking.rooms")}</Label>
                 <Input
                   id="booking-rooms"
                   type="number"
@@ -174,7 +176,7 @@ const BookingFormSection = ({ section }: { section: Section }) => {
               </div>
               <div className="flex items-end md:col-span-6">
                 <Button type="submit" className="w-full">
-                  Check rooms
+                  {t("booking.submit")}
                 </Button>
               </div>
             </form>

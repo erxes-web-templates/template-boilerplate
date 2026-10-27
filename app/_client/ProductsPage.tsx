@@ -21,15 +21,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useProductCategoriesQuery, useProductsQuery, type ProductCategory } from "../../graphql/products";
-import type { ProductSummary } from "../../graphql/products/types";
+import { useProductCategoriesQuery, useProductsQuery, type ProductCategory } from "@site-core/graphql/products";
+import type { ProductSummary } from "@site-core/graphql/products/types";
 import ProductCard, {
   type ProductCardProduct,
 } from "../../components/common/ProductCard";
-import { renderSections } from "../../lib/renderSections";
+import { renderSections } from "../_components/sections/render";
 import { sectionComponents } from "../_components/sections";
-import { isBuildMode } from "../../lib/buildMode";
-import { Section } from "../../types/sections";
+import { isBuildMode } from "@site-core/lib/buildMode";
+import { Section } from "@site-core/types/sections";
 import ProductsPageSections from "./ProductsPageSections";
 
 type SortOption = "featured" | "price-low" | "price-high" | "name-az";

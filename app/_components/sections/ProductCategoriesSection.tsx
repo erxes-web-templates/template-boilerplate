@@ -4,12 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
 import { useQuery } from "@apollo/client";
-import ecommerceQueries from "../../../graphql/products/queries";
+import ecommerceQueries from "@site-core/graphql/products/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Section } from "../../../types/sections";
+import { Section } from "@site-core/types/sections";
 import { getFileUrl, templateUrl } from "@/lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
+import { isBuildMode } from "@site-core/lib/buildMode";
 import EmptyState from "@/components/common/EmptyState";
+import { useSiteText } from "../siteText";
 
 type ProductCategory = {
   _id: string;
@@ -22,6 +23,7 @@ type ProductCategory = {
 };
 
 const ProductCategoriesSection = ({ section }: { section: Section }) => {
+  const t = useSiteText();
   const selectedCategories: string[] = section.config?.categories ?? [];
   const title = section.config?.title ?? "Featured categories";
   const description = section.config?.description ?? "";
@@ -49,6 +51,8 @@ const ProductCategoriesSection = ({ section }: { section: Section }) => {
   }, [data, selectedCategories]);
 
   if (!loading && !error && categories.length === 0) {
+    // Setup guidance for the builder; visitors just don't see the section.
+    if (!isBuilder) return null;
     return (
       <section className="py-20 md:py-28">
         <div className="container mx-auto max-w-5xl px-4">
@@ -76,7 +80,7 @@ const ProductCategoriesSection = ({ section }: { section: Section }) => {
 
         {error && (
           <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-            Unable to load categories right now. Please try again later.
+            {t("categories.loadError")}
           </div>
         )}
 
@@ -143,7 +147,7 @@ const ProductCategoriesSection = ({ section }: { section: Section }) => {
                         }
                         className="text-sm font-medium text-primary underline-offset-4 hover:underline"
                       >
-                        View products
+                        {t("categories.view")}
                       </Link>
                     </div>
                   </CardContent>

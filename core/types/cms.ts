@@ -45,6 +45,8 @@ type CPDetail = {
     headingFont: string;
     baseFont: string;
   };
+  /** The owner's replacements for this template's site text (lib/siteText.tsx). */
+  texts?: Record<string, string> | null;
   appearances?: {
     backgroundColor?: string;
     primaryColor?: string;

@@ -3,11 +3,19 @@ import defaultTheme from "tailwindcss/defaultTheme";
 
 export default {
   darkMode: ["class"],
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  // Relative to this file, so the paths hold when the builder compiles this
+  // template's CSS from its own working directory.
+  content: {
+    relative: true,
+    files: [
+      "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+      "./components/**/*.{js,ts,jsx,tsx,mdx}",
+      "./app/**/*.{js,ts,jsx,tsx,mdx}",
+      // The shared core: ./core in a published repo, the package here.
+      "./core/**/*.{js,ts,jsx,tsx,mdx}",
+      "../../../packages/site-core/**/*.{js,ts,jsx,tsx,mdx}",
+    ],
+  },
   theme: {
     extend: {
       colors: {

@@ -3,14 +3,18 @@
 import Script from "next/script";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { ApolloWrapper } from "../../lib/apollo-wrapper";
-import { CartProvider } from "../../lib/CartContext";
+import { ApolloWrapper } from "@site-core/lib/apollo-wrapper";
+import { CartProvider } from "@site-core/lib/CartContext";
 import Header from "./Header";
 import Footer from "./Footer";
 import SyncConfigOnLoad from "./SyncConfigOnLoad";
 import { getEnv } from "@/lib/utils";
-import type { CPDetail } from "../../types/cms";
+import type { CPDetail } from "@site-core/types/cms";
 
+import { loadOwnerFonts } from "@site-core/lib/fonts";
+import { applyOwnerPalette } from "@site-core/lib/ownerPalette";
+import { ownerColorTokens } from "./sections/theme";
+import { SiteTextProvider } from "./siteText";
 type ClientShellProps = {
   children: React.ReactNode;
   cpDetail?: (CPDetail & { integrations?: { messengerBrandCode?: string } }) | null;
@@ -84,6 +88,9 @@ export default function ClientShell({ children, cpDetail }: ClientShellProps) {
     setVar("--font-body", bodyFont);
     setVar("--font-heading", headingFont);
     setVar("--font-mono", (appearances as any)?.fontMono);
+    // Load the chosen families' files; the variables alone don't.
+    loadOwnerFonts();
+    applyOwnerPalette(ownerColorTokens);
   }, [cpDetail]);
   const env = getEnv();
   const posToken =
@@ -96,6 +103,7 @@ export default function ClientShell({ children, cpDetail }: ClientShellProps) {
     : "";
 
   return (
+    <SiteTextProvider texts={cpDetail?.texts}>
     <ApolloWrapper>
       <SyncConfigOnLoad />
       {cpDetail?.integrations?.messengerBrandCode && baseUrl && (
@@ -134,5 +142,6 @@ export default function ClientShell({ children, cpDetail }: ClientShellProps) {
         )}
       </CartProvider>
     </ApolloWrapper>
+    </SiteTextProvider>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { getFileUrl } from "../../lib/utils";
+import { getFileUrl } from "@site-core/lib/utils";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -17,13 +17,13 @@ import {
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
-import { useToast } from "../../hooks/use-toast";
-import { useCart } from "../../lib/CartContext";
-import paymentQueries from "../../graphql/payment/queries";
-import paymentMutations from "../../graphql/payment/mutations";
-import orderMutations from "../../graphql/order/mutations";
-import authQueries from "../../graphql/auth/queries";
-import orderQueries from "../../graphql/order/queries";
+import { useToast } from "@site-core/hooks/use-toast";
+import { useCart } from "@site-core/lib/CartContext";
+import paymentQueries from "@site-core/graphql/payment/queries";
+import paymentMutations from "@site-core/graphql/payment/mutations";
+import orderMutations from "@site-core/graphql/order/mutations";
+import authQueries from "@site-core/graphql/auth/queries";
+import orderQueries from "@site-core/graphql/order/queries";
 import {
   Dialog,
   DialogContent,

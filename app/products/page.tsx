@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { isBuildMode } from "../../lib/buildMode";
+import { isBuildMode } from "@site-core/lib/buildMode";
 import ProductsPageClient from "../_client/ProductsPage";
 import {
   fetchProductCategories,
   fetchProducts,
-} from "../../graphql/products/server";
-import { fetchWebPage } from "../../lib/fetchWebPage";
-import { Section } from "../../types/sections";
+} from "@site-core/graphql/products/server";
+import { fetchWebPage } from "@site-core/lib/fetchWebPage";
+import { Section } from "@site-core/types/sections";
 
 export async function generateMetadata(): Promise<Metadata> {
   if (isBuildMode()) return { title: "Products" };

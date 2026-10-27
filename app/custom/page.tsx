@@ -1,6 +1,6 @@
 "use client";
 
-import usePage from "../../lib/usePage";
+import usePage from "../_components/sections/render";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 

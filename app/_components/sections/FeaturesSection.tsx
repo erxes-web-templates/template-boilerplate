@@ -1,5 +1,5 @@
-import { Section } from "../../../types/sections";
-import { cardSurfaceStyle } from "../../../lib/renderSections";
+import { Section } from "@site-core/types/sections";
+import { cardSurfaceStyle } from "./render";
 import {
   CARD,
   SECTION_ICONS,

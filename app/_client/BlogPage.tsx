@@ -1,9 +1,9 @@
 "use client";
 
-import { GET_CMS_POSTS } from "../../graphql/queries";
-import usePage from "../../lib/usePage";
+import { GET_CMS_POSTS } from "@site-core/graphql/queries";
+import usePage from "../_components/sections/render";
 import { sectionComponents } from "../_components/sections";
-import { CmsPost } from "../../types/cms";
+import { CmsPost } from "@site-core/types/cms";
 import { useQuery } from "@apollo/client";
 import { useSearchParams } from "next/navigation";
 import React from "react";

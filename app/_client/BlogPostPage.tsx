@@ -1,7 +1,7 @@
 "use client";
 
-import { GET_CMS_POST } from "../../graphql/queries";
-import usePage from "../../lib/usePage";
+import { GET_CMS_POST } from "@site-core/graphql/queries";
+import usePage from "../_components/sections/render";
 import { sectionComponents } from "../_components/sections";
 import { useSearchParams } from "next/navigation";
 import React from "react";

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { getFileUrl } from "../../lib/utils";
+import { getFileUrl } from "@site-core/lib/utils";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -26,14 +26,14 @@ import { Textarea } from "../../components/ui/textarea";
 import { Label } from "../../components/ui/label";
 import { Checkbox } from "../../components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
-import { useToast } from "../../hooks/use-toast";
-import { useCart } from "../../lib/CartContext";
-import orderQueries from "../../graphql/order/queries";
-import orderMutations from "../../graphql/order/mutations";
-import authQueries from "../../graphql/auth/queries";
+import { useToast } from "@site-core/hooks/use-toast";
+import { useCart } from "@site-core/lib/CartContext";
+import orderQueries from "@site-core/graphql/order/queries";
+import orderMutations from "@site-core/graphql/order/mutations";
+import authQueries from "@site-core/graphql/auth/queries";
 import { Check, Minus, Plus, Trash2 } from "lucide-react";
-import { templateUrl } from "../../lib/utils";
-import useClientPortal from "../../hooks/useClientPortal";
+import { templateUrl } from "@site-core/lib/utils";
+import useClientPortal from "@site-core/hooks/useClientPortal";
 
 const STEP_TITLES = ["Review Cart", "Delivery Details", "Confirm & Pay"];
 

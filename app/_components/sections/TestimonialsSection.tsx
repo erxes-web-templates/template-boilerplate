@@ -1,7 +1,7 @@
 import { Quote } from "lucide-react";
-import { Section } from "../../../types/sections";
+import { Section } from "@site-core/types/sections";
 import { CARD, SectionHeading, SectionShell } from "./_SectionHeading";
-import { cardSurfaceStyle } from "../../../lib/renderSections";
+import { cardSurfaceStyle } from "./render";
 
 type Testimonial = {
   quote?: string;

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { isBuildMode } from "../../lib/buildMode";
+import { isBuildMode } from "@site-core/lib/buildMode";
 import BlogPageClient from "../_client/BlogPage";
-import { fetchCmsPosts } from "../../lib/fetchCms";
-import { fetchWebPage } from "../../lib/fetchWebPage";
+import { fetchCmsPosts } from "@site-core/lib/fetchCms";
+import { fetchWebPage } from "@site-core/lib/fetchWebPage";
 import data from "../../data/configs.json";
 
 export async function generateMetadata(): Promise<Metadata> {

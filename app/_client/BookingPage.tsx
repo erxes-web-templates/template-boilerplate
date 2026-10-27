@@ -3,11 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { useApolloClient, useQuery } from "@apollo/client";
-import pmsRoomQueries from "../../graphql/pms/rooms/queries";
-import pmsConfigQueries from "../../graphql/pms/config/queries";
-import pmsExtraQueries from "../../graphql/pms/extras/queries";
+import pmsRoomQueries from "@site-core/graphql/pms/rooms/queries";
+import pmsConfigQueries from "@site-core/graphql/pms/config/queries";
+import pmsExtraQueries from "@site-core/graphql/pms/extras/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import usePage from "../../lib/usePage";
+import usePage from "../_components/sections/render";
 import { sectionComponents } from "../_components/sections";
 import Image from "next/image";
 import { getFileUrl } from "@/lib/utils";
@@ -19,10 +19,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useCart } from "../../lib/CartContext";
-import { templateUrl } from "../../lib/utils";
+import { useCart } from "@site-core/lib/CartContext";
+import { templateUrl } from "@site-core/lib/utils";
 import TourBookingForm from "../booking/_components/BookingForm";
-import webQueries from "../../graphql/web/queries";
+import webQueries from "@site-core/graphql/web/queries";
 
 const parsePipelineConfig = (value: unknown) => {
   if (!value) {

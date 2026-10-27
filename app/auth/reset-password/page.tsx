@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@apollo/client";
-import { mutations } from "../../../graphql/auth";
+import { mutations } from "@site-core/graphql/auth";
 import {
   Card,
   CardContent,
@@ -18,7 +18,7 @@ import { Label } from "../../../components/ui/label";
 import { Button } from "../../../components/ui/button";
 import { AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { templateUrl } from "../../../lib/utils";
+import { templateUrl } from "@site-core/lib/utils";
 
 export default function ResetPasswordPage() {
   const router = useRouter();

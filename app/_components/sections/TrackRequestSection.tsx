@@ -4,12 +4,13 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Section } from "../../../types/sections";
-import { getTicketConfig } from "../../../lib/ticketConfig";
-import { useRequestByIdOrReference } from "../../../hooks/useTickets";
-import { STAGE_TRACK } from "../../../lib/ticketMapping";
+import { Section } from "@site-core/types/sections";
+import { getTicketConfig } from "@site-core/lib/ticketConfig";
+import { useRequestByIdOrReference } from "@site-core/hooks/useTickets";
+import { STAGE_TRACK } from "@site-core/lib/ticketMapping";
 import { SectionHeading } from "./_SectionHeading";
-import { cardSurfaceStyle } from "../../../lib/renderSections";
+import { cardSurfaceStyle } from "./render";
+import { useSiteText } from "../siteText";
 
 /**
  * Look up a request by its reference.
@@ -24,6 +25,7 @@ import { cardSurfaceStyle } from "../../../lib/renderSections";
  * while someone is still halfway through typing.
  */
 const TrackRequestSection = ({ section }: { section: Section }) => {
+  const t = useSiteText();
   const config = useMemo(
     () => getTicketConfig(section.config),
     [section.config],
@@ -42,7 +44,7 @@ const TrackRequestSection = ({ section }: { section: Section }) => {
     event.preventDefault();
     const value = reference.trim();
     if (!value) {
-      setError("Enter the reference from your confirmation.");
+      setError(t("trackRequest.referenceRequired"));
       setQuery("");
       return;
     }
@@ -65,19 +67,21 @@ const TrackRequestSection = ({ section }: { section: Section }) => {
         />
 
         <form className="mt-8" onSubmit={handleSubmit} noValidate>
-          <Label htmlFor="request-reference">Reference</Label>
+          <Label htmlFor="request-reference">
+            {t("trackRequest.referenceLabel")}
+          </Label>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row">
             <Input
               id="request-reference"
               className="sm:flex-1"
               value={reference}
-              placeholder="REQ-2026-0417"
+              placeholder={t("trackRequest.placeholder")}
               onChange={(event) => setReference(event.target.value)}
               aria-invalid={Boolean(error)}
               aria-describedby={error ? "request-reference-error" : undefined}
             />
             <Button type="submit" disabled={loading}>
-              {loading ? "Looking…" : "Find it"}
+              {loading ? t("trackRequest.finding") : t("trackRequest.find")}
             </Button>
           </div>
           {error && (
@@ -96,8 +100,7 @@ const TrackRequestSection = ({ section }: { section: Section }) => {
             className="mt-6 rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground"
             style={cardSurfaceStyle(section)}
           >
-            No request matches that reference. Check it against your
-            confirmation — it has to match exactly.
+            {t("trackRequest.notFound")}
           </p>
         )}
 

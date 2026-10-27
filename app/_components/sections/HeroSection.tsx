@@ -1,11 +1,11 @@
 import React from "react";
-import { Section } from "../../../types/sections";
+import { Section } from "@site-core/types/sections";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { getFileUrl, templateUrl } from "@/lib/utils";
-import { toHtml } from "../../../lib/html";
-import { isBuildMode } from "../../../lib/buildMode";
+import { toHtml } from "@site-core/lib/html";
+import { isBuildMode } from "@site-core/lib/buildMode";
 
 const HeroSection = ({ section }: { section: Section }) => {
   const isBuilder = isBuildMode();

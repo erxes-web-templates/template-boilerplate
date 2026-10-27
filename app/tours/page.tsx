@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { isBuildMode } from "../../lib/buildMode";
+import { isBuildMode } from "@site-core/lib/buildMode";
 import ToursPageClient from "../_client/ToursPage";
-import { fetchBmTours } from "../../lib/fetchTours";
-import { fetchWebPage } from "../../lib/fetchWebPage";
+import { fetchBmTours } from "@site-core/lib/fetchTours";
+import { fetchWebPage } from "@site-core/lib/fetchWebPage";
 
 export async function generateMetadata(): Promise<Metadata> {
   if (isBuildMode()) return { title: "Tours" };

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { isBuildMode } from "../../../lib/buildMode";
+import { isBuildMode } from "@site-core/lib/buildMode";
 import ProductDetailPageClient from "../../_client/ProductDetailPage";
 import {
   fetchProductAverageReview,
   fetchProductDetail,
   fetchProductReviews,
   fetchProductSimilarities,
-} from "../../../graphql/products/server";
+} from "@site-core/graphql/products/server";
 
 type PageProps = {
   params: Promise<{ id: string }>;

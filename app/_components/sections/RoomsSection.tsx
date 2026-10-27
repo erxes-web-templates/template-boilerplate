@@ -7,11 +7,11 @@ import {
   useRoomsQuery,
   useTagsQuery,
   type RoomSummary,
-} from "../../../graphql/pms/rooms";
-import { Section } from "../../../types/sections";
-import { toHtml } from "../../../lib/html";
+} from "@site-core/graphql/pms/rooms";
+import { Section } from "@site-core/types/sections";
+import { toHtml } from "@site-core/lib/html";
 import { templateUrl, getFileUrl } from "@/lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
+import { isBuildMode } from "@site-core/lib/buildMode";
 import {
   Card,
   CardContent,
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import EmptyState from "@/components/common/EmptyState";
+import { useSiteText } from "../siteText";
 
 const toCurrency = (value?: number | null) => {
   if (typeof value !== "number" || Number.isNaN(value)) return "—";
@@ -29,6 +30,7 @@ const toCurrency = (value?: number | null) => {
 };
 
 const RoomsSection = ({ section }: { section: Section }) => {
+  const t = useSiteText();
   const limit = Number(section.config?.limit ?? 6);
   const categoryId = section.config?.categoryId || null;
   const tag = section.config?.tag || null;
@@ -63,6 +65,8 @@ const RoomsSection = ({ section }: { section: Section }) => {
   const description = section.config?.description || "";
 
   if (!loading && !error && rooms.length === 0) {
+    // Setup guidance for the builder; visitors just don't see the section.
+    if (!isBuilder) return null;
     return (
       <section className="py-20 md:py-28">
         <div className="container mx-auto max-w-6xl px-4 md:px-6">
@@ -95,7 +99,7 @@ const RoomsSection = ({ section }: { section: Section }) => {
 
         {error && (
           <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
-            Unable to load rooms. Please try again later.
+            {t("rooms.loadError")}
           </div>
         )}
 
@@ -143,7 +147,7 @@ const RoomsSection = ({ section }: { section: Section }) => {
                   </CardHeader>
                   <CardContent className="flex flex-1 flex-col gap-2 p-4">
                     <CardTitle className="text-sm font-medium leading-snug line-clamp-2">
-                      {room?.name ?? "Untitled room"}
+                      {room?.name ?? t("rooms.untitled")}
                     </CardTitle>
                     <CardDescription className="line-clamp-2 text-xs">
                       <span
@@ -172,7 +176,7 @@ const RoomsSection = ({ section }: { section: Section }) => {
                             : `/rooms/${room._id}`
                         }
                       >
-                        View
+                        {t("rooms.view")}
                       </Link>
                     </Button>
                     <Button asChild size="sm" className="flex-1 text-xs">
@@ -183,7 +187,7 @@ const RoomsSection = ({ section }: { section: Section }) => {
                             : `/rooms/${room._id}?book=true`
                         }
                       >
-                        Book now
+                        {t("rooms.book")}
                       </Link>
                     </Button>
                   </CardFooter>

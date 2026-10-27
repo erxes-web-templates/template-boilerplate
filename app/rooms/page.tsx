@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { isBuildMode } from "../../lib/buildMode";
-import { getFileUrl } from "../../lib/utils";
+import { isBuildMode } from "@site-core/lib/buildMode";
+import { getFileUrl } from "@site-core/lib/utils";
 import RoomsPageClient from "../_client/RoomsPage";
-import { fetchRooms } from "../../lib/fetchRooms";
-import { fetchWebPage } from "../../lib/fetchWebPage";
+import { fetchRooms } from "@site-core/lib/fetchRooms";
+import { fetchWebPage } from "@site-core/lib/fetchWebPage";
 
 const PER_PAGE = 12;
 

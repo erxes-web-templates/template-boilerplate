@@ -2,15 +2,17 @@
 
 import React from "react";
 import CustomImage from "@/components/common/CustomImage";
-import { Section } from "../../../types/sections";
+import { Section } from "@site-core/types/sections";
 import { getFileUrl } from "@/lib/utils";
 
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
+import { useSiteText } from "../siteText";
 
 const GallerySection = ({ section }: { section: Section }) => {
+  const t = useSiteText();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -54,7 +56,7 @@ const GallerySection = ({ section }: { section: Section }) => {
                       <div className="relative aspect-[4/3] w-full overflow-hidden">
                         <CustomImage 
                           src={getFileUrl(image.url)} 
-                          alt="image" 
+                          alt={`${t("gallery.photo")} ${index + 1}`} 
                           fill 
                           className="transition-transform duration-500 group-hover:scale-110"
                         />
@@ -66,8 +68,8 @@ const GallerySection = ({ section }: { section: Section }) => {
             ))}
           </CarouselContent>
           <div className="flex justify-center mt-8 gap-3">
-            <CarouselPrevious className="relative static translate-y-0 hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-110 shadow-lg" />
-            <CarouselNext className="relative static translate-y-0 hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-110 shadow-lg" />
+            <CarouselPrevious aria-label={t("carousel.previous")} className="relative static translate-y-0 hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-110 shadow-lg" />
+            <CarouselNext aria-label={t("carousel.next")} className="relative static translate-y-0 hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-110 shadow-lg" />
           </div>
         </Carousel>
 

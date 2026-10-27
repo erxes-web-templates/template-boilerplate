@@ -29,11 +29,26 @@ type KnownSectionType =
   | "requestForm"
   | "trackRequest";
 
+/**
+ * The template's own token names a section's colours (set in the builder)
+ * also drive — passed in by the template (its sections/theme.ts) because this
+ * package is shared by every template and cannot import any one of them.
+ *
+ *  - main / soft: the template's text palette (Terrace's `--bark`), set to the
+ *    section's text colour and a muted version of it.
+ *  - surface: the template's panel surfaces (`--sand`, `--night-raised`),
+ *    lifted off the section's background.
+ */
+export type SectionTheme = { main: string[]; soft: string[]; surface: string[] };
+
+const NO_THEME: SectionTheme = { main: [], soft: [], surface: [] };
+
 interface RenderSectionsProps {
   sections: Section[];
   components: {
     [key in KnownSectionType]?: React.ComponentType<{ section: Section }>;
   };
+  theme?: SectionTheme;
 }
 
 /**
@@ -90,6 +105,48 @@ const mutedFrom = (channels: string): string => {
 };
 
 /**
+ * The template's own text palette, set to the chosen colour alongside the
+ * theme tokens. Templates such as Terrace colour most copy with `text-bark`
+ * rather than `text-foreground`, so the theme tokens alone left it unchanged.
+ * The names come from the template's SectionTheme.
+ */
+const paletteTextTokens = (
+  text: string,
+  theme: SectionTheme,
+): Record<string, string> => {
+  const tokens: Record<string, string> = {};
+  theme.main.forEach((name) => {
+    tokens[name] = text;
+  });
+  theme.soft.forEach((name) => {
+    tokens[name] = mutedFrom(text);
+  });
+  return tokens;
+};
+
+/**
+ * Panels inside a section, lifted off its background.
+ *
+ * Sections set panels on the theme's surfaces (`bg-card`, `bg-muted`) or the
+ * template's own (`bg-sand`, `bg-night-raised`). Left alone, those kept their
+ * stock colour on whatever background was picked — a sand panel on a navy
+ * band, holding text coloured for the navy. Re-pointing them at a lift of the
+ * section background keeps panels reading as panels, in the section's colour.
+ * The template's names come from its SectionTheme.
+ */
+const surfaceTokens = (
+  background: string,
+  theme: SectionTheme,
+): Record<string, string> => {
+  const lifted = liftedFrom(background);
+  const tokens: Record<string, string> = { "--card": lifted, "--muted": lifted };
+  theme.surface.forEach((name) => {
+    tokens[name] = lifted;
+  });
+  return tokens;
+};
+
+/**
  * Per-section background and text colour, set in the builder.
  *
  * Shared by both render paths. Sections reach the page two ways — this module
@@ -111,18 +168,29 @@ const mutedFrom = (channels: string): string => {
  */
 export const sectionSurfaceStyle = (
   section: Section,
+  theme: SectionTheme = NO_THEME,
 ): React.CSSProperties | undefined => {
   const background = section?.config?.backgroundColor;
-  const text = hexToHslChannels(section?.config?.textColor);
+  const backgroundChannels = hexToHslChannels(background);
+  // With a background but no text colour, the template's own text could be
+  // light-on-light or dark-on-dark — a dark band under Terrace's dark brown
+  // copy, a pale one under Nocturne's bone. Pick whichever reads.
+  const text =
+    hexToHslChannels(section?.config?.textColor) ??
+    (backgroundChannels ? readableForChannels(backgroundChannels) : null);
 
   if (!background && !text) return undefined;
 
   return {
     ...(background ? { backgroundColor: background } : {}),
+    ...(backgroundChannels ? surfaceTokens(backgroundChannels, theme) : {}),
     ...(text
       ? ({
+          // Plain inherited colour too, for text with no colour class.
+          color: `hsl(${text})`,
           "--foreground": text,
           "--muted-foreground": mutedFrom(text),
+          ...paletteTextTokens(text, theme),
         } as React.CSSProperties)
       : {}),
   };
@@ -191,7 +259,29 @@ export const cardSurfaceStyle = (
   };
 };
 
-export function renderSections({ sections, components }: RenderSectionsProps) {
+/**
+ * Props for a section's wrapper: the surface style, plus a marker when a
+ * background is set. Most sections paint their own root — `bg-background`, or
+ * a fixed surface such as `bg-night` — which covered the wrapper's colour, so
+ * the setting looked like it did nothing. globals.css clears the root's colour
+ * under this marker; background images on heroes are left alone.
+ */
+export const sectionSurfaceProps = (
+  section: Section,
+  theme: SectionTheme = NO_THEME,
+): { style?: React.CSSProperties; "data-section-background"?: "" } => {
+  const style = sectionSurfaceStyle(section, theme);
+  if (!style) return {};
+  return section?.config?.backgroundColor
+    ? { style, "data-section-background": "" }
+    : { style };
+};
+
+export function renderSections({
+  sections,
+  components,
+  theme = NO_THEME,
+}: RenderSectionsProps) {
   if (!sections || !Array.isArray(sections)) {
     console.warn("Invalid or missing sections array");
     return null;
@@ -210,11 +300,11 @@ export function renderSections({ sections, components }: RenderSectionsProps) {
       return null;
     }
 
-    const surface = sectionSurfaceStyle(section);
+    const surface = sectionSurfaceProps(section, theme);
 
-    if (surface) {
+    if (surface.style) {
       return (
-        <div key={index} style={surface}>
+        <div key={index} {...surface}>
           <Component section={section} />
         </div>
       );

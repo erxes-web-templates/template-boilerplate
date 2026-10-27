@@ -1,4 +1,4 @@
-import { createNextConfig } from "./lib/next.config.base";
+import { createNextConfig } from "./core/lib/next.config.base";
 
 export default createNextConfig({
   ERXES_API_URL: "http://localhost:4000/graphql",

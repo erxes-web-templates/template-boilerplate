@@ -5,14 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Section } from "../../../types/sections";
-import { getTicketConfig } from "../../../lib/ticketConfig";
+import { Section } from "@site-core/types/sections";
+import { getTicketConfig } from "@site-core/lib/ticketConfig";
 import {
   useCurrentCustomerId,
   useSubmitRequest,
   useTicketTags,
-} from "../../../hooks/useTickets";
+} from "@site-core/hooks/useTickets";
 import { SectionHeading } from "./_SectionHeading";
+import { useSiteText } from "../siteText";
+import { isBuildMode } from "@site-core/lib/buildMode";
 
 type FieldErrors = Partial<
   Record<"title" | "description" | "email" | "route", string>
@@ -43,6 +45,7 @@ const EMPTY_FORM = {
  * posting a ticket that would be rejected.
  */
 const RequestFormSection = ({ section }: { section: Section }) => {
+  const t = useSiteText();
   const config = useMemo(
     () => getTicketConfig(section.config),
     [section.config],
@@ -66,20 +69,19 @@ const RequestFormSection = ({ section }: { section: Section }) => {
   const validate = (): FieldErrors => {
     const next: FieldErrors = {};
     if (!form.title.trim()) {
-      next.title = "Enter a short summary of your request.";
+      next.title = t("requestForm.summaryRequired");
     }
     if (form.description.trim().length < 20) {
-      next.description =
-        "Describe what happened in at least a sentence or two, so we can act on it.";
+      next.description = t("requestForm.detailsTooShort");
     }
     // An anonymous submitter has no account to be reached through, so an email
     // is the only way they will hear back at all.
     if (!customerId && !form.email.trim()) {
-      next.email = "Enter an email address so we can reply to you.";
+      next.email = t("requestForm.emailRequired");
     } else if (form.email.trim() && !EMAIL_RE.test(form.email.trim())) {
-      next.email = "Enter an email address in the format name@example.com.";
+      next.email = t("requestForm.emailInvalid");
     }
-    if (!routeValue) next.route = "Choose what kind of request this is.";
+    if (!routeValue) next.route = t("requestForm.routeRequired");
     return next;
   };
 
@@ -106,21 +108,30 @@ const RequestFormSection = ({ section }: { section: Section }) => {
     });
 
     if (!response.ok) {
-      setSubmitError(response.message ?? "Your request could not be sent.");
+      setSubmitError(response.message ?? t("requestForm.sendError"));
       return;
     }
 
     setResult({ reference: response.reference ?? "", id: response.id });
   };
 
+  // Unconnected, the form cannot accept anything: the builder says what to
+  // set, and visitors see no form they would fill in for nothing.
+  if (!config.isConfigured && !isBuildMode()) return null;
+
   if (result) {
     return (
       <section id="request-form" className="py-20 md:py-28">
         <div className="container mx-auto max-w-3xl px-4 md:px-6">
-          <SectionHeading eyebrow="Request sent" title="We have your request" />
+          <SectionHeading
+            eyebrow={t("requestForm.sentEyebrow")}
+            title={t("requestForm.sentTitle")}
+          />
 
           <div className="mt-6 rounded-2xl border border-border bg-card p-6">
-            <p className="text-sm text-muted-foreground">Your reference</p>
+            <p className="text-sm text-muted-foreground">
+              {t("requestForm.referenceLabel")}
+            </p>
             <p className="mt-1 font-heading text-3xl font-semibold text-card-foreground">
               {result.reference}
             </p>
@@ -132,13 +143,13 @@ const RequestFormSection = ({ section }: { section: Section }) => {
           <div className="mt-6 rounded-2xl border border-border bg-muted/40 p-4">
             <p className="text-sm font-semibold text-foreground">
               {customerId
-                ? "This request is saved to your account."
-                : "Save this reference now."}
+                ? t("requestForm.savedTitle")
+                : t("requestForm.keepReferenceTitle")}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               {customerId
-                ? "You can follow its progress at any time under your requests."
-                : "You submitted without signing in, so this reference is the only way back to this request. We cannot look it up for you by name."}
+                ? t("requestForm.savedBody")
+                : t("requestForm.keepReferenceBody")}
             </p>
           </div>
 
@@ -151,7 +162,7 @@ const RequestFormSection = ({ section }: { section: Section }) => {
               setForm(EMPTY_FORM);
             }}
           >
-            Submit another
+            {t("requestForm.another")}
           </Button>
         </div>
       </section>
@@ -170,7 +181,7 @@ const RequestFormSection = ({ section }: { section: Section }) => {
           }
         />
 
-        {!config.isConfigured && (
+        {!config.isConfigured && isBuildMode() && (
           <p className="mt-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-foreground">
             This form is not connected to a ticket channel yet, so it cannot
             accept submissions. Set the channel and at least one route in the
@@ -182,7 +193,7 @@ const RequestFormSection = ({ section }: { section: Section }) => {
           {config.routes.length > 1 && (
             <fieldset>
               <legend className="text-sm font-medium text-foreground">
-                What kind of request is this?
+                {t("requestForm.routeQuestion")}
               </legend>
               <div className="mt-3 space-y-2">
                 {config.routes.map((route) => (
@@ -220,7 +231,7 @@ const RequestFormSection = ({ section }: { section: Section }) => {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="request-title">Summary</Label>
+            <Label htmlFor="request-title">{t("requestForm.summary")}</Label>
             <Input
               id="request-title"
               value={form.title}
@@ -235,7 +246,9 @@ const RequestFormSection = ({ section }: { section: Section }) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="request-description">What happened</Label>
+            <Label htmlFor="request-description">
+              {t("requestForm.details")}
+            </Label>
             <Textarea
               id="request-description"
               rows={6}
@@ -252,14 +265,16 @@ const RequestFormSection = ({ section }: { section: Section }) => {
 
           {tags.length > 0 && (
             <div className="space-y-2">
-              <Label htmlFor="request-category">Category</Label>
+              <Label htmlFor="request-category">
+                {t("requestForm.category")}
+              </Label>
               <select
                 id="request-category"
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 value={form.categoryTagId}
                 onChange={(event) => set("categoryTagId")(event.target.value)}
               >
-                <option value="">Not sure</option>
+                <option value="">{t("requestForm.categoryUnsure")}</option>
                 {tags.map((tag) => (
                   <option key={tag._id} value={tag._id}>
                     {tag.name}
@@ -270,7 +285,9 @@ const RequestFormSection = ({ section }: { section: Section }) => {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="request-location">Location (optional)</Label>
+            <Label htmlFor="request-location">
+              {t("requestForm.location")}
+            </Label>
             <Input
               id="request-location"
               value={form.location}
@@ -281,7 +298,7 @@ const RequestFormSection = ({ section }: { section: Section }) => {
           {!customerId && (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="request-name">Your name</Label>
+                <Label htmlFor="request-name">{t("requestForm.name")}</Label>
                 <Input
                   id="request-name"
                   value={form.name}
@@ -290,7 +307,7 @@ const RequestFormSection = ({ section }: { section: Section }) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="request-email">Email</Label>
+                <Label htmlFor="request-email">{t("requestForm.email")}</Label>
                 <Input
                   id="request-email"
                   type="email"
@@ -306,7 +323,9 @@ const RequestFormSection = ({ section }: { section: Section }) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="request-phone">Phone (optional)</Label>
+                <Label htmlFor="request-phone">
+                  {t("requestForm.phone")}
+                </Label>
                 <Input
                   id="request-phone"
                   value={form.phone}
@@ -323,7 +342,7 @@ const RequestFormSection = ({ section }: { section: Section }) => {
           )}
 
           <Button type="submit" disabled={loading || !config.isConfigured}>
-            {loading ? "Sending…" : "Send request"}
+            {loading ? t("requestForm.sending") : t("requestForm.send")}
           </Button>
         </form>
       </div>

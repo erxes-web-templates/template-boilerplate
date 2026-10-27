@@ -1,7 +1,7 @@
 "use client";
 
 import type { BookingFormData } from "./BookingForm";
-import type { BmTour } from "../../../types/tours";
+import type { BmTour } from "@site-core/types/tours";
 import TravelerHotelDetails from "./TravelerHotelDetails";
 import TravelerTourDetails from "./TravelerTourDetails";
 

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
-import { getFileUrl } from "../../../lib/utils";
+import { getFileUrl } from "@site-core/lib/utils";
 import type { HotelRoom } from "./types";
 
 type Props = {

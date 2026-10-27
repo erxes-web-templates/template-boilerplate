@@ -1,14 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { getFileUrl } from "../../lib/utils";
+import { getFileUrl } from "@site-core/lib/utils";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Ban, Check, ImageOff, Loader2, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCart } from "../../lib/CartContext";
-import { templateUrl } from "../../lib/utils";
-import { isBuildMode } from "../../lib/buildMode";
+import { useCart } from "@site-core/lib/CartContext";
+import { templateUrl } from "@site-core/lib/utils";
+import { isBuildMode } from "@site-core/lib/buildMode";
 type ButtonState = "idle" | "adding" | "added";
 
 export type ProductCardProduct = {

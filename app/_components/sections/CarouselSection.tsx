@@ -18,10 +18,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Section } from "../../../types/sections";
+import { Section } from "@site-core/types/sections";
 import { getFileUrl } from "@/lib/utils";
 import { templateUrl } from "@/lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
+import { isBuildMode } from "@site-core/lib/buildMode";
+import { useSiteText } from "../siteText";
 
 type CarouselLinkType = "product" | "productCategory" | "external";
 
@@ -89,6 +90,8 @@ const resolveLink = (
 };
 
 const CarouselSection = ({ section }: { section: Section }) => {
+  const t = useSiteText();
+  const isBuilder = isBuildMode();
   const title = section.config?.title ?? "Featured carousel";
   const description = section.config?.description ?? "";
   const items: CarouselConfigItem[] = useMemo(
@@ -117,24 +120,29 @@ const CarouselSection = ({ section }: { section: Section }) => {
                   {imageUrl ? (
                     <Image
                       src={imageUrl}
-                      alt={item.title ?? "Carousel item"}
+                      alt={item.title ?? ""}
                       fill
                       className="object-cover"
                       sizes="100vw"
                       priority
                     />
-                  ) : (
+                  ) : isBuilder ? (
+                    // A placeholder for the builder only.
                     <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
                       No image
                     </div>
+                  ) : (
+                    <div className="h-full w-full bg-muted" />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/5" />
                   <div className="absolute inset-0 flex items-center justify-center px-6 py-12">
                     <Card className="w-full max-w-3xl bg-black/50 text-white backdrop-blur-md">
                       <CardHeader>
-                        <CardTitle className="text-3xl font-bold md:text-4xl">
-                          {item.title ?? "Untitled slide"}
-                        </CardTitle>
+                        {(item.title || isBuilder) && (
+                          <CardTitle className="text-3xl font-bold md:text-4xl">
+                            {item.title || "Untitled slide"}
+                          </CardTitle>
+                        )}
                         {item.description && (
                           <CardDescription className="mt-4 text-base text-white/80 md:text-lg">
                             {item.description}
@@ -153,7 +161,7 @@ const CarouselSection = ({ section }: { section: Section }) => {
                               target={link.isExternal ? "_blank" : undefined}
                               rel={link.isExternal ? "noopener noreferrer" : undefined}
                             >
-                              Learn more
+                              {t("carousel.learnMore")}
                             </Link>
                           </Button>
                         </CardFooter>
@@ -166,8 +174,14 @@ const CarouselSection = ({ section }: { section: Section }) => {
           })}
         </CarouselContent>
         <div className="pointer-events-none absolute inset-x-0 bottom-10 flex items-center justify-center gap-4">
-          <CarouselPrevious className="pointer-events-auto relative h-12 w-12 rounded-full bg-white/80 text-black hover:bg-white" />
-          <CarouselNext className="pointer-events-auto relative h-12 w-12 rounded-full bg-white/80 text-black hover:bg-white" />
+          <CarouselPrevious
+            aria-label={t("carousel.previous")}
+            className="pointer-events-auto relative h-12 w-12 rounded-full bg-white/80 text-black hover:bg-white"
+          />
+          <CarouselNext
+            aria-label={t("carousel.next")}
+            className="pointer-events-auto relative h-12 w-12 rounded-full bg-white/80 text-black hover:bg-white"
+          />
         </div>
       </Carousel>
     </section>

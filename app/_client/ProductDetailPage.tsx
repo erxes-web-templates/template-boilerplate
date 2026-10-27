@@ -20,26 +20,26 @@ import {
   useProductAverageReviewQuery,
   useProductDetailQuery,
   useProductSimilaritiesQuery,
-} from "../../graphql/products";
+} from "@site-core/graphql/products";
 import type {
   ProductDetail,
   ProductReviewSummary,
   ProductReviewsData,
   ProductSummary,
-} from "../../graphql/products/types";
-import { useCart } from "../../lib/CartContext";
-import authQueries from "../../graphql/auth/queries";
-import productMutations from "../../graphql/products/mutations";
-import ecommerceQueries from "../../graphql/ecommerce/queries";
-import ecommerceMutations from "../../graphql/ecommerce/mutations";
+} from "@site-core/graphql/products/types";
+import { useCart } from "@site-core/lib/CartContext";
+import authQueries from "@site-core/graphql/auth/queries";
+import productMutations from "@site-core/graphql/products/mutations";
+import ecommerceQueries from "@site-core/graphql/ecommerce/queries";
+import ecommerceMutations from "@site-core/graphql/ecommerce/mutations";
 import { templateUrl, getFileUrl } from "@/lib/utils";
-import { isBuildMode } from "../../lib/buildMode";
-import { blockNoteToHtml, blockNoteToPlainText } from "../../lib/blocknote";
+import { isBuildMode } from "@site-core/lib/buildMode";
+import { blockNoteToHtml, blockNoteToPlainText } from "@site-core/lib/blocknote";
 import {
   clearLocalLastViewedProducts,
   getLocalLastViewedProducts,
   rememberLastViewedProduct,
-} from "../../lib/lastViewedProducts";
+} from "@site-core/lib/lastViewedProducts";
 import {
   ProductReviews,
   type ProductReview,

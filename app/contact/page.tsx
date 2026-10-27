@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import pageData from "../../data/pages/contact.json";
-import { renderSections } from "../../lib/renderSections";
-import { Section } from "../../types/sections";
-import { isBuildMode } from "../../lib/buildMode";
-import { fetchWebPage } from "../../lib/fetchWebPage";
+import { renderSections } from "../_components/sections/render";
+import { Section } from "@site-core/types/sections";
+import { isBuildMode } from "@site-core/lib/buildMode";
+import { fetchWebPage } from "@site-core/lib/fetchWebPage";
 import ContactPageClient from "../_client/ContactPage";
 import HeroSection from "../_components/sections/HeroSection";
 import AboutSection from "../_components/sections/AboutSection";

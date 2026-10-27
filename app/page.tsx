@@ -1,7 +1,7 @@
-import { renderSections } from "../lib/renderSections";
-import { fetchWebPage } from "../lib/fetchWebPage";
-import { Section } from "../types/sections";
-import { isBuildMode } from "../lib/buildMode";
+import { renderSections } from "./_components/sections/render";
+import { fetchWebPage } from "@site-core/lib/fetchWebPage";
+import { Section } from "@site-core/types/sections";
+import { isBuildMode } from "@site-core/lib/buildMode";
 import HomePageClient from "./_client/HomePage";
 import HeroSection from "./_components/sections/HeroSection";
 import AboutSection from "./_components/sections/AboutSection";

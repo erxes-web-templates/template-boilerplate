@@ -12,11 +12,11 @@ import {
 import React from "react";
 import Link from "next/link";
 import { useQuery } from "@apollo/client";
-import { TOURS_GROUP_QUERY } from "../../../graphql/queries";
-import { getFileUrl, getMinTourPrice, templateUrl } from "../../../lib/utils";
-import { isBuildMode } from "../../../lib/buildMode";
-import { toHtml } from "../../../lib/html";
-import { Section } from "../../../types/sections";
+import { TOURS_GROUP_QUERY } from "@site-core/graphql/queries";
+import { getFileUrl, getMinTourPrice, templateUrl } from "@site-core/lib/utils";
+import { isBuildMode } from "@site-core/lib/buildMode";
+import { toHtml } from "@site-core/lib/html";
+import { Section } from "@site-core/types/sections";
 import Image from "next/image";
 import dayjs from "dayjs";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { TOURS_GROUP_QUERY } from "../../graphql/queries";
+import { TOURS_GROUP_QUERY } from "@site-core/graphql/queries";
 import { useQuery } from "@apollo/client";
 import Link from "next/link";
 import Image from "next/image";
@@ -16,9 +16,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { getFileUrl, getMinTourPrice, templateUrl } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
-import usePage from "../../lib/usePage";
+import usePage from "../_components/sections/render";
 import { sectionComponents } from "../_components/sections";
-import { BmTour } from "../../types/tours";
+import { BmTour } from "@site-core/types/tours";
 
 type Props = {
   initialData?: any;

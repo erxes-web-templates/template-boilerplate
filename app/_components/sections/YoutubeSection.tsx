@@ -1,5 +1,5 @@
 import React from "react";
-import { Section } from "../../../types/sections";
+import { Section } from "@site-core/types/sections";
 import { MEDIA, SectionHeading, SectionShell } from "./_SectionHeading";
 
 const YoutubeSection = ({ section }: { section: Section }) => {

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Calendar, Tag, Users } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Separator } from "../../../components/ui/separator";
-import { useTourPricing } from "../../../hooks/useTourPricing";
+import { useTourPricing } from "@site-core/hooks/useTourPricing";
 
 export default function BookingSummarySidebarTour({
   currentStep,

@@ -3,9 +3,9 @@ import Script from "next/script";
 import "./globals.css";
 import data from "../data/configs.json";
 import ClientShell from "./_components/ClientShell";
-import { fetchCpConfig } from "../lib/fetchCpConfig";
-import { isBuildMode } from "../lib/buildMode";
-import type { CPDetail } from "../types/cms";
+import { fetchCpConfig } from "@site-core/lib/fetchCpConfig";
+import { isBuildMode } from "@site-core/lib/buildMode";
+import type { CPDetail } from "@site-core/types/cms";
 import { Toaster } from "@/components/ui/sonner";
 
 export async function generateMetadata(): Promise<Metadata> {

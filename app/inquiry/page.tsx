@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import DynamicForm from "../../components/common/DynamicForm";
-import { FORM_SUBMISSION } from "../../graphql/mutations";
+import { FORM_SUBMISSION } from "@site-core/graphql/mutations";
 import { useSearchParams } from "next/navigation";
-import { INQUIRY_FORM, TOUR_GROUP_DETAIL_QUERY } from "../../graphql/queries";
+import { INQUIRY_FORM, TOUR_GROUP_DETAIL_QUERY } from "@site-core/graphql/queries";
 
 export default function InquiryPage() {
   const [submitted, setSubmitted] = useState(false);

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { isBuildMode } from "../../../lib/buildMode";
+import { isBuildMode } from "@site-core/lib/buildMode";
 import TourDetailPageClient from "../../_client/TourDetailPage";
-import { fetchBmTourDetail } from "../../../lib/fetchTours";
+import { fetchBmTourDetail } from "@site-core/lib/fetchTours";
 
 type PageProps = {
   params: Promise<{ id: string }>;

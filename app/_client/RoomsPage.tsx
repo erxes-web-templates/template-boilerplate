@@ -3,10 +3,10 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRoomsQuery, useTagsQuery, type RoomSummary } from "../../graphql/pms/rooms";
-import { templateUrl, getFileUrl } from "../../lib/utils";
+import { useRoomsQuery, useTagsQuery, type RoomSummary } from "@site-core/graphql/pms/rooms";
+import { templateUrl, getFileUrl } from "@site-core/lib/utils";
 import { useSearchParams } from "next/navigation";
-import usePage from "../../lib/usePage";
+import usePage from "../_components/sections/render";
 import { sectionComponents } from "../_components/sections";
 import { Button } from "../../components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";

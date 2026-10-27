@@ -3,13 +3,13 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Tag, X } from "lucide-react";
-import { getMinTourPrice, templateUrl } from "../../../lib/utils";
+import { getMinTourPrice, templateUrl } from "@site-core/lib/utils";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { useQuery, useMutation } from "@apollo/client";
-import authQueries from "../../../graphql/auth/queries";
-import authMutations from "../../../graphql/auth/mutations";
+import authQueries from "@site-core/graphql/auth/queries";
+import authMutations from "@site-core/graphql/auth/mutations";
 import { toast } from "sonner";
 
 type TourItem = {

@@ -1,7 +1,7 @@
 import pageData from "../../data/pages/privacy.json";
-import { renderSections } from "../../lib/renderSections";
-import { Section } from "../../types/sections";
-import { isBuildMode } from "../../lib/buildMode";
+import { renderSections } from "../_components/sections/render";
+import { Section } from "@site-core/types/sections";
+import { isBuildMode } from "@site-core/lib/buildMode";
 import PrivacyPageClient from "../_client/PrivacyPage";
 import HeroSection from "../_components/sections/HeroSection";
 import AboutSection from "../_components/sections/AboutSection";

@@ -1,11 +1,11 @@
 "use client";
 
-import { GET_FORM_DETAIL } from "../../../graphql/queries";
-import { Section } from "../../../types/sections";
+import { GET_FORM_DETAIL } from "@site-core/graphql/queries";
+import { Section } from "@site-core/types/sections";
 import React, { useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import DynamicForm from "../../../components/common/DynamicForm";
-import { FORM_SUBMISSION } from "../../../graphql/mutations";
+import { FORM_SUBMISSION } from "@site-core/graphql/mutations";
 
 const FormSection = ({ section }: { section: Section }) => {
   const [submitted, setSubmitted] = useState(false);

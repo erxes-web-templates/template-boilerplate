@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { isBuildMode } from "../../lib/buildMode";
-import { fetchWebPage } from "../../lib/fetchWebPage";
+import { isBuildMode } from "@site-core/lib/buildMode";
+import { fetchWebPage } from "@site-core/lib/fetchWebPage";
 import pageData from "../../data/pages/privacy.json";
 
 export async function generateMetadata(): Promise<Metadata> {

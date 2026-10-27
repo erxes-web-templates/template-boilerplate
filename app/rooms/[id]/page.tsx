@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { isBuildMode } from "../../../lib/buildMode";
-import { getFileUrl } from "../../../lib/utils";
+import { isBuildMode } from "@site-core/lib/buildMode";
+import { getFileUrl } from "@site-core/lib/utils";
 import RoomDetailPageClient from "../../_client/RoomDetailPage";
-import { fetchRoomDetail } from "../../../lib/fetchRooms";
+import { fetchRoomDetail } from "@site-core/lib/fetchRooms";
 
 type PageProps = {
   params: Promise<{ id: string }>;

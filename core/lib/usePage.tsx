@@ -7,13 +7,18 @@ import { useParams } from "next/navigation";
 import React, { Suspense } from "react";
 import CircleLoader from "@/components/common/CircleLoader";
 import EmptyState from "@/components/common/EmptyState";
-import { sectionSurfaceStyle } from "./renderSections";
+import { sectionSurfaceProps, type SectionTheme } from "./renderSections";
 
 type SectionComponents = Record<string, React.ComponentType<{ section: Section }>>;
 
 const EMPTY_SLUGS = ["home", "about", "contact", "confirmation"];
 
-const usePage = (slug: string | null, sectionComponents: SectionComponents = {}) => {
+/** `theme`: the template's section theme (see SectionTheme in renderSections). */
+const usePage = (
+  slug: string | null,
+  sectionComponents: SectionComponents = {},
+  theme?: SectionTheme,
+) => {
   const params = useParams<{ id: string }>();
   const { data: pageData, loading } = useQuery(GET_WEB_PAGE, {
     variables: {
@@ -49,7 +54,7 @@ const usePage = (slug: string | null, sectionComponents: SectionComponents = {})
       <Suspense fallback={<CircleLoader />}>
         {sections.length > 0 &&
           sections.map((section: Section, index: number) => (
-            <div key={index} style={sectionSurfaceStyle(section)}>
+            <div key={index} {...sectionSurfaceProps(section, theme)}>
               {renderSection(section)}
             </div>
           ))}
